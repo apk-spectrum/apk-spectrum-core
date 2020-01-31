@@ -70,6 +70,8 @@ public enum _RFile implements ResFile<String>, ResString<String>
 	ETC_SETTINGS_FILE			(Type.ETC, "settings.txt"),
 	; // ENUM END
 
+	private static String corePath = "core";
+
 	private String value;
 	private Type type;
 	private String os;
@@ -117,7 +119,7 @@ public enum _RFile implements ResFile<String>, ResString<String>
 		if(type == Type.RES_VALUE || type == Type.RES_ROOT) {
 			return getURL().toExternalForm();
 		}
-		return type.getPath() + File.separator + value;
+		return getUTF8Path() + value;
 	}
 
 	@Override
@@ -184,9 +186,21 @@ public enum _RFile implements ResFile<String>, ResString<String>
 		return null;
 	}
 
-	public static String getUTF8Path() {
-		String resourcePath = _RFile.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-		resourcePath = (new File(resourcePath)).getParentFile().getPath();
+	public static void setCorePath(String path) {
+		corePath = path;
+	}
+
+	private String getUTF8Path() {
+		File binary = new File(_RFile.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+		String resourcePath = binary.getParentFile().getPath();
+		switch(type) {
+		case BIN: case SECURITY:
+			if(corePath != null && binary.isDirectory()) {
+				resourcePath += File.separator + corePath;
+			}
+		default:
+			resourcePath += File.separator + type.getValue() + File.separator;
+		}
 
 		try {
 			resourcePath = URLDecoder.decode(resourcePath, "UTF-8");
