@@ -57,8 +57,8 @@ public enum _RFile implements ResFile<String>, ResString<String>
 	RAW_ANDROID_MANIFEST		(Type.RES_ROOT, "AndroidManifest.xml"),
 
 	RAW_VALUES_PATH				(Type.RES_VALUE, ""),
-	RAW_STRINGS_EN				(Type.RES_VALUE, "strings.xml"),
-	RAW_STRINGS_KO				(Type.RES_VALUE, "strings-ko.xml"),
+	RAW_STRINGS_EN				(Type.RES_VALUE, "_strings.xml"),
+	RAW_STRINGS_KO				(Type.RES_VALUE, "_strings-ko.xml"),
 
 	RAW_PUBLIC_XML				(Type.RES_VALUE, "public.xml"),
 	RAW_PERMISSIONS_HISTORY		(Type.RES_VALUE, "PermissionsHistory.xml"),

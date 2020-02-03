@@ -28,7 +28,6 @@ public enum _RStr implements ResString<String>
 	BTN_ADD						("@btn_add"),
 	BTN_DEL						("@btn_del"),
 	BTN_EDIT					("@btn_edit"),
-
 	BTN_RETRY					("@btn_retry"),
 	BTN_APPLY					("@btn_apply"),
 	BTN_REMOVE					("@btn_remove"),
@@ -66,15 +65,6 @@ public enum _RStr implements ResString<String>
 	LABEL_DO_NOT_LOOK_AGAIN		("@label_do_not_look_again"),
 	LABEL_UPDATE_LIST			("@label_update_list"),
 
-	TREE_NODE_PLUGINS_TOP		("@tree_node_plugins_top"),
-	TREE_NODE_PLUGINS_TOP_DESC	("@tree_node_plugins_top_desc"),
-	TREE_NODE_NO_PLUGINS		("@tree_node_no_plugins"),
-	TREE_NODE_NO_PLUGINS_DESC	("@tree_node_no_plugins_desc"),
-	TREE_NODE_NETWORK			("@tree_node_network_setting"),
-	TREE_NODE_CONFIGURATION		("@tree_node_configurations"),
-	TREE_NODE_GLOBAL_SETTING	("@tree_node_global_setting"),
-	TREE_NODE_GLOBAL_SETTING_DESC("@tree_node_global_setting_desc"),
-
 	MSG_CANNOT_WRITE_FILE		("@msg_cannot_write_file"),
 	MSG_WARN_UNSUPPORTED_JVM	("@msg_warn_unsupported_jvm"),
 	MSG_WARN_SSL_IGNORE			("@msg_warn_ssl_ignore"),
@@ -84,6 +74,15 @@ public enum _RStr implements ResString<String>
 	MSG_NO_UPDATE_INFO			("@msg_no_update_informations"),
 
 	QUESTION_SAVE_OVERWRITE		("@question_save_overwrite"),
+
+	TREE_NODE_PLUGINS_TOP		("@tree_node_plugins_top"),
+	TREE_NODE_PLUGINS_TOP_DESC	("@tree_node_plugins_top_desc"),
+	TREE_NODE_NO_PLUGINS		("@tree_node_no_plugins"),
+	TREE_NODE_NO_PLUGINS_DESC	("@tree_node_no_plugins_desc"),
+	TREE_NODE_NETWORK			("@tree_node_network_setting"),
+	TREE_NODE_CONFIGURATION		("@tree_node_configurations"),
+	TREE_NODE_GLOBAL_SETTING	("@tree_node_global_setting"),
+	TREE_NODE_GLOBAL_SETTING_DESC("@tree_node_global_setting_desc"),
 
 	PATTERN_PRINT_X509_CERT		("@pattern_print_x509_cert"),
 	WITH_WEAK					("@with_weak"),
@@ -188,7 +187,7 @@ public enum _RStr implements ResString<String>
 
 		String value_path = _RFile.DATA_PATH.getPath();
 		if(lang != null && !lang.isEmpty()) {
-			String ext_lang_value_path = value_path + "strings-" + lang + ".xml";
+			String ext_lang_value_path = value_path + "_strings-" + lang + ".xml";
 			File extFile = new File(ext_lang_value_path);
 			if(extFile.exists()) {
 				xmlList.add(new XmlPath(extFile));
@@ -223,7 +222,7 @@ public enum _RStr implements ResString<String>
 		File valueDir = new File(value_path);
 		if(valueDir != null && valueDir.isDirectory()) {
 			for(String name: valueDir.list()) {
-				if(name.startsWith("strings-") && name.endsWith(".xml")) {
+				if(name.startsWith("_strings-") && name.endsWith(".xml")) {
 					name = name.substring(8,name.length()-4);
 					if(!languages.contains(name)) {
 						languages.add(name);
@@ -244,7 +243,7 @@ public enum _RStr implements ResString<String>
 			valueDir = new File(resFilePath);
 			if(valueDir != null && valueDir.isDirectory()) {
 				for(String name: valueDir.list()) {
-					if(name.startsWith("strings-") && name.endsWith(".xml")) {
+					if(name.startsWith("_strings-") && name.endsWith(".xml")) {
 						name = name.substring(8,name.length()-4);
 						if(!languages.contains(name)) {
 							languages.add(name);
@@ -257,7 +256,7 @@ public enum _RStr implements ResString<String>
 			if(jarPath != null && jarPath.length == 2) {
 				String[] list = ZipFileUtil.findFiles(jarPath[0].substring(5), ".xml", "^"+jarPath[1].substring(1) + "/.*");
 				for(String name : list) {
-					if(name.startsWith("values/strings-") && name.endsWith(".xml")) {
+					if(name.startsWith("values/_strings-") && name.endsWith(".xml")) {
 						name = name.substring(15,name.length()-4);
 						if(!languages.contains(name)) {
 							languages.add(name);
