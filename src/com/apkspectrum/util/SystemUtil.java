@@ -1,8 +1,11 @@
 package com.apkspectrum.util;
 
+import java.awt.Toolkit;
+import java.awt.event.InputEvent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -488,6 +491,19 @@ public class SystemUtil
 		GeneralVersionChecker jvmVer = GeneralVersionChecker.parseFrom(System.getProperty("java.specification.version"));
 		GeneralVersionChecker minVer = GeneralVersionChecker.parseFrom(minVersion);
 		return jvmVer.compareTo(minVer) >= 0;
+	}
+
+	public static int getMenuShortcutKeyMask() {
+		boolean isJdkA = SystemUtil.checkJvmVersion("10");
+	    try {
+	        final Object toolkit = Toolkit.getDefaultToolkit();
+	        final Method getMenuShortcutKeyMask =
+	        		Toolkit.class.getMethod(isJdkA ? "getMenuShortcutKeyMaskEx" : "getMenuShortcutKeyMask");
+	        return (int) getMenuShortcutKeyMask.invoke(toolkit);
+	    } catch (Exception e) {
+	        Log.w(e.getMessage());
+	    }
+	    return SystemUtil.isMac() ? InputEvent.META_DOWN_MASK : InputEvent.CTRL_DOWN_MASK;
 	}
 
     @SuppressWarnings("unchecked")

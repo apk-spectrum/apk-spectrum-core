@@ -41,11 +41,11 @@ public class AttributiveCellTableModel extends DefaultTableModel {
 	}
 
 	@Override
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked"})
 	public void setDataVector(Vector dataVector, Vector columnIdentifiers) {
 		cellAtt = new DefaultCellAttribute(dataVector.size(),
 				columnIdentifiers.size());
-		super.setDataVector(dataVector, columnIdentifiers);
+		super.setDataVector(new Vector<Vector>(dataVector), columnIdentifiers);
 	}
 
 	@Override

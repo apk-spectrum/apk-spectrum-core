@@ -12,9 +12,9 @@ public class SortedMutableTreeNode extends DefaultMutableTreeNode
 {
 	private static final long serialVersionUID = -3207855054891986462L;
 
-	protected Comparator<? super MutableTreeNode> comparator = new Comparator<MutableTreeNode>() {
+	protected Comparator<? super TreeNode> comparator = new Comparator<TreeNode>() {
 		@Override
-		public int compare(MutableTreeNode o1, MutableTreeNode o2) {
+		public int compare(TreeNode o1, TreeNode o2) {
 			if(o1.isLeaf() != o2.isLeaf()) {
 				return o1.isLeaf() ? 1 : -1;
 			}
@@ -34,15 +34,15 @@ public class SortedMutableTreeNode extends DefaultMutableTreeNode
         super(userObject, allowsChildren);
     }
 
-    public SortedMutableTreeNode(Comparator<? super MutableTreeNode> comparator) {
+    public SortedMutableTreeNode(Comparator<? super TreeNode> comparator) {
     	this(null, comparator);
     }
 
-    public SortedMutableTreeNode(Object userObject, Comparator<? super MutableTreeNode> comparator) {
+    public SortedMutableTreeNode(Object userObject, Comparator<? super TreeNode> comparator) {
     	this(userObject, comparator, true);
     }
 
-    public SortedMutableTreeNode(Object userObject, Comparator<? super MutableTreeNode> comparator, boolean allowsChildren) {
+    public SortedMutableTreeNode(Object userObject, Comparator<? super TreeNode> comparator, boolean allowsChildren) {
         super(userObject, allowsChildren);
         setComparator(comparator);
     }
@@ -77,21 +77,21 @@ public class SortedMutableTreeNode extends DefaultMutableTreeNode
 
 	public void sort() {
 		@SuppressWarnings("unchecked")
-		Vector<MutableTreeNode> c = (Vector<MutableTreeNode>) children;
+		Vector<TreeNode> c = (Vector<TreeNode>)(Vector<?>) children;
 		Collections.sort(c, getComparator());
 	}
 
-	public void sort(Comparator<? super MutableTreeNode> comparator) {
+	public void sort(Comparator<? super TreeNode> comparator) {
 		if(comparator == null) return;
 		setComparator(comparator);
 		sort();
 	}
 
-	public void setComparator(Comparator<? super MutableTreeNode> comparator) {
+	public void setComparator(Comparator<? super TreeNode> comparator) {
 		this.comparator = comparator;
 	}
 
-	public Comparator<? super MutableTreeNode> getComparator() {
+	public Comparator<? super TreeNode> getComparator() {
 		return comparator;
 	}
 }
