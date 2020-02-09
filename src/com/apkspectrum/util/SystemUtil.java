@@ -220,6 +220,58 @@ public class SystemUtil
 		return realPath;
 	}
 
+	public static String[] getRealPaths(String[] paths) {
+		if(paths == null || paths.length == 0) return null;
+
+		ArrayList<String> realPathList = new ArrayList<String>(paths.length);
+		ArrayList<String> shortPathList = new ArrayList<String>(paths.length);
+
+		for(String path: paths) {
+			if(path.contains(File.separator)) {
+				if(path.startsWith("%")) {
+					String env = path.replaceAll("^%(.*)%.*", "$1");
+					if(!env.equals(path)) {
+						path = System.getenv(env) + path.replaceAll("^%.*%(.*)", "$1");
+					}
+				}
+				File file = new File(path);
+				if(!file.exists()) continue;
+				if(!realPathList.contains(file.getAbsolutePath())) {
+					realPathList.add(file.getAbsolutePath());
+				}
+			} else {
+				if(path == null || path.trim().isEmpty()) continue;
+				shortPathList.add(path.trim());
+			}
+		}
+
+		if(!shortPathList.isEmpty()) {
+			String cmd = null;
+			String regular = null;
+			if(isWindows()) {
+				cmd = "where";
+				regular = "^[A-Z]:\\\\.*";
+			} else if(isLinux()) {
+				cmd = "which";
+				regular = "^/.*";
+			}
+
+			shortPathList.add(0, cmd);
+
+			String[] result = ConsolCmd.exec(shortPathList.toArray(new String[shortPathList.size()]), true, null);
+			if(result != null) {
+				for(String r: result) {
+					if(r.matches(regular) && new File(r).exists()
+							&& !realPathList.contains(r)) {
+						realPathList.add(r);
+					}
+				}
+			}
+		}
+
+		return !realPathList.isEmpty() ? realPathList.toArray(new String[realPathList.size()]) : null;
+	}
+
 	public static void createShortCut(String exePath, String shortCutName) {
 		if(isWindows()) {
 			String lnkPath = System.getProperty("user.home") + File.separator + "Desktop" + File.separator + shortCutName + ".lnk";
