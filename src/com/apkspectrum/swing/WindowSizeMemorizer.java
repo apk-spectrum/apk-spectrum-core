@@ -8,8 +8,11 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
+import com.apkspectrum.resource.ResProp;
 import com.apkspectrum.resource._RProp;
 import com.apkspectrum.util.Log;
 
@@ -21,9 +24,42 @@ public class WindowSizeMemorizer implements ComponentListener, WindowListener
 
 	static private ArrayList<WindowSizeMemorizer> components = new ArrayList<WindowSizeMemorizer>();
 
+	private static ResProp<Boolean> propEnabled;
+	private static PropertyChangeListener propListener;
+	private static boolean enabled;
+	static { setEnabled(_RProp.B.SAVE_WINDOW_SIZE); }
+
 	private Component component;
 	private String id;
 	private int flag;
+
+	public static void setEnabled(boolean enabled) {
+		if(propEnabled != null) {
+			propEnabled.set(enabled);
+		} else {
+			WindowSizeMemorizer.enabled = enabled;
+		}
+	}
+
+	public static void setEnabled(ResProp<Boolean> prop) {
+		if(prop == null) return;
+
+		if(propEnabled != null && propListener != null) {
+			propEnabled.removePropertyChangeListener(propListener);
+		}
+		propEnabled = prop;
+		enabled = propEnabled.get();
+
+		if(propListener == null) {
+			propListener = new PropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					enabled = (boolean) evt.getNewValue();
+				}
+			};
+		}
+		propEnabled.addPropertyChangeListener(propListener);
+	}
 
 	static public void registeComponent(Component component) {
 		registeComponent(component, MEMORIZE_TYPE_WINDOWN_CLOSED | MEMORIZE_TYPE_AUTO_UNREGISTE);
@@ -107,7 +143,7 @@ public class WindowSizeMemorizer implements ComponentListener, WindowListener
 	}
 
 	static public Dimension getCompoentSize(Component component, String id, Dimension defaultSize) {
-		if(component == null || !_RProp.B.SAVE_WINDOW_SIZE.get()) return defaultSize;
+		if(component == null || !enabled) return defaultSize;
 		int width = defaultSize != null ? (int)defaultSize.getWidth() : -1;
 		int height = defaultSize != null ? (int)defaultSize.getHeight() : -1;
 		String key = "ws_"+ component.getClass().getName() + (id != null ? "#" + id : "");
@@ -189,7 +225,7 @@ public class WindowSizeMemorizer implements ComponentListener, WindowListener
 
 	private void saveComponentSize() {
 		Log.v("saveComponentSize() component:" + component.getClass().getName() + ", id:" + id + ", flag:" + flag + " / size:"+component.getSize().toString());
-		if(_RProp.B.SAVE_WINDOW_SIZE.get()) {
+		if(enabled) {
 			String key = "ws_"+ component.getClass().getName() + (id != null ? "#" + id : "");
 			int state = Frame.NORMAL;
 			if(component instanceof Frame) {
