@@ -266,17 +266,32 @@ public class FileUtil
         return buf.toString();
     }
 
-	public static String getMessageDigest(File file, String algorithm) {
-		if(file.canRead()) {
-			try {
-				MessageDigest messageDigest = MessageDigest.getInstance(algorithm);
-				messageDigest.update(Files.readAllBytes(file.toPath()));
-				byte[] hash = messageDigest.digest();
-				return toHexString(hash);
-			} catch (IOException | NoSuchAlgorithmException e) {
-				e.printStackTrace();
+	public static String getMessageDigest(final File file, final String algorithm) {
+		final StringBuilder ret = new StringBuilder();
+		Thread t = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				if(file.canRead()) {
+					try {
+						MessageDigest messageDigest = MessageDigest.getInstance(algorithm);
+						messageDigest.update(Files.readAllBytes(file.toPath()));
+						byte[] hash = messageDigest.digest();
+						ret.append(toHexString(hash));
+					} catch (IOException | NoSuchAlgorithmException e) {
+						e.printStackTrace();
+					}
+				}
+				
 			}
+		});
+		t.setPriority(Thread.NORM_PRIORITY);
+		t.start();
+		try {
+			t.join();
+		} catch (InterruptedException e) { }
+		if(ret.length() == 0) {
+			ret.append("Unable to calculate checksum by " + algorithm);
 		}
-		return null;
+		return ret.toString();
 	}
 }
