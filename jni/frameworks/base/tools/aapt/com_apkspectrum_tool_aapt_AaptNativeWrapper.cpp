@@ -11,8 +11,6 @@
 
 extern int main(int argc, char* const argv[]);
 
-extern jstring gEncodingCharaset;
-
 JNIEXPORT jobjectArray JNICALL Java_com_apkspectrum_tool_aapt_AaptNativeWrapper_run
   (JNIEnv *env, jclass /*thiz*/, jobjectArray params)
 {
@@ -27,7 +25,7 @@ JNIEXPORT jobjectArray JNICALL Java_com_apkspectrum_tool_aapt_AaptNativeWrapper_
 	char* buf[paramCnt+1];
 	buf[0] = prog;
 
-    jstring encoding = gEncodingCharaset;
+    jstring encoding = getStickyEncodingCharacterSet(env);
     jclass java_lang_String = NULL;
     jmethodID java_lang_String_getBytes = NULL;
 
@@ -54,7 +52,7 @@ JNIEXPORT jobjectArray JNICALL Java_com_apkspectrum_tool_aapt_AaptNativeWrapper_
         }
 
         if(encoding != NULL) {
-            jbyteArray bytes = static_cast<jbyteArray>(env->CallObjectMethod(param, java_lang_String_getBytes, gEncodingCharaset));
+            jbyteArray bytes = static_cast<jbyteArray>(env->CallObjectMethod(param, java_lang_String_getBytes, encoding));
             // check UnsupportedEncodingException
             if(env->ExceptionCheck()) {
                 fprintf(stderr, "UnsupportedEncodingException occurred\n");
@@ -105,7 +103,7 @@ JNIEXPORT jobjectArray JNICALL Java_com_apkspectrum_tool_aapt_AaptNativeWrapper_
 
 //static JNINativeMethod sMethod[] = {
     /* name, signature, funcPtr */
-//    {"Java_com_apkspectrum_tool_aapt_AaptNativeWrapper_run", "([Ljava/lang/String;)[Ljava/lang/String;", (jobjectArray*)Java_com_apkspectrum_tool_aapt_AaptNativeWrapper_run}
+//    {"run", "([Ljava/lang/String;)[Ljava/lang/String;", (jobjectArray*)Java_com_apkspectrum_tool_aapt_AaptNativeWrapper_run}
 //};
 
 /*
@@ -124,6 +122,13 @@ int jniRegisterNativMethod(JNIEnv* env, const char* className, const JNINativeMe
 }
 */
 
+/*
+ For the Oracle JRE8u261 32bit.
+ It waw ocurred fatal error at after called to the JNI_OnLoad.
+ It even occurs when there is no body.
+ I do not know the cause. So, I do block the called for the 32 bits.
+*/
+#if !defined(_WIN32) || defined(_WIN64)
 jint JNI_OnLoad(JavaVM* jvm, void* /*reserved*/) {
     JNIEnv* env = NULL;
     jint result = -1;
@@ -131,18 +136,14 @@ jint JNI_OnLoad(JavaVM* jvm, void* /*reserved*/) {
     if(jvm->GetEnv((void**) &env, JNI_VERSION_1_6) != JNI_OK){
         return result;
     }
-    
-    jstring encodingCharaset = getEncodingCharacterSet(env);
-    if(encodingCharaset != NULL) {
-        gEncodingCharaset = static_cast<jstring>(env->NewGlobalRef(encodingCharaset));
-        env->DeleteLocalRef(encodingCharaset);
-    }
-    fflush(stderr);
+
+    getStickyEncodingCharacterSet(env);
  
-    //jniRegisterNativMethod(env, "com/example/jniedu/day2/ByteJniTestActivity", sMethod, NELEM(sMethod));
+    //jniRegisterNativMethod(env, "com/apkspectrum/tool/aapt/AaptNativeWrapper", sMethod, NELEM(sMethod));
  
     return JNI_VERSION_1_6;
 }
+#endif
 
 void JNI_OnUnload(JavaVM *jvm, void* /*reserved*/)
 {
@@ -151,10 +152,8 @@ void JNI_OnUnload(JavaVM *jvm, void* /*reserved*/)
     if (jvm->GetEnv((void **)&env, JNI_VERSION_1_6)) {
         return; 
     }
-    
-    if(gEncodingCharaset != NULL) {
-        env->DeleteWeakGlobalRef(gEncodingCharaset);
-    }
+
+    releaseStickyEncodingCharacterSet(env);
 
     return; 
 }

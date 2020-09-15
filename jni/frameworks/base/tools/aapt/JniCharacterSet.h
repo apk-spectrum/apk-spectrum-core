@@ -19,6 +19,10 @@ jstring getPosibleCharacterSet(JNIEnv *env, const char *nativ_char_set);
 
 jstring getEncodingCharacterSet(JNIEnv *env);
 
+jstring getStickyEncodingCharacterSet(JNIEnv *env);
+
+void releaseStickyEncodingCharacterSet(JNIEnv *env);
+
 char* jstring2cstr( JNIEnv *env, jstring jstr);
 
 #endif // __JNI_CHARACTER_SET_H

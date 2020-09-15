@@ -2338,10 +2338,19 @@ int testMemStream(void)
   return 0;
 }
 */
-//static JNINativeMethod sMethod[] = {
-    /* name, signature, funcPtr */
-//    {"com_apkspectrum_core_scanner_AaptNativeScanner_run", "([Ljava/lang/String;)[Ljava/lang/String;", (jobjectArray*)com_apkspectrum_core_scanner_AaptNativeScanner_run}
-//};
+
+// static JNINativeMethod sMethod[] = {
+//     /* name, signature, funcPtr */
+//     {"nativeCreateAssetManager", "()J", (jobjectArray*)Java_com_apkspectrum_core_scanner_AaptNativeScanner_nativeCreateAssetManager},
+//     {"nativeRealeaseAssetManager", "(J)V", (jobjectArray*)Java_com_apkspectrum_core_scanner_AaptNativeScanner_nativeRealeaseAssetManager},
+//     {"nativeGetPackageId", "(Ljava/lang/String;)I", (jobjectArray*)Java_com_apkspectrum_core_scanner_AaptNativeScanner_nativeGetPackageId},
+//     {"nativeAddPackage", "(JLjava/lang/String;)Z", (jobjectArray*)Java_com_apkspectrum_core_scanner_AaptNativeScanner_nativeAddPackage},
+//     {"nativeAddResPackage", "(JLjava/lang/String;)Z", (jobjectArray*)Java_com_apkspectrum_core_scanner_AaptNativeScanner_nativeAddResPackage},
+//     {"nativeGetResourceName", "(JI)Ljava/lang/String;", (jobjectArray*)Java_com_apkspectrum_core_scanner_AaptNativeScanner_nativeGetResourceName},
+//     {"nativeGetResourceType", "(JI)Ljava/lang/String;", (jobjectArray*)Java_com_apkspectrum_core_scanner_AaptNativeScanner_nativeGetResourceType},
+//     {"nativeGetResourceValues", "(JI)[Lcom/apkspectrum/data/apkinfo/ResourceInfo;", (jobjectArray*)Java_com_apkspectrum_core_scanner_AaptNativeScanner_nativeGetResourceValues},
+//     {"nativeGetResourceString", "(JILjava/lang/String;)Lcom/apkspectrum/data/apkinfo/ResourceInfo;", (jobjectArray*)Java_com_apkspectrum_core_scanner_AaptNativeScanner_nativeGetResourceString}
+// };
 
 /*
 int jniRegisterNativMethod(JNIEnv* env, const char* className, const JNINativeMethod* gMethods, int numMethods ) {

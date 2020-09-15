@@ -324,9 +324,27 @@ jstring getEncodingCharacterSet(JNIEnv *env) {
     return encodingSet;
 }
 
+jstring getStickyEncodingCharacterSet(JNIEnv *env) {
+    if(gEncodingCharaset == NULL) {
+        jstring encodingCharaset = getEncodingCharacterSet(env);
+        if(encodingCharaset != NULL) {
+            gEncodingCharaset = static_cast<jstring>(env->NewGlobalRef(encodingCharaset));
+            env->DeleteLocalRef(encodingCharaset);
+        }
+    }
+    return gEncodingCharaset;
+}
+
+void releaseStickyEncodingCharacterSet(JNIEnv *env) {
+    if(env != NULL && gEncodingCharaset != NULL) {
+        env->DeleteWeakGlobalRef(gEncodingCharaset);
+        gEncodingCharaset = NULL;
+    }
+}
+
 char* jstring2cstr( JNIEnv *env, jstring jstr)
 {
-    jstring encoding = gEncodingCharaset;
+    jstring encoding = getStickyEncodingCharacterSet(env);
     jclass java_lang_String = NULL;
     jmethodID java_lang_String_getBytes = NULL;
 
