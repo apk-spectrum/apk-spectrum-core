@@ -72,6 +72,8 @@ public class SystemUtil
 			return "explorer";
 		} else if(isLinux()) {
 			return "nautilus";
+		} else if(isMac()) {
+			return "open";
 		}
 		throw new Exception("Unknown OS : " + OS);
 	}
@@ -81,6 +83,8 @@ public class SystemUtil
 			return "explorer";
 		} else if(isLinux()) {
 			return "xdg-open";
+		} else if(isMac()) {
+			return "open";
 		}
 		throw new Exception("Unknown OS : " + OS);
 	}
@@ -106,6 +110,8 @@ public class SystemUtil
 			return editorPath != null ? editorPath : "notepad";
 		} else if(isLinux()) {
 			return "gedit";
+		} else if(isMac()) {
+			return "open";
 		}
 		throw new Exception("Unknown OS : " + OS);
 	}
@@ -122,7 +128,11 @@ public class SystemUtil
 
 		try {
 			String editor = _RProp.S.EDITOR.get();
-			exec(new String[] { editor, file.getAbsolutePath() });
+			if(isMac() && getDefaultEditor().contentEquals(editor)) {
+				exec(new String[] { editor, "-t", file.getAbsolutePath() });
+			} else {
+				exec(new String[] { editor, file.getAbsolutePath() });
+			}
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
@@ -141,7 +151,11 @@ public class SystemUtil
 		String openPath = String.format((isWindows() && file.isFile())? "/select,\"%s\"" : "%s", file.getAbsolutePath());
 
 		try {
-			exec(new String[] {getFileExplorer(), openPath});
+			if(isMac()) {
+				exec(new String[] {getFileExplorer(), "-R", openPath});
+			} else {
+				exec(new String[] {getFileExplorer(), openPath});
+			}
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
@@ -154,6 +168,11 @@ public class SystemUtil
 	public static void openArchiveExplorer(File file) {
 		if(file == null || !file.exists()) {
 			Log.d("No such file or directory");
+			return;
+		}
+
+		if(isMac()) {
+			openFileExplorer(file);
 			return;
 		}
 
@@ -202,7 +221,7 @@ public class SystemUtil
 			if(isWindows()) {
 				cmd = "where";
 				regular = "^[A-Z]:\\\\.*";
-			} else if(isLinux()) {
+			} else if(isLinux() || isMac()) {
 				cmd = "which";
 				regular = "^/.*";
 			}
@@ -251,7 +270,7 @@ public class SystemUtil
 			if(isWindows()) {
 				cmd = "where";
 				regular = "^[A-Z]:\\\\.*";
-			} else if(isLinux()) {
+			} else if(isLinux() || isMac()) {
 				cmd = "which";
 				regular = "^/.*";
 			}
@@ -280,8 +299,6 @@ public class SystemUtil
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-		} else if(isLinux()) {
-
 		}
 	}
 
