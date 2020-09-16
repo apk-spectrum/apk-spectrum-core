@@ -26,7 +26,7 @@ public enum _RFile implements ResFile<String>, ResString<String>
 	BIN_AAPT_WIN				(Type.BIN, "windows\\aapt.exe", "win"),
 	BIN_AAPT					(Type.BIN, new _RFile[]{ BIN_AAPT_WIN, BIN_AAPT_LNX, BIN_AAPT_MAC }),
 
-	BIN_JDGUI					(Type.BIN, "jd-gui-1.6.2.jar"),
+	BIN_JDGUI					(Type.BIN, "jd-gui-1.6.6.jar"),
 
 	BIN_DEX2JAR_LNX				(Type.BIN, "dex2jar/d2j-dex2jar.sh", "nux"),
 	BIN_DEX2JAR_MAC				(Type.BIN, "dex2jar/d2j-dex2jar.sh", "mac"),
