@@ -708,23 +708,38 @@
   <public type="dimen" name="thumbnail_height" id="0x01050001" />
   <public type="dimen" name="thumbnail_width" id="0x01050002" />
 
+  <!-- Equivalent to 0xffaaaaaa -->
   <public type="color" name="darker_gray" id="0x01060000" />
+  <!-- {@deprecated Use a text color from your theme instead.} -->
   <public type="color" name="primary_text_dark" id="0x01060001" />
+  <!-- {@deprecated Use a text color from your theme instead.} -->
   <public type="color" name="primary_text_dark_nodisable" id="0x01060002" />
+  <!-- {@deprecated Use a text color from your theme instead.} -->
   <public type="color" name="primary_text_light" id="0x01060003" />
+  <!-- {@deprecated Use a text color from your theme instead.} -->
   <public type="color" name="primary_text_light_nodisable" id="0x01060004" />
+  <!-- {@deprecated Use a text color from your theme instead.} -->
   <public type="color" name="secondary_text_dark" id="0x01060005" />
+  <!-- {@deprecated Use a text color from your theme instead.} -->
   <public type="color" name="secondary_text_dark_nodisable" id="0x01060006" />
+  <!-- {@deprecated Use a text color from your theme instead.} -->
   <public type="color" name="secondary_text_light" id="0x01060007" />
+  <!-- {@deprecated Use a text color from your theme instead.} -->
   <public type="color" name="secondary_text_light_nodisable" id="0x01060008" />
+  <!-- Equivalent to 0xff808080 -->
   <public type="color" name="tab_indicator_text" id="0x01060009" />
+  <!-- Equivalent to 0xff000000 -->
   <public type="color" name="widget_edittext_dark" id="0x0106000a" />
   <public type="color" name="white" id="0x0106000b" />
   <public type="color" name="black" id="0x0106000c" />
   <public type="color" name="transparent" id="0x0106000d" />
+  <!-- Equivalent to 0xff000000 -->
   <public type="color" name="background_dark" id="0x0106000e" />
+  <!-- Equivalent to 0xffffffff -->
   <public type="color" name="background_light" id="0x0106000f" />
+  <!-- {@deprecated Use a text color from your theme instead.} -->
   <public type="color" name="tertiary_text_dark" id="0x01060010" />
+  <!-- {@deprecated Use a text color from your theme instead.} -->
   <public type="color" name="tertiary_text_light" id="0x01060011" />
 
   <public type="array" name="emailAddressTypes" id="0x01070000" />
@@ -1052,7 +1067,8 @@
   <public type="id" name="inputExtractEditText" id="0x01020025" />
 
   <!-- View ID of the {@link android.inputmethodservice.KeyboardView} within
-        an input method's input area. -->
+       an input method's input area.
+       {@deprecated Use Copy this definition into your own application project.} -->
   <public type="id" name="keyboardView" id="0x01020026" />
   <!-- View ID of a {@link android.view.View} to close a popup keyboard -->
   <public type="id" name="closeButton" id="0x01020027" />
@@ -1067,6 +1083,7 @@
   <public type="style" name="Theme.InputMethod" id="0x01030054" />
   <public type="style" name="Theme.NoDisplay" id="0x01030055" />
   <public type="style" name="Animation.InputMethod" id="0x01030056" />
+  <!-- {@deprecated Use Copy this definition into your own application project.} -->
   <public type="style" name="Widget.KeyboardView" id="0x01030057" />
   <public type="style" name="ButtonBar" id="0x01030058" />
   <public type="style" name="Theme.Panel" id="0x01030059" />
@@ -2082,7 +2099,7 @@
   <public type="attr" name="accessibilityLiveRegion" id="0x010103ee" />
   <public type="attr" name="windowTranslucentStatus" id="0x010103ef" />
   <public type="attr" name="windowTranslucentNavigation" id="0x010103f0" />
-  <public type="attr" name="advancedPrintOptionsActivity" id="0x010103f1"/>
+  <public type="attr" name="advancedPrintOptionsActivity" id="0x10103f1"/>
 
   <public type="style" name="Theme.Holo.NoActionBar.TranslucentDecor" id="0x010301e1" />
   <public type="style" name="Theme.Holo.Light.NoActionBar.TranslucentDecor" id="0x010301e2" />
@@ -2094,11 +2111,11 @@
      =============================================================== -->
   <eat-comment />
 
-  <public type="attr" name="banner" id="0x010103f2" />
-  <public type="attr" name="windowSwipeToDismiss" id="0x010103f3" />
-  <public type="attr" name="isGame" id="0x010103f4" />
-  <public type="attr" name="allowEmbedded" id="0x010103f5" />
-  <public type="attr" name="setupActivity" id="0x010103f6"/>
+  <public type="attr" name="banner" id="0x10103f2" />
+  <public type="attr" name="windowSwipeToDismiss" id="0x10103f3" />
+  <public type="attr" name="isGame" id="0x10103f4" />
+  <public type="attr" name="allowEmbedded" id="0x10103f5" />
+  <public type="attr" name="setupActivity" id="0x10103f6"/>
 
 <!-- ===============================================================
      Resources added in version 21 of the platform
@@ -2745,18 +2762,6 @@
 
   <!-- ===============================================================
        Resources added in version O of the platform
-
-       NOTE: add <public> elements within a <public-group> like so:
-
-       <public-group type="attr" first-id="0x01010531">
-           <public name="exampleAttr1" />
-           <public name="exampleAttr2" />
-       </public-group>
-
-       To add a new public-group block, choose an id value that is 1 greater
-       than the last of that item above. For example, the last "attr" id
-       value above is 0x01010530, so the public-group of attrs below has
-       the id value of 0x01010531.
        =============================================================== -->
     <eat-comment />
 
@@ -2825,17 +2830,247 @@
 
     <public type="string" name="paste_as_plain_text" id="0x01040019" />
 
-    <public-group type="attr" first-id="0x01010569">
-    </public-group>
+  <!-- ===============================================================
+       Resources added in version O MR1 of the platform
+       =============================================================== -->
+    <eat-comment />
 
-    <public-group type="style" first-id="0x010302e0">
-    </public-group>
+    <public type="attr" name="showWhenLocked" id="0x01010569" />
+    <public type="attr" name="turnScreenOn" id="0x0101056a" />
+    <public type="attr" name="classLoader" id="0x0101056b" />
+    <public type="attr" name="windowLightNavigationBar" id="0x0101056c" />
+    <public type="attr" name="navigationBarDividerColor" id="0x0101056d" />
 
-    <public-group type="id" first-id="0x01020044">
-    </public-group>
+    <public type="string" name="autofill" id="0x0104001a"/>
 
-    <public-group type="string" first-id="0x0104001a">
-    </public-group>
+  <!-- ===============================================================
+       Resources added in version P of the platform
+       =============================================================== -->
+    <eat-comment />
+
+    <public type="attr" name="cantSaveState" id="0x0101056e" />
+    <public type="attr" name="ttcIndex" id="0x0101056f" />
+    <public type="attr" name="fontVariationSettings" id="0x01010570" />
+    <public type="attr" name="dialogCornerRadius" id="0x01010571" />
+    <!-- @hide For use by platform and tools only. Developers should not specify this value. -->
+    <public type="attr" name="compileSdkVersion" id="0x01010572" />
+    <!-- @hide For use by platform and tools only. Developers should not specify this value. -->
+    <public type="attr" name="compileSdkVersionCodename" id="0x01010573" />
+    <public type="attr" name="screenReaderFocusable" id="0x01010574" />
+    <public type="attr" name="buttonCornerRadius" id="0x01010575" />
+    <public type="attr" name="versionCodeMajor" id="0x01010576" />
+    <public type="attr" name="versionMajor" id="0x01010577" />
+    <!-- @hide @SystemApi -->
+    <public type="attr" name="isVrOnly" id="0x01010578" />
+    <public type="attr" name="widgetFeatures" id="0x01010579" />
+    <public type="attr" name="appComponentFactory" id="0x0101057a" />
+    <public type="attr" name="fallbackLineSpacing" id="0x0101057b" />
+    <public type="attr" name="accessibilityPaneTitle" id="0x0101057c" />
+    <public type="attr" name="firstBaselineToTopHeight" id="0x0101057d" />
+    <public type="attr" name="lastBaselineToBottomHeight" id="0x0101057e" />
+    <public type="attr" name="lineHeight" id="0x0101057f" />
+    <public type="attr" name="accessibilityHeading" id="0x01010580" />
+    <public type="attr" name="outlineSpotShadowColor" id="0x01010581" />
+    <public type="attr" name="outlineAmbientShadowColor" id="0x01010582" />
+    <public type="attr" name="maxLongVersionCode" id="0x01010583" />
+    <!-- @hide @SystemApi -->
+    <public type="attr" name="userRestriction" id="0x01010584" />
+    <public type="attr" name="textFontWeight" id="0x01010585" />
+    <public type="attr" name="windowLayoutInDisplayCutoutMode" id="0x01010586" />
+
+    <public type="style" name="Widget.DeviceDefault.Button.Colored" id="0x010302e0" />
+    <public type="style" name="Widget.DeviceDefault.Button.Borderless.Colored" id="0x010302e1" />
+
+    <public type="id" name="accessibilityActionShowTooltip" id="0x01020044" />
+    <public type="id" name="accessibilityActionHideTooltip" id="0x01020045" />
+
+    <!-- An interpolator which accelerates fast but decelerates extra slowly. -->
+    <public type="interpolator" name="fast_out_extra_slow_in" id="0x10c001a"/>
+
+  <!-- ===============================================================
+       Resources added in version Q of the platform
+       =============================================================== -->
+    <eat-comment />
+
+    <public type="attr" name="packageType" id="0x01010587" />
+    <public type="attr" name="opticalInsetLeft" id="0x01010588" />
+    <public type="attr" name="opticalInsetTop" id="0x01010589" />
+    <public type="attr" name="opticalInsetRight" id="0x0101058a" />
+    <public type="attr" name="opticalInsetBottom" id="0x0101058b" />
+    <public type="attr" name="forceDarkAllowed" id="0x0101058c" />
+    <!-- @hide @SystemApi -->
+    <public type="attr" name="supportsAmbientMode" id="0x0101058d" />
+    <!-- @hide For use by platform and tools only. Developers should not specify this value. -->
+    <public type="attr" name="usesNonSdkApi" id="0x0101058e" />
+    <public type="attr" name="nonInteractiveUiTimeout" id="0x0101058f" />
+    <public type="attr" name="isLightTheme" id="0x01010590" />
+    <public type="attr" name="isSplitRequired" id="0x01010591" />
+    <public type="attr" name="textLocale" id="0x01010592" />
+    <public type="attr" name="settingsSliceUri" id="0x01010593" />
+    <public type="attr" name="shell" id="0x01010594" />
+    <public type="attr" name="interactiveUiTimeout" id="0x01010595" />
+    <public type="attr" name="supportsMultipleDisplays" id="0x01010596" />
+    <public type="attr" name="useAppZygote" id="0x01010597" />
+    <public type="attr" name="selectionDividerHeight" id="0x01010598" />
+    <public type="attr" name="foregroundServiceType" id="0x01010599" />
+    <public type="attr" name="hasFragileUserData" id="0x0101059a" />
+    <public type="attr" name="minAspectRatio" id="0x0101059b" />
+    <public type="attr" name="inheritShowWhenLocked" id="0x0101059c" />
+    <public type="attr" name="zygotePreloadName" id="0x0101059d" />
+    <public type="attr" name="useEmbeddedDex" id="0x0101059e" />
+    <public type="attr" name="forceUriPermissions" id="0x0101059f" />
+    <!-- @hide @SystemApi -->
+    <public type="attr" name="allowClearUserDataOnFailedRestore" id="0x01010600" />
+    <public type="attr" name="allowAudioPlaybackCapture" id="0x01010601" />
+    <public type="attr" name="secureElementName" id="0x01010602" />
+    <public type="attr" name="requestLegacyExternalStorage" id="0x01010603" />
+    <public type="attr" name="enforceStatusBarContrast" id="0x01010604" />
+    <public type="attr" name="enforceNavigationBarContrast" id="0x01010605" />
+    <public type="attr" name="identifier" id="0x01010606" />
+
+    <!-- @hide @SystemApi -->
+    <public type="drawable" name="ic_info" id="0x010800b4" />
+
+    <!-- @hide @SystemApi -->
+    <public type="style" name="Theme.DeviceDefault.DocumentsUI" id="0x010302e2" />
+    <public type="style" name="Theme.DeviceDefault.DayNight" id="0x010302e3" />
+    <public type="style" name="ThemeOverlay.DeviceDefault.Accent.DayNight" id="0x010302e4" />
+
+    <public type="id" name="accessibilityActionPageUp" id="0x01020046" />
+    <public type="id" name="accessibilityActionPageDown" id="0x01020047" />
+    <public type="id" name="accessibilityActionPageLeft" id="0x01020048" />
+    <public type="id" name="accessibilityActionPageRight" id="0x01020049" />
+
+    <!-- @hide @SystemApi -->
+    <public type="string" name="config_helpPackageNameKey" id="0x0104001b" />
+    <!-- @hide @SystemApi -->
+    <public type="string" name="config_helpPackageNameValue" id="0x0104001c" />
+    <!-- @hide @SystemApi -->
+    <public type="string" name="config_helpIntentExtraKey" id="0x0104001d" />
+    <!-- @hide @SystemApi -->
+    <public type="string" name="config_helpIntentNameKey" id="0x0104001e" />
+    <!-- @hide @SystemApi -->
+    <public type="string" name="config_feedbackIntentExtraKey" id="0x0104001f" />
+    <!-- @hide @SystemApi -->
+    <public type="string" name="config_feedbackIntentNameKey" id="0x01040020" />
+    <!-- @hide @SystemApi @TestApi -->
+    <public type="string" name="config_defaultAssistant" id="0x01040021" />
+    <!-- @hide @SystemApi -->
+    <public type="string" name="config_defaultBrowser" id="0x01040022" />
+    <!-- @hide @SystemApi @TestApi -->
+    <public type="string" name="config_defaultDialer" id="0x01040023" />
+    <!-- @hide @SystemApi -->
+    <public type="string" name="config_defaultSms" id="0x01040024" />
+
+    <!-- @hide @SystemApi -->
+    <public type="bool" name="config_sendPackageName" id="0x01110000" />
+    <!-- @hide @SystemApi -->
+    <public type="bool" name="config_showDefaultAssistant" id="0x01110001" />
+    <!-- @hide @SystemApi -->
+    <public type="bool" name="config_showDefaultEmergency" id="0x01110002" />
+    <!-- @hide @SystemApi -->
+    <public type="bool" name="config_showDefaultHome" id="0x01110003" />
+    <!-- @hide @TestApi -->
+    <public type="bool" name="config_perDisplayFocusEnabled" id="0x01110004" />
+
+    <!-- @hide @SystemApi -->
+    <public type="dimen" name="config_restrictedIconSize" id="0x01050007" />
+
+    <!-- @hide @SystemApi -->
+    <public type="color" name="system_notification_accent_color" id="0x0106001c" />
+
+    <!-- ===============================================================
+     Resources added in version R of the platform
+     =============================================================== -->
+    <eat-comment />
+
+    <public type="attr" name="importantForContentCapture" id="0x01010607" />
+    <public type="attr" name="forceQueryable" id="0x01010608"/>
+    <public type="attr" name="resourcesMap" id="0x01010609"/>
+    <public type="attr" name="animatedImageDrawable" id="0x0101060a"/>
+    <public type="attr" name="htmlDescription" id="0x0101060b"/>
+    <public type="attr" name="preferMinimalPostProcessing" id="0x0101060c"/>
+    <public type="attr" name="supportsInlineSuggestions" id="0x0101060d"/>
+    <public type="attr" name="crossProfile" id="0x0101060e"/>
+    <public type="attr" name="canTakeScreenshot" id="0x0101060f"/>
+    <!-- @hide @SystemApi -->
+    <public type="attr" name="sdkVersion" id="0x01010610" />
+    <!-- @hide @SystemApi -->
+    <public type="attr" name="minExtensionVersion" id="0x01010611" />
+    <public type="attr" name="allowNativeHeapPointerTagging" id="0x01010612" />
+    <public type="attr" name="autoRevokePermissions" id="0x01010613" />
+    <public type="attr" name="preserveLegacyExternalStorage" id="0x01010614" />
+    <public type="attr" name="mimeGroup" id="0x01010615" />
+    <public type="attr" name="gwpAsanMode" id="0x01010616" />
+
+    <!-- @hide @SystemApi -->
+    <public type="string" name="config_defaultCallRedirection" id="0x01040025" />
+    <!-- @hide @SystemApi -->
+    <public type="string" name="config_defaultCallScreening" id="0x01040026" />
+    <!-- @hide @SystemApi @TestApi -->
+    <public type="string" name="config_systemGallery" id="0x01040027" />
+
+    <public type="id" name="accessibilityActionPressAndHold" id="0x0102004a" />
+    <public type="id" name="accessibilitySystemActionBack" id="0x0102004b" />
+    <public type="id" name="accessibilitySystemActionHome" id="0x0102004c" />
+    <public type="id" name="accessibilitySystemActionRecents" id="0x0102004d" />
+    <public type="id" name="accessibilitySystemActionNotifications" id="0x0102004e" />
+    <public type="id" name="accessibilitySystemActionQuickSettings" id="0x0102004f" />
+    <public type="id" name="accessibilitySystemActionPowerDialog" id="0x01020050" />
+    <public type="id" name="accessibilitySystemActionToggleSplitScreen" id="0x01020051" />
+    <public type="id" name="accessibilitySystemActionLockScreen" id="0x01020052" />
+    <public type="id" name="accessibilitySystemActionTakeScreenshot" id="0x01020053" />
+    <public type="id" name="accessibilityActionImeEnter" id="0x01020054" />
+
+    <!-- @hide @TestApi -->
+    <public type="bool" name="config_assistantOnTopOfDream" id="0x01110005" />
+  <!-- ===============================================================
+       Resources added in version S of the platform
+
+       NOTE: add <public> elements within a <public-group> like so:
+
+       <public-group type="attr" first-id="0x01010531">
+           <public name="exampleAttr1" />
+           <public name="exampleAttr2" />
+       </public-group>
+
+       To add a new public-group block, choose an id value that is 1 greater
+       than the last of that item above. For example, the last "attr" id
+       value above is 0x01010530, so the public-group of attrs below has
+       the id value of 0x01010531.
+       =============================================================== -->
+
+  <public-group type="attr" first-id="0x01010617">
+    <!-- attribute definitions go here -->
+  </public-group>
+
+  <public-group type="drawable" first-id="0x010800b5">
+    <!-- drawable definitions go here -->
+  </public-group>
+
+  <public-group type="color" first-id="0x0106001d">
+    <!-- color definitions go here -->
+  </public-group>
+
+  <public-group type="dimen" first-id="0x01050008">
+    <!-- dimension definitions go here -->
+  </public-group>
+
+  <public-group type="bool" first-id="0x01110006">
+    <!-- boolean definitions go here -->
+  </public-group>
+
+  <public-group type="style" first-id="0x010302e5">
+    <!-- style definitions go here -->
+  </public-group>
+
+  <public-group type="string" first-id="0x01040028">
+    <!-- string definitions go here -->
+  </public-group>
+
+  <public-group type="id" first-id="0x01020055">
+    <!-- id definitions go here -->
+  </public-group>
 
   <!-- ===============================================================
        DO NOT ADD UN-GROUPED ITEMS HERE
@@ -2845,4 +3080,5 @@
        Items added outside of a group may have their value recalculated
        every time something new is added to this file.
        =============================================================== -->
+
 </resources>
