@@ -243,7 +243,7 @@ public class NetworkSetting
 			} else {
 				Log.v("use truststore of jre");
 			}
-		    SSLContext sslContext = SSLContext.getInstance("SSL");
+		    SSLContext sslContext = SSLContext.getInstance("TLSv1.1");
 		    sslContext.init(null, trustManager, null);
 
 		    HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
