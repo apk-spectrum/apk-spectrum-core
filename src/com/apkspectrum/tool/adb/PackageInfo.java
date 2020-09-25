@@ -10,7 +10,6 @@ import com.android.ddmlib.ShellCommandUnresponsiveException;
 import com.android.ddmlib.TimeoutException;
 import com.apkspectrum.data.apkinfo.ApkInfo;
 import com.apkspectrum.data.apkinfo.ComponentInfo;
-import com.apkspectrum.tool.adb.SimpleOutputReceiver;
 import com.apkspectrum.util.Log;
 import com.apkspectrum.util.XmlPath;
 
