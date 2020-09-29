@@ -4,9 +4,11 @@ import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
+import java.util.EventObject;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.SwingUtilities;
 
 import com.apkspectrum.util.Log;
@@ -22,7 +24,7 @@ public abstract class AbstractUIAction extends AbstractAction implements UIActio
 		setHandler(h);
 	}
 
-	protected Window getWindow(ActionEvent e) {
+	protected Window getWindow(EventObject e) {
 		Object source = null;
 
 		if(e != null) {
@@ -67,5 +69,55 @@ public abstract class AbstractUIAction extends AbstractAction implements UIActio
 
 	public Object getUserObject() {
 		return getValue(USER_OBJECT);
+	}
+
+	public String getText() {
+		return (String) getValue(Action.NAME);
+	}
+
+	public void setText(String text) {
+		putValue(Action.NAME, text);
+	}
+
+	public Icon getIcon() {
+		return (Icon) getValue(Action.LARGE_ICON_KEY);
+	}
+
+	public void setIcon(Icon icon) {
+		putValue(Action.LARGE_ICON_KEY, icon);
+	}
+
+	public String getToolTipText() {
+		return (String) getValue(Action.SHORT_DESCRIPTION);
+	}
+
+	public void setToolTipText(String text) {
+		putValue(Action.SHORT_DESCRIPTION, text);
+	}
+
+	public int getMnemonic() {
+		Integer mnemonic = (Integer) getValue(Action.MNEMONIC_KEY);
+		return mnemonic != null ? mnemonic.intValue() : '\0';
+	}
+
+	public void setMnemonic(int mnemonic) {
+		putValue(Action.MNEMONIC_KEY, Integer.valueOf(mnemonic));
+	}
+
+	public int getDisplayedMnemonicIndex() {
+		Integer index = (Integer) getValue(Action.DISPLAYED_MNEMONIC_INDEX_KEY);
+		return index != null ? index.intValue() : -1;
+	}
+
+	public void setDisplayedMnemonicIndex(int index) {
+		putValue(Action.DISPLAYED_MNEMONIC_INDEX_KEY, Integer.valueOf(index));
+	}
+
+	public boolean isSelected() {
+		return Boolean.TRUE.equals(getValue(Action.SELECTED_KEY));
+	}
+
+	public void setSelected(boolean b) {
+		putValue(Action.SELECTED_KEY, Boolean.valueOf(b));
 	}
 }
