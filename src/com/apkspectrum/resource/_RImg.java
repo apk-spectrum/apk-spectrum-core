@@ -7,7 +7,7 @@ import javax.swing.ImageIcon;
 
 import com.apkspectrum.swing.ImageScaler;
 
-public enum _RImg implements ResImage<URL>
+public enum _RImg implements ResImage<Image>
 {
 	PERM_GROUP_ACCESSIBILITY_FEATURES	("perm_group/perm_group_accessibility_features.png"),
 	PERM_GROUP_ACCOUNTS					("perm_group/perm_group_accounts.png"),
@@ -85,8 +85,8 @@ public enum _RImg implements ResImage<URL>
 	}
 
 	@Override
-	public URL get() {
-		return getURL();
+	public Image get() {
+		return getImage();
 	}
 
 	@Override

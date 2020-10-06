@@ -220,7 +220,7 @@ public class AaptNativeScanner extends ApkScanner
 
 	static {
 		String arch = System.getProperty("sun.arch.data.model");
-		String libPath = _RFile.BIN_PATH.get();
+		String libPath = _RFile.BIN_PATH.getPath();
 		if(SystemUtil.isWindows()) {
 			Log.e(libPath + "windows\\AaptNativeWrapper" + arch + ".dll");
 			System.load(libPath + "windows\\AaptNativeWrapper" + arch + ".dll");

@@ -208,7 +208,7 @@ public class NetworkSetting
 		trustStore = config.getConfiguration(PlugInConfig.CONFIG_SSL_TRUSTSTORE, APK_SCANNER_SSL_TRUSTSTORE);
 		Log.v("trustStore: " + trustStore);
 		if(APK_SCANNER_SSL_TRUSTSTORE.equals(trustStore)) {
-			trustStore = _RFile.SSL_TRUSTSTORE_PATH.get();
+			trustStore = _RFile.SSL_TRUSTSTORE_PATH.getPath();
 		} else if(JVM_SSL_TRUSTSTORE.equals(trustStore)) {
 			trustStore = "";
 		} else if(IGNORE_TRUSTSTORE.equals(trustStore)) {

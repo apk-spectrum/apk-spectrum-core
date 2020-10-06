@@ -30,7 +30,7 @@ public class BytecodeViewerLauncher
 			public void run()
 			{
 				ConsolCmd.exec(new String[] {"java", "-version"}, true, observer);
-				ConsolCmd.exec(new String[] {"java", "-jar", _RFile.BIN_BYTECODE_VIEWER.get(), jarFilePath}, true, observer);
+				ConsolCmd.exec(new String[] {"java", "-jar", _RFile.BIN_BYTECODE_VIEWER.getPath(), jarFilePath}, true, observer);
 				if(observer != null) {
 					observer.ConsolOutput("BytecodeViewerLauncher Completed");
 				}

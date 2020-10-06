@@ -14,6 +14,6 @@ public class JDGuiLauncher
 			Log.e("No such file : " + jarFilePath);
 			return;
 		}
-		SystemUtil.exec(new String[] {"java", "-jar", _RFile.BIN_JDGUI.get(), jarFilePath});
+		SystemUtil.exec(new String[] {"java", "-jar", _RFile.BIN_JDGUI.getPath(), jarFilePath});
 	}
 }

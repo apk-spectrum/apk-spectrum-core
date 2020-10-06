@@ -120,7 +120,7 @@ public class AaptNativeWrapper {
 
 	static {
 		String arch = System.getProperty("sun.arch.data.model");
-		String libPath = _RFile.BIN_PATH.get();
+		String libPath = _RFile.BIN_PATH.getPath();
 		if(SystemUtil.isWindows()) {
 			System.load(libPath + "windows\\AaptNativeWrapper" + arch + ".dll");
 		} else if (SystemUtil.isLinux()){

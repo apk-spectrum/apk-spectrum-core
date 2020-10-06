@@ -30,7 +30,7 @@ public class JADXLauncher
 			public void run()
 			{
 				ConsolCmd.exec(new String[] {"java", "-version"}, true, observer);
-				ConsolCmd.exec(new String[] {_RFile.BIN_JADX_GUI.get(), jarFilePath}, true, observer);
+				ConsolCmd.exec(new String[] {_RFile.BIN_JADX_GUI.getPath(), jarFilePath}, true, observer);
 				if(observer != null) {
 					observer.ConsolOutput("JADXLauncher Completed");
 				}

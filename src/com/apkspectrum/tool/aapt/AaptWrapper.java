@@ -107,7 +107,7 @@ public class AaptWrapper
 		synchronized(initSync) {
 			cmd = aaptCmd;
 			if(cmd == null) {
-				cmd = _RFile.BIN_AAPT.get();
+				cmd = _RFile.BIN_AAPT.getPath();
 
 				if(!(new File(cmd)).exists()) {
 					Log.e("no such aapt tool" + aaptCmd);

@@ -76,7 +76,7 @@ public class AdbWrapper
 			}
 
 			if(runningAdbPath == null) {
-				runningAdbPath = _RFile.BIN_ADB.get();
+				runningAdbPath = _RFile.BIN_ADB.getPath();
 			}
 			cmd = runningAdbPath;
 

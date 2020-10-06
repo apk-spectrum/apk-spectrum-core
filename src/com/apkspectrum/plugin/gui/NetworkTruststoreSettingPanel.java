@@ -149,7 +149,7 @@ public class NetworkTruststoreSettingPanel extends JPanel implements ActionListe
 
 						switch(type) {
 						case TRUSTSTORE_TYPE_APKSCANNER:
-							path = _RFile.SSL_TRUSTSTORE_PATH.get();
+							path = _RFile.SSL_TRUSTSTORE_PATH.getPath();
 							store = NetworkSetting.APK_SCANNER_SSL_TRUSTSTORE;
 							break;
 						case TRUSTSTORE_TYPE_JVM:
@@ -160,7 +160,7 @@ public class NetworkTruststoreSettingPanel extends JPanel implements ActionListe
 							path = pluginConfig.getConfiguration(PlugInConfig.CONFIG_SSL_TRUSTSTORE);
 							if(!new File(path).canRead()) {
 								//Log.e(path);
-								File file = getKeyStoreFile(NetworkTruststoreSettingPanel.this, _RFile.SSL_TRUSTSTORE_PATH.get());
+								File file = getKeyStoreFile(NetworkTruststoreSettingPanel.this, _RFile.SSL_TRUSTSTORE_PATH.getPath());
 								if(file != null) {
 									path = file.getAbsolutePath();
 								}

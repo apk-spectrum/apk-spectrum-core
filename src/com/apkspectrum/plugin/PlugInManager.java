@@ -210,7 +210,7 @@ public final class PlugInManager
 		synchronized (sLock) {
 			pluginPackages.clear();
 
-			File pluginFolder = new File(_RFile.PLUGIN_PATH.get());
+			File pluginFolder = new File(_RFile.PLUGIN_PATH.getPath());
 			if(!pluginFolder.isDirectory()) {
 				Log.v("No such plugins: " + _RFile.PLUGIN_PATH.get());
 				return;
@@ -298,7 +298,7 @@ public final class PlugInManager
 
 	public static void loadProperty()
 	{
-		File file = new File(_RFile.PLUGIN_CONF_PATH.get());
+		File file = new File(_RFile.PLUGIN_CONF_PATH.getPath());
 		if(!file.exists() || file.length() == 0) return;
 		try(FileReader fileReader = new FileReader(file)) {
 			JSONParser parser = new JSONParser();
@@ -310,7 +310,7 @@ public final class PlugInManager
 
 	public static void saveProperty()
 	{
-		File file = new File(_RFile.PLUGIN_CONF_PATH.get());
+		File file = new File(_RFile.PLUGIN_CONF_PATH.getPath());
 		try {
 			if(!file.exists() && !file.createNewFile()) {
 				Log.w("Cann't create file : " + _RFile.PLUGIN_CONF_PATH.get());
