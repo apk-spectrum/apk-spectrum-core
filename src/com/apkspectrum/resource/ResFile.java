@@ -1,12 +1,10 @@
 package com.apkspectrum.resource;
 
+import java.io.InputStream;
 import java.net.URL;
 
 public interface ResFile<T> extends ResValue<T>
 {
-	public String getPath();
-	public URL getURL();
-
 	public enum Type {
 		BIN("tool"),
 		DATA("data"),
@@ -26,4 +24,10 @@ public interface ResFile<T> extends ResValue<T>
 			return value;
 		}
 	}
+
+	public String getPath();
+	public URL getURL();
+	public String getConfiguration();
+	public URL getResource();
+	public InputStream getResourceAsStream();
 }

@@ -2,7 +2,7 @@ package com.apkspectrum.resource;
 
 import java.beans.PropertyChangeListener;
 
-public interface ResProp<T> extends Res<T>
+public interface ResProp<T> extends ResValue<T>
 {
 	public void set(T data);
 

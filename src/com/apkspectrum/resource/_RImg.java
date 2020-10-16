@@ -1,11 +1,10 @@
 package com.apkspectrum.resource;
 
 import java.awt.Image;
+import java.io.InputStream;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
-
-import com.apkspectrum.swing.ImageScaler;
 
 public enum _RImg implements ResImage<Image>
 {
@@ -58,86 +57,69 @@ public enum _RImg implements ResImage<Image>
 
 	; // ENUM END
 
-	private String value;
+	private DefaultResImage res;
 
 	private _RImg(String value) {
-		this.value = value;
+		res = new DefaultResImage(value);
 	}
 
 	@Override
 	public String getValue() {
-		return value;
+		return res.getValue();
+	}
+
+	@Override
+	public String getConfiguration() {
+		return res.getConfiguration();
 	}
 
 	@Override
 	public String toString() {
-		return getPath();
+		return res.toString();
 	}
 
 	@Override
 	public String getPath() {
-		return getURL().toExternalForm();
+		return res.getPath();
 	}
 
 	@Override
 	public URL getURL() {
-		return getClass().getResource("/icons/" + value);
+		return res.getURL();
 	}
 
 	@Override
 	public Image get() {
-		return getImage();
+		return res.get();
 	}
 
 	@Override
 	public Image getImage() {
-		return getImageIcon().getImage();
+		return res.getImage();
 	}
 
 	@Override
 	public Image getImage(int w, int h) {
-		return ImageScaler.getScaledImage(getImage(), w, h);
+		return res.getImage(w, h);
 	}
 
 	@Override
 	public ImageIcon getImageIcon() {
-		return new ImageIcon(getURL());
+		return res.getImageIcon();
 	}
 
 	@Override
 	public ImageIcon getImageIcon(int w, int h) {
-		return ImageScaler.getScaledImageIcon(getImage(), w, h);
+		return res.getImageIcon(w, h);
 	}
 
-	public static Image getImage(String path) {
-		return getImage(_RImg.class.getResource(path));
+	@Override
+	public URL getResource() {
+		return res.getResource();
 	}
 
-	public static Image getImage(URL url) {
-		return getImageIcon(url).getImage();
-	}
-
-	public static Image getImage(String path, int w, int h) {
-		return getImage(_RImg.class.getResource(path), w, h);
-	}
-
-	public static Image getImage(URL url, int w, int h) {
-		return ImageScaler.getScaledImage(getImage(url), w, h);
-	}
-
-	public static ImageIcon getImageIcon(String path) {
-		return new ImageIcon(_RImg.class.getResource(path));
-	}
-
-	public static ImageIcon getImageIcon(URL url) {
-		return new ImageIcon(url);
-	}
-
-	public static ImageIcon getImageIcon(String path, int w, int h) {
-		return getImageIcon(_RImg.class.getResource(path), w, h);
-	}
-
-	public static ImageIcon getImageIcon(URL url, int w, int h) {
-		return ImageScaler.getScaledImageIcon(getImageIcon(url), w, h);
+	@Override
+	public InputStream getResourceAsStream() {
+		return res.getResourceAsStream();
 	}
 }

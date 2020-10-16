@@ -1,5 +1,6 @@
 package com.apkspectrum.plugin;
 
+import java.awt.Image;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
@@ -19,7 +20,6 @@ import org.json.simple.parser.JSONParser;
 import com.apkspectrum.data.apkinfo.ApkInfo;
 import com.apkspectrum.plugin.manifest.InvalidManifestException;
 import com.apkspectrum.resource.Res;
-import com.apkspectrum.resource.ResImage;
 import com.apkspectrum.resource._RFile;
 import com.apkspectrum.util.Log;
 
@@ -35,11 +35,11 @@ public final class PlugInManager
 	protected static String appPackageName;
 	protected static String appVersion;
 	protected static Res<String> appName;
-	protected static ResImage<?> appIcon;
+	protected static Res<Image> appIcon;
 
 	private PlugInManager() { }
 
-	public static void setAppPackage(String appPackageName, String appVerseion, Res<String> appName, ResImage<?> appIcon) {
+	public static void setAppPackage(String appPackageName, String appVerseion, Res<String> appName, Res<Image> appIcon) {
 		PlugInManager.appPackageName = appPackageName;
 		PlugInManager.appVersion = appVerseion;
 		PlugInManager.appName = appName;
@@ -58,8 +58,8 @@ public final class PlugInManager
 		return appName != null ? appName.get() : null;
 	}
 
-	public static ResImage<?> getAppImage() {
-		return appIcon;
+	public static Image getAppIcon() {
+		return appIcon.get();
 	}
 
 	public static void addPlugInEventListener(IPlugInEventListener listener) {
@@ -210,9 +210,9 @@ public final class PlugInManager
 		synchronized (sLock) {
 			pluginPackages.clear();
 
-			File pluginFolder = new File(_RFile.PLUGIN_PATH.getPath());
+			File pluginFolder = _RFile.PLUGIN_PATH.get();
 			if(!pluginFolder.isDirectory()) {
-				Log.v("No such plugins: " + _RFile.PLUGIN_PATH.get());
+				Log.v("No such plugins: " + _RFile.PLUGIN_PATH.getPath());
 				return;
 			}
 
@@ -298,7 +298,7 @@ public final class PlugInManager
 
 	public static void loadProperty()
 	{
-		File file = new File(_RFile.PLUGIN_CONF_PATH.getPath());
+		File file = _RFile.PLUGIN_CONF_PATH.get();
 		if(!file.exists() || file.length() == 0) return;
 		try(FileReader fileReader = new FileReader(file)) {
 			JSONParser parser = new JSONParser();
@@ -310,15 +310,15 @@ public final class PlugInManager
 
 	public static void saveProperty()
 	{
-		File file = new File(_RFile.PLUGIN_CONF_PATH.getPath());
+		File file = _RFile.PLUGIN_CONF_PATH.get();
 		try {
 			if(!file.exists() && !file.createNewFile()) {
-				Log.w("Cann't create file : " + _RFile.PLUGIN_CONF_PATH.get());
+				Log.w("Cann't create file : " + _RFile.PLUGIN_CONF_PATH.getPath());
 			}
 		} catch (IOException e1) { }
 
 		if(!file.canWrite()) {
-			Log.v("Cann't write file : " + _RFile.PLUGIN_CONF_PATH.get());
+			Log.v("Cann't write file : " + _RFile.PLUGIN_CONF_PATH.getPath());
 			return;
 		}
 
@@ -327,7 +327,7 @@ public final class PlugInManager
 				.replaceAll("(\"[^\"]*\":(\"[^\"]*\")?([^\",]*)?,)", "$1\n");
 		//.replaceAll("(\"[^\"]*\":(\"[^\"]*\")?([^\",\\[]*(\\[[^\\]]\\])?)?,)", "$1\n");
 
-		try( FileWriter fw = new FileWriter(_RFile.PLUGIN_CONF_PATH.get());
+		try( FileWriter fw = new FileWriter(file);
 			 BufferedWriter writer = new BufferedWriter(fw) ) {
 			writer.write(transMultiLine);
 		} catch (IOException e) {
