@@ -60,8 +60,8 @@ public enum _RFile implements ResFile<java.io.File>
 		res = new DefaultResFile(type, value);
 	}
 
-	private _RFile(Type type, String value, String os) {
-		res = new DefaultResFile(type, value, os);
+	private _RFile(Type type, String value, String config) {
+		res = new DefaultResFile(type, value, config);
 	}
 
 	private _RFile(Type type, _RFile[] cfgResources) {

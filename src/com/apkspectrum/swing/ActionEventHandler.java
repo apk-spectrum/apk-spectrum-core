@@ -7,18 +7,24 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import com.apkspectrum.plugin.IPlugIn;
 import com.apkspectrum.plugin.PlugInManager;
+import com.apkspectrum.resource.ResAction;
 import com.apkspectrum.util.ClassFinder;
 import com.apkspectrum.util.Log;
 
-abstract public class ActionEventHandler implements ActionListener
+public class ActionEventHandler implements ActionListener
 {
 	protected Map<String, ActionListener> actionMap = new HashMap<>();
 	protected Map<Object, Object> dataMap;
@@ -29,16 +35,36 @@ abstract public class ActionEventHandler implements ActionListener
 		loadActions(actionPackage);
 	}
 
+	public ActionEventHandler(Package actionPackage,
+			Class<? extends Enum<? extends ResAction<?>>> actResEnum) {
+		loadActions(actionPackage, actResEnum);
+	}
+
 	public ActionEventHandler(String packageName) {
 		loadActions(packageName);
 	}
 
+	public ActionEventHandler(String packageName,
+			Class<? extends Enum<? extends ResAction<?>>> actResEnum) {
+		loadActions(packageName, actResEnum);
+	}
+
 	public void loadActions(Package actionPackage) {
+		loadActions(actionPackage, null);
+	}
+
+	public void loadActions(Package actionPackage,
+			Class<? extends Enum<? extends ResAction<?>>> actResEnum) {
 		if(actionPackage == null) return;
-		loadActions(actionPackage.getName());
+		loadActions(actionPackage.getName(), actResEnum);
 	}
 
 	public void loadActions(String packageName) {
+		loadActions(packageName, null);
+	}
+
+	public void loadActions(String packageName,
+			Class<? extends Enum<? extends ResAction<?>>> actResEnum) {
 		try {
 			for(Class<?> cls : ClassFinder.getClasses(packageName)) {
 				if(cls.isMemberClass() || cls.isInterface()
@@ -46,17 +72,20 @@ abstract public class ActionEventHandler implements ActionListener
 				ActionListener listener = null;
 				if (UIAction.class.isAssignableFrom(cls)) {
 					try {
-						listener = (ActionListener) cls.getDeclaredConstructor(ActionEventHandler.class).newInstance(this);
+						listener = (ActionListener) cls.getDeclaredConstructor(
+								ActionEventHandler.class).newInstance(this);
 					} catch (Exception e) { }
 				}
 				if(listener == null) {
 					try {
-						listener = (ActionListener) cls.getDeclaredConstructor().newInstance();
+						listener = (ActionListener) cls.getDeclaredConstructor()
+								.newInstance();
 					} catch (Exception e1) { }
 				}
 				if(listener != null) {
 					if (listener instanceof Action) {
-						addAction((Action)listener);
+						Action action = (Action) listener;
+						addAction(action, actResEnum);
 					} else {
 						addActionListener(getActionCommand(listener), listener);
 					}
@@ -68,13 +97,29 @@ abstract public class ActionEventHandler implements ActionListener
 	}
 
 	public void addAction(Action action) {
-		addActionListener(getActionCommand(action), action);
+		addAction(action, null);
+	}
+
+	private void addAction(Action action,
+			Class<? extends Enum<? extends ResAction<?>>> actResEnum) {
+		String actCommand = getActionCommand(action);
+		try {
+			Method method = actResEnum.getMethod("valueOf", String.class);
+			ResAction<?> res = (ResAction<?>) method.invoke(null, actCommand);
+			res.set(action);
+		} catch (IllegalAccessException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			//Log.v("No such action resource : " + actCommand);
+		}
+		action.putValue(UIAction.ACTION_EVENT_HANDLER, this);
+		addActionListener(actCommand, action);
 	}
 
 	public void addActionListener(String actionCommand, ActionListener action) {
 		if(action == null) return;
 		if(actionMap.containsKey(actionCommand)) {
-			Log.v(String.format("addAction() %s was already existed. So change to new : %s", actionCommand, action));
+			Log.v(String.format("addAction() %s was already existed. "
+					+ "Change to new : %s", actionCommand, action));
 		}
 		actionMap.put(actionCommand, action);
 	}
@@ -102,6 +147,26 @@ abstract public class ActionEventHandler implements ActionListener
 		return actionMap.get(actionCommand);
 	}
 
+	public void setActionToComponent(AbstractButton c) {
+		setActionToComponent(c, c.getActionCommand());
+	}
+
+	public void setActionToComponent(AbstractButton c, String actionCommand) {
+		c.setAction(getAction(actionCommand));
+	}
+
+	public void setActionToComponent(JComboBox<?> c) {
+		setActionToComponent(c, c.getActionCommand());
+	}
+
+	public void setActionToComponent(JComboBox<?> c, String actionCommand) {
+		c.setAction(getAction(actionCommand));
+	}
+
+	public void setActionToComponent(JTextField c, String actionCommand) {
+		c.setAction(getAction(actionCommand));
+	}
+
 	public void sendEvent(String actionCommand) {
 		sendEvent(getWindow(), actionCommand);
 	}
@@ -110,26 +175,17 @@ abstract public class ActionEventHandler implements ActionListener
 		ActionListener action = getAction(actionCommand);
 		if(action == null) return;
 
-		action.actionPerformed(new ActionEvent(c, ActionEvent.ACTION_PERFORMED, actionCommand));
+		action.actionPerformed(new ActionEvent(c, ActionEvent.ACTION_PERFORMED,
+				actionCommand));
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		actionPerformed(e, null);
-	}
-
-	public void actionPerformed(ActionEvent e, Object userObject) {
 		String actCmd = e.getActionCommand();
 		if(actCmd != null) {
 			ActionListener act = actionMap.get(actCmd);
 			if(act != null) {
-				if(userObject != null && act instanceof Action) {
-					((Action)act).putValue(UIAction.USER_OBJECT, userObject);
-				}
 				act.actionPerformed(e);
-				if(userObject != null && act instanceof Action) {
-					((Action)act).putValue(UIAction.USER_OBJECT, null);
-				}
 				return;
 			}
 
@@ -162,15 +218,19 @@ abstract public class ActionEventHandler implements ActionListener
 			return ((UIAction) actionListener).getActionCommand();
 		} else {
 			try {
-				return (String) actionListener.getClass().getDeclaredField(UIAction.ACTION_COMMAND_FIELD).get(null);
-			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-				Log.v("No such field : " + e.getMessage() + " from " + getClass().getName());
+				return (String) actionListener.getClass().getDeclaredField(
+						UIAction.ACTION_COMMAND_FIELD).get(null);
+			} catch (NoSuchFieldException | SecurityException
+					| IllegalArgumentException | IllegalAccessException e) {
+				Log.v("No such field : " + e.getMessage()
+					+ " from " + actionListener.getClass().getName());
 			}
 			String actCmd = null;
 			if(actionListener instanceof Action) {
-				actCmd = (String) ((Action) actionListener).getValue(Action.ACTION_COMMAND_KEY);
+				actCmd = (String) ((Action) actionListener)
+							.getValue(Action.ACTION_COMMAND_KEY);
 			}
-			if(actCmd == null) actCmd = getClass().getName();
+			if(actCmd == null) actCmd = actionListener.getClass().getName();
 			return actCmd;
 		}
 	}

@@ -8,19 +8,19 @@ public enum _RComp implements ResComp<ResComp<?>>
 	DefaultResComp res;
 
 	private _RComp(ResString<?> text) {
-		this(text, (javax.swing.Icon) null, null);
+		res = new DefaultResComp(text);
 	}
 
 	private _RComp(ResString<?> text, ResString<?> toolTipText) {
-		this(text, (javax.swing.Icon) null, toolTipText);
+		res = new DefaultResComp(text, toolTipText);
 	}
 
 	private _RComp(ResString<?> text, ResImage<?> image) {
-		this(text, image, null);
+		res = new DefaultResComp(text, image);
 	}
 
 	private _RComp(ResString<?> text, javax.swing.Icon icon) {
-		this(text, icon, null);
+		res = new DefaultResComp(text, icon);
 	}
 
 	private _RComp(ResString<?> text, ResImage<?> image, ResString<?> toolTipText) {

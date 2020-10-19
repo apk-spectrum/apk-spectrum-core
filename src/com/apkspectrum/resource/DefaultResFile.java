@@ -29,10 +29,10 @@ public class DefaultResFile implements ResFile<File>
 		this(type, value, null);
 	}
 
-	public DefaultResFile(Type type, String value, String os) {
+	public DefaultResFile(Type type, String value, String config) {
 		this.type = type;
 		this.value = value;
-		this.config = os;
+		this.config = config;
 	}
 
 	public DefaultResFile(Type type, ResFile<?>[] cfgResources) {
@@ -126,10 +126,12 @@ public class DefaultResFile implements ResFile<File>
 		}
 	}
 
+	@Override
 	public URL getResource() {
 		return getURL();
 	}
 
+	@Override
 	public InputStream getResourceAsStream() {
 		switch(type){
 		case RES_VALUE:
@@ -173,7 +175,9 @@ public class DefaultResFile implements ResFile<File>
 		return utf8Path;
 	}
 
+	private static String[] cachedModulePaths = null;
 	private String[] getModulePaths(String rootPath) {
+		if(cachedModulePaths != null) return cachedModulePaths;
 		List<String> paths = new ArrayList<>();
 		paths.add(rootPath);
 
@@ -207,6 +211,6 @@ public class DefaultResFile implements ResFile<File>
 				e.printStackTrace();
 			}
 		}
-		return paths.toArray(new String[paths.size()]);
+		return cachedModulePaths = paths.toArray(new String[paths.size()]);
 	}
 }
