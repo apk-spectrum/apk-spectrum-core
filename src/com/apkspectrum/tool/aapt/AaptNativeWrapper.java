@@ -119,16 +119,16 @@ public class AaptNativeWrapper {
 	private native static String[] run(String[] params);
 
 	static {
-		String arch = System.getProperty("sun.arch.data.model");
-		String libPath = _RFile.BIN_PATH.getPath();
-		if(SystemUtil.isWindows()) {
-			System.load(libPath + "windows\\AaptNativeWrapper" + arch + ".dll");
-		} else if (SystemUtil.isLinux()){
-			System.load(libPath + "linux/libc++" + arch + ".so");
-			System.load(libPath + "linux/libAaptNativeWrapper" + arch + ".so");
-		} else if (SystemUtil.isMac()) {
-			System.load(libPath + "darwin/libc++" + arch + ".dylib");
-			System.load(libPath + "darwin/libAaptNativeWrapper" + arch + ".dylib");
+		if("64".equals(System.getProperty("sun.arch.data.model"))) {
+			System.load(_RFile.BIN_AAPT_LIB64.getPath());
+			if(!SystemUtil.isWindows()) {
+				System.load(_RFile.BIN_AAPT_LIBC64.getPath());
+			}
+		} else {
+			System.load(_RFile.BIN_AAPT_LIB32.getPath());
+			if(!SystemUtil.isWindows()) {
+				System.load(_RFile.BIN_AAPT_LIBC32.getPath());
+			}
 		}
 	}
 }

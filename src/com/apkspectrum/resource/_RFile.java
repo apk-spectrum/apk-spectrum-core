@@ -4,6 +4,24 @@ public enum _RFile implements ResFile<java.io.File>
 {
 	BIN_PATH					(Type.BIN, ""),
 
+	BIN_AAPT_LIB32_LNX			(Type.BIN, "linux/libAaptNativeWrapper32.so", "nux"),
+	BIN_AAPT_LIB32_MAC			(Type.BIN, "darwin/libAaptNativeWrapper32.dylib", "mac"),
+	BIN_AAPT_LIB32_WIN			(Type.BIN, "windows\\AaptNativeWrapper32.dll", "win"),
+	BIN_AAPT_LIB32				(Type.BIN, new _RFile[]{ BIN_AAPT_LIB32_WIN, BIN_AAPT_LIB32_LNX, BIN_AAPT_LIB32_MAC }),
+
+	BIN_AAPT_LIB64_LNX			(Type.BIN, "linux/libAaptNativeWrapper64.so", "nux"),
+	BIN_AAPT_LIB64_MAC			(Type.BIN, "darwin/libAaptNativeWrapper64.dylib", "mac"),
+	BIN_AAPT_LIB64_WIN			(Type.BIN, "windows\\AaptNativeWrapper64.dll", "win"),
+	BIN_AAPT_LIB64				(Type.BIN, new _RFile[]{ BIN_AAPT_LIB64_WIN, BIN_AAPT_LIB64_LNX, BIN_AAPT_LIB64_MAC }),
+
+	BIN_AAPT_LIBC32_LNX			(Type.BIN, "linux/libAaptNativeWrapper32.so", "nux"),
+	BIN_AAPT_LIBC32_MAC			(Type.BIN, "darwin/libAaptNativeWrapper32.dylib", "mac"),
+	BIN_AAPT_LIBC32				(Type.BIN, new _RFile[]{ BIN_AAPT_LIBC32_LNX, BIN_AAPT_LIBC32_MAC }),
+
+	BIN_AAPT_LIBC64_LNX			(Type.BIN, "linux/libAaptNativeWrapper64.so", "nux"),
+	BIN_AAPT_LIBC64_MAC			(Type.BIN, "darwin/libAaptNativeWrapper64.dylib", "mac"),
+	BIN_AAPT_LIBC64				(Type.BIN, new _RFile[]{ BIN_AAPT_LIBC64_LNX, BIN_AAPT_LIBC64_MAC }),
+
 	BIN_ADB_LNX					(Type.BIN, "linux/adb", "nux"),
 	BIN_ADB_MAC					(Type.BIN, "darwin/adb", "mac"),
 	BIN_ADB_WIN					(Type.BIN, "windows\\adb.exe", "win"),
@@ -65,7 +83,11 @@ public enum _RFile implements ResFile<java.io.File>
 	}
 
 	private _RFile(Type type, _RFile[] cfgResources) {
-		res = new DefaultResFile(type, cfgResources);
+		try {
+			res = new DefaultResFile(type, cfgResources);
+		} catch(IllegalArgumentException e) {
+			//Log.v(name() + " hasn't supported config. " + res);
+		}
 	}
 
 	@Override
