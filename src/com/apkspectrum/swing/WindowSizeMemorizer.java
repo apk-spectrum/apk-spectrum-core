@@ -144,8 +144,8 @@ public class WindowSizeMemorizer implements ComponentListener, WindowListener
 
 	static public Dimension getCompoentSize(Component component, String id, Dimension defaultSize) {
 		if(component == null || !enabled) return defaultSize;
-		int width = defaultSize != null ? (int)defaultSize.getWidth() : -1;
-		int height = defaultSize != null ? (int)defaultSize.getHeight() : -1;
+		int width = defaultSize != null ? (int)defaultSize.getWidth() : component.getWidth();
+		int height = defaultSize != null ? (int)defaultSize.getHeight() : component.getHeight();
 		String key = "ws_"+ component.getClass().getName() + (id != null ? "#" + id : "");
 
 		Object data = _RProp.getPropData(key+"_width");
@@ -162,7 +162,7 @@ public class WindowSizeMemorizer implements ComponentListener, WindowListener
 			height = (int)data;
 		}
 
-		return new Dimension(width,height);
+		return width == -1 && height == -1 ? null : new Dimension(width,height);
 	}
 
 	static public int getCompoentState(Component component) {
