@@ -103,13 +103,16 @@ public class ActionEventHandler implements ActionListener
 	private void addAction(Action action,
 			Class<? extends Enum<? extends ResAction<?>>> actResEnum) {
 		String actCommand = getActionCommand(action);
-		try {
-			Method method = actResEnum.getMethod("valueOf", String.class);
-			ResAction<?> res = (ResAction<?>) method.invoke(null, actCommand);
-			res.set(action);
-		} catch (IllegalAccessException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
-			//Log.v("No such action resource : " + actCommand);
+		if(actResEnum != null) {
+			try {
+				Method method = actResEnum.getMethod("valueOf", String.class);
+				ResAction<?> res = (ResAction<?>)
+						method.invoke(null, actCommand);
+				res.set(action);
+			} catch (IllegalAccessException | InvocationTargetException
+					| NoSuchMethodException | SecurityException e) {
+				//Log.v("No such action resource : " + actCommand);
+			}
 		}
 		action.putValue(UIAction.ACTION_EVENT_HANDLER, this);
 		addActionListener(actCommand, action);
