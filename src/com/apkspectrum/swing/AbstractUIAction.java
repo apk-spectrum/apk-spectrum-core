@@ -14,9 +14,11 @@ import javax.swing.SwingUtilities;
 import com.apkspectrum.util.Log;
 
 @SuppressWarnings("serial")
-public abstract class AbstractUIAction extends AbstractAction implements UIAction
+public abstract class AbstractUIAction extends AbstractAction
+	implements UIAction
 {
 	protected ActionEventHandler handler;
+	protected int conditions;
 
 	public AbstractUIAction() { }
 
@@ -50,6 +52,9 @@ public abstract class AbstractUIAction extends AbstractAction implements UIActio
 		if(ACTION_EVENT_HANDLER.equals(key)
 				&& newValue instanceof ActionEventHandler) {
 			setHandler((ActionEventHandler) newValue);
+		} else if(ACTION_REQUIRED_CONDITIONS.equals(key)) {
+			setRequiredConditions(newValue instanceof Integer ?
+					((Integer) newValue).intValue() : 0);
 		} else {
 			super.putValue(key, newValue);
 		}
@@ -65,11 +70,30 @@ public abstract class AbstractUIAction extends AbstractAction implements UIActio
 	}
 
 	@Override
+	public void setRequiredConditions(int conditions) {
+		this.conditions = conditions;
+		super.putValue(ACTION_REQUIRED_CONDITIONS, Integer.valueOf(conditions));
+	}
+
+	@Override
+	public int getRequiredConditions() {
+		return conditions;
+	}
+
+	@Override
+	public void setEnabled(int flags) {
+		setEnabled((flags & conditions) == conditions);
+	}
+
+	@Override
 	public String getActionCommand() {
 		try {
-			return (String) getClass().getDeclaredField(ACTION_COMMAND_FIELD).get(null);
-		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-			Log.w("No such field : " + e.getMessage() + " from " + getClass().getName());
+			return (String) getClass()
+					.getDeclaredField(ACTION_COMMAND_FIELD).get(null);
+		} catch (NoSuchFieldException | SecurityException
+				| IllegalArgumentException | IllegalAccessException e) {
+			Log.w("No such field : " + e.getMessage()
+					+ " from " + getClass().getName());
 		}
 		String actCmd = (String) getValue(ACTION_COMMAND_KEY);
 		return actCmd != null ? actCmd : getClass().getName();

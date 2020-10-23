@@ -6,10 +6,14 @@ import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractButton;
@@ -24,10 +28,13 @@ import com.apkspectrum.resource.ResAction;
 import com.apkspectrum.util.ClassFinder;
 import com.apkspectrum.util.Log;
 
-public class ActionEventHandler implements ActionListener
+public class ActionEventHandler
+	implements ActionListener, PropertyChangeListener
 {
 	protected Map<String, ActionListener> actionMap = new HashMap<>();
 	protected Map<Object, Object> dataMap;
+
+	protected int flags;
 
 	public ActionEventHandler() { }
 
@@ -116,6 +123,9 @@ public class ActionEventHandler implements ActionListener
 		}
 		action.putValue(UIAction.ACTION_EVENT_HANDLER, this);
 		addActionListener(actCommand, action);
+
+		action.addPropertyChangeListener(this);
+		updateAction(action);
 	}
 
 	public void addActionListener(String actionCommand, ActionListener action) {
@@ -145,9 +155,63 @@ public class ActionEventHandler implements ActionListener
 		return listener instanceof Action ? (Action)listener : null;
 	}
 
+	public Action[] getActions() {
+		List<Action> list = new ArrayList<>(actionMap.size());
+		for(ActionListener listener: actionMap.values()) {
+			if(listener instanceof Action) {
+				list.add((Action) listener);
+			}
+		}
+		return list.toArray(new Action[list.size()]);
+	}
+
 	public ActionListener getActionListener(String actionCommand) {
 		if(actionCommand == null) return null;
 		return actionMap.get(actionCommand);
+	}
+
+	public ActionListener[] getActionListeners() {
+		return actionMap.values().toArray(new ActionListener[actionMap.size()]);
+	}
+
+	public void setFlag(int flag) {
+		this.flags |= flag;
+		updateActions();
+	}
+
+	public void unsetFlag(int flag) {
+		this.flags &= ~flag;
+		updateActions();
+	}
+
+	protected void updateActions() {
+		for(ActionListener listener: actionMap.values()) {
+			if(listener instanceof Action) {
+				updateAction((Action) listener);
+			}
+		}
+	}
+
+	protected void updateAction(Action action) {
+		if(action instanceof UIAction) {
+			((UIAction) action).setEnabled(flags);
+		} else {
+			Object data = action.getValue(UIAction.ACTION_REQUIRED_CONDITIONS);
+			if(data != null && data instanceof Integer) {
+				int condition = ((Integer) data).intValue();
+				action.setEnabled((flags & condition) == condition);
+			} else {
+				action.setEnabled(true);
+			}
+		}
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		if(UIAction.ACTION_REQUIRED_CONDITIONS.equals(evt.getPropertyName())
+				&& evt.getSource() instanceof Action) {
+			updateAction((Action) evt.getSource());
+		}
 	}
 
 	public void setActionToComponent(AbstractButton c) {
