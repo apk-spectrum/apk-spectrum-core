@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,6 +32,8 @@ import com.apkspectrum.util.Log;
 public class ActionEventHandler
 	implements ActionListener, PropertyChangeListener
 {
+	public static final String CONDITIONS_CHANGED = "conditions_changed";
+
 	protected Map<String, ActionListener> actionMap = new HashMap<>();
 	protected Map<Object, Object> dataMap;
 
@@ -175,13 +178,23 @@ public class ActionEventHandler
 	}
 
 	public void setFlag(int flag) {
-		this.flags |= flag;
-		updateActions();
+		int oldValue = this.flags;
+		if((oldValue & flag) != flag) {
+			this.flags |= flag;
+			updateActions();
+			firePropertyChange(CONDITIONS_CHANGED,
+					Integer.valueOf(oldValue), Integer.valueOf(this.flags));
+		}
 	}
 
 	public void unsetFlag(int flag) {
-		this.flags &= ~flag;
-		updateActions();
+		int oldValue = this.flags;
+		if((oldValue & flag) != 0) {
+			this.flags &= ~flag;
+			updateActions();
+			firePropertyChange(CONDITIONS_CHANGED,
+					Integer.valueOf(oldValue), Integer.valueOf(this.flags));
+		}
 	}
 
 	protected void updateActions() {
@@ -197,11 +210,13 @@ public class ActionEventHandler
 			((UIAction) action).setEnabled(flags);
 		} else {
 			Object data = action.getValue(UIAction.ACTION_REQUIRED_CONDITIONS);
-			if(data != null && data instanceof Integer) {
-				int condition = ((Integer) data).intValue();
-				action.setEnabled((flags & condition) == condition);
-			} else {
-				action.setEnabled(true);
+			if(data != null) {
+				if(data instanceof Integer) {
+					int condition = ((Integer) data).intValue();
+					action.setEnabled((flags & condition) == condition);
+				} else {
+					action.setEnabled(true);
+				}
 			}
 		}
 	}
@@ -210,7 +225,11 @@ public class ActionEventHandler
 	public void propertyChange(PropertyChangeEvent evt) {
 		if(UIAction.ACTION_REQUIRED_CONDITIONS.equals(evt.getPropertyName())
 				&& evt.getSource() instanceof Action) {
-			updateAction((Action) evt.getSource());
+			Action action = (Action) evt.getSource();
+			updateAction(action);
+			if(evt.getOldValue() != null && evt.getNewValue() == null) {
+				action.setEnabled(true);
+			}
 		}
 	}
 
@@ -265,19 +284,23 @@ public class ActionEventHandler
 		Log.e("Unknown action command : " + actCmd);
 	}
 
-	public Object getData(Object key) {
+	public Object getData(String key) {
 		return dataMap != null ? dataMap.get(key) : null;
 	}
 
-	public void putData(Object key, Object value) {
+	public void putData(String key, Object newValue) {
+		Object oldValue = null;
 		if(dataMap == null) {
 			dataMap = new HashMap<>();
+		} else if(dataMap.containsKey(key)) {
+			oldValue = dataMap.get(key);
 		}
-		if(value == null) {
+		if(newValue == null) {
 			dataMap.remove(key);
 		} else {
-			dataMap.put(key, value);
+			dataMap.put(key, newValue);
 		}
+		firePropertyChange(key, oldValue, newValue);
 	}
 
 	private String getActionCommand(ActionListener actionListener) {
@@ -316,4 +339,39 @@ public class ActionEventHandler
 
 		return null;
 	}
+
+	private static PropertyChangeSupport pcs;
+
+    protected void firePropertyChange(String propertyName, Object oldValue,
+    		Object newValue) {
+        if (pcs == null ||
+            (oldValue != null && newValue != null
+            	&& oldValue.equals(newValue))) {
+            return;
+        }
+        pcs.firePropertyChange(propertyName, oldValue, newValue);
+    }
+
+    public synchronized void addPropertyChangeListener(
+    		PropertyChangeListener listener) {
+        if (pcs == null) {
+        	pcs = new PropertyChangeSupport(this);
+        }
+        pcs.addPropertyChangeListener(listener);
+    }
+
+    public synchronized void removePropertyChangeListener(
+    		PropertyChangeListener listener) {
+        if (pcs == null) {
+            return;
+        }
+        pcs.removePropertyChangeListener(listener);
+    }
+
+    public synchronized PropertyChangeListener[] getPropertyChangeListeners() {
+        if (pcs == null) {
+            return new PropertyChangeListener[0];
+        }
+        return pcs.getPropertyChangeListeners();
+    }
 }
