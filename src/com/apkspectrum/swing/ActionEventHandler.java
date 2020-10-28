@@ -177,6 +177,10 @@ public class ActionEventHandler
 		return actionMap.values().toArray(new ActionListener[actionMap.size()]);
 	}
 
+	public int getFlag() {
+		return this.flags;
+	}
+
 	public void setFlag(int flag) {
 		int oldValue = this.flags;
 		if((oldValue & flag) != flag) {
