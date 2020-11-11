@@ -11,8 +11,6 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.SwingUtilities;
 
-import com.apkspectrum.util.Log;
-
 @SuppressWarnings("serial")
 public abstract class AbstractUIAction extends AbstractAction
 	implements UIAction
@@ -87,15 +85,13 @@ public abstract class AbstractUIAction extends AbstractAction
 
 	@Override
 	public String getActionCommand() {
-		try {
-			return (String) getClass()
-					.getDeclaredField(ACTION_COMMAND_FIELD).get(null);
-		} catch (NoSuchFieldException | SecurityException
-				| IllegalArgumentException | IllegalAccessException e) {
-			Log.w("No such field : " + e.getMessage()
-					+ " from " + getClass().getName());
-		}
 		String actCmd = (String) getValue(ACTION_COMMAND_KEY);
+		if(actCmd == null) {
+			try {
+				actCmd = (String) getClass().getDeclaredField(
+						UIAction.ACTION_COMMAND_FIELD).get(null);
+			} catch (Exception e) { }
+		}
 		return actCmd != null ? actCmd : getClass().getName();
 	}
 

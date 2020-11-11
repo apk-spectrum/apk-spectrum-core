@@ -311,18 +311,16 @@ public class ActionEventHandler
 		if(actionListener instanceof UIAction) {
 			return ((UIAction) actionListener).getActionCommand();
 		} else {
-			try {
-				return (String) actionListener.getClass().getDeclaredField(
-						UIAction.ACTION_COMMAND_FIELD).get(null);
-			} catch (NoSuchFieldException | SecurityException
-					| IllegalArgumentException | IllegalAccessException e) {
-				Log.v("No such field : " + e.getMessage()
-					+ " from " + actionListener.getClass().getName());
-			}
 			String actCmd = null;
 			if(actionListener instanceof Action) {
 				actCmd = (String) ((Action) actionListener)
 							.getValue(Action.ACTION_COMMAND_KEY);
+			}
+			if(actCmd == null) {
+				try {
+					actCmd = (String)actionListener.getClass().getDeclaredField(
+							UIAction.ACTION_COMMAND_FIELD).get(null);
+				} catch (Exception e) { }
 			}
 			if(actCmd == null) actCmd = actionListener.getClass().getName();
 			return actCmd;
