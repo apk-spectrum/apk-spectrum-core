@@ -2,6 +2,4 @@ package com.apkspectrum.plugin;
 
 import com.apkspectrum.swing.ITabbedComponent;
 
-public interface IExtraComponent<T> extends IPlugIn, ITabbedComponent<T> {
-
-}
+public interface ExtraComponent<T> extends PlugIn, ITabbedComponent<T> {}

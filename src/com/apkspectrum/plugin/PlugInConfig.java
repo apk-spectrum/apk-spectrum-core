@@ -18,31 +18,38 @@ public class PlugInConfig
 	public static final String CONFIG_HTTPS_PROXY_PORT = "https.proxyPort";
 	public static final String CONFIG_HTTPS_PROXY_USER = "https.proxyUser";
 	public static final String CONFIG_HTTPS_PROXY_PASS = "https.proxyPassword";
-	public static final String CONFIG_HTTP_NON_PROXY_HOSTS = "http.nonProxyHosts";
+	public static final String CONFIG_HTTP_NON_PROXY_HOSTS
+														= "http.nonProxyHosts";
 
 	public static final String[] CONFIG_PROXY_PROPERTIES = {
-			CONFIG_HTTP_PROXY_HOST,
-			CONFIG_HTTP_PROXY_PORT,
-			CONFIG_HTTP_PROXY_USER,
-			CONFIG_HTTP_PROXY_PASS,
-			CONFIG_HTTPS_PROXY_HOST,
-			CONFIG_HTTPS_PROXY_PORT,
-			CONFIG_HTTPS_PROXY_USER,
-			CONFIG_HTTPS_PROXY_PASS,
-			CONFIG_HTTP_NON_PROXY_HOSTS
-	};
+										CONFIG_HTTP_PROXY_HOST,
+										CONFIG_HTTP_PROXY_PORT,
+										CONFIG_HTTP_PROXY_USER,
+										CONFIG_HTTP_PROXY_PASS,
+										CONFIG_HTTPS_PROXY_HOST,
+										CONFIG_HTTPS_PROXY_PORT,
+										CONFIG_HTTPS_PROXY_USER,
+										CONFIG_HTTPS_PROXY_PASS,
+										CONFIG_HTTP_NON_PROXY_HOSTS };
 
-	// Ignoring certificate errors opens the connection to potential MITM attacks.
-	//public static final String CONFIG_IGNORE_SSL_CERT = "ignoreSSLCert";
+	// Ignoring certificate errors opens the connection to potential MITM
+	// attacks.
+	// public static final String CONFIG_IGNORE_SSL_CERT = "ignoreSSLCert";
 
-	public static final String CONFIG_SSL_TRUSTSTORE = "javax.net.ssl.trustStore";
-	public static final String CONFIG_SSL_TRUSTSTORE_PWD = "javax.net.ssl.trustStorePassword";
+	public static final String CONFIG_SSL_TRUSTSTORE
+								= "javax.net.ssl.trustStore";
+	public static final String CONFIG_SSL_TRUSTSTORE_PWD
+								= "javax.net.ssl.trustStorePassword";
 
-	public static final String CONFIG_IGNORE_NETWORK_ERR_NO_SUCHE_INTERFACE = "ingnore.err-no-such-interface";
-	public static final String CONFIG_IGNORE_NETWORK_ERR_CONNECTION_TIMEOUT = "ingnore.err-connection-time-out";
-	public static final String CONFIG_IGNORE_NETWORK_ERR_SSL_HANDSHAKE = "ingnore.err-ssl-handshake";
+	public static final String CONFIG_IGNORE_NETWORK_ERR_NO_SUCHE_INTERFACE
+								= "ingnore.err-no-such-interface";
+	public static final String CONFIG_IGNORE_NETWORK_ERR_CONNECTION_TIMEOUT
+								= "ingnore.err-connection-time-out";
+	public static final String CONFIG_IGNORE_NETWORK_ERR_SSL_HANDSHAKE
+								= "ingnore.err-ssl-handshake";
 
-	public static final String CONFIG_NO_LOOK_UPDATE_POPUP = "CONFIG_NO_LOOK_STARTUP_UPDATE_POPUP";
+	public static final String CONFIG_NO_LOOK_UPDATE_POPUP
+								= "CONFIG_NO_LOOK_STARTUP_UPDATE_POPUP";
 
 	static HashMap<String, String> configurations = new HashMap<>();
 
@@ -53,9 +60,9 @@ public class PlugInConfig
 		this(plugInPackage, false);
 	}
 
-	public PlugInConfig(PlugInPackage plugInPackage, boolean allowGlobalConfig) {
+	public PlugInConfig(PlugInPackage plugInPackage, boolean allowGlobalCfg) {
 		this.plugInPackage = plugInPackage;
-		this.allowGlobalConfig = allowGlobalConfig;
+		this.allowGlobalConfig = allowGlobalCfg;
 	}
 
 	public void setPlugInPackage(PlugInPackage plugInPackage) {
@@ -68,13 +75,14 @@ public class PlugInConfig
 
 	public static String getGlobalConfiguration(String key) {
 		synchronized(configurations) {
-			return configurations.containsKey(key) ? configurations.get(key) : null;
+			return configurations.containsKey(key) ? configurations.get(key)
+													: null;
 		}
 	}
 
-	public static String getGlobalConfiguration(String key, String defaultValue) {
+	public static String getGlobalConfiguration(String key, String defValue) {
 		String value = getGlobalConfiguration(key);
-		return value != null ? value : defaultValue;
+		return value != null ? value : defValue;
 	}
 
 	public static void setGlobalConfiguration(String key, String value) {
@@ -111,7 +119,8 @@ public class PlugInConfig
 		return value;
 	}
 
-	public static String getConfiguration(PlugInPackage plugInPackage, String key) {
+	public static String getConfiguration(PlugInPackage plugInPackage,
+			String key) {
 		if(plugInPackage == null) {
 			return getGlobalConfiguration(key);
 		} else {
@@ -119,7 +128,8 @@ public class PlugInConfig
 		}
 	}
 
-	public static String getConfiguration(PlugInPackage plugInPackage, String key, String defaultValue) {
+	public static String getConfiguration(PlugInPackage plugInPackage,
+			String key, String defaultValue) {
 		if(plugInPackage == null) {
 			return getGlobalConfiguration(key, defaultValue);
 		} else {
@@ -131,7 +141,8 @@ public class PlugInConfig
 		setConfiguration(plugInPackage, key, value);
 	}
 
-	public static void setConfiguration(PlugInPackage plugInPackage, String key, String value) {
+	public static void setConfiguration(PlugInPackage plugInPackage,
+			String key, String value) {
 		if(plugInPackage == null) {
 			setGlobalConfiguration(key, value);
 		} else {
@@ -143,7 +154,8 @@ public class PlugInConfig
 		clearConfiguration(plugInPackage, key);
 	}
 
-	public static void clearConfiguration(PlugInPackage plugInPackage, String key) {
+	public static void clearConfiguration(PlugInPackage plugInPackage,
+			String key) {
 		if(plugInPackage == null) {
 			clearGlobalConfiguration(key);
 		} else {

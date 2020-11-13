@@ -32,7 +32,7 @@ public class PlugInPackage
 	private Manifest manifest;
 	private URI pluginUri;
 	private String fingerprint;
-	private IPlugIn[] plugins;
+	private PlugIn[] plugins;
 	private PlugInGroup[] pluginGroups;
 	private HashMap<String, HashMap<String,String>> resources;
 	private HashMap<String, String> configurations;
@@ -46,14 +46,15 @@ public class PlugInPackage
 		}
 		pluginUri = pluginFile.toURI();
 		if(!isJarPackage() && !isXmlPackage()) {
-			throw new IllegalArgumentException("Unsupported extension of file.");
+			throw new IllegalArgumentException(
+					"Unsupported extension of file.");
 		}
 		fingerprint = FileUtil.getMessageDigest(pluginFile, "SHA-1");
 		manifest = readManifest(pluginUri);
 		enabled = manifest.plugin.enabled;
 		pluginGroups = readPlugInGroup(pluginFile, manifest);
 		plugins = createPlugInInstance(pluginFile, manifest);
-		resources = loadResource(pluginFile, manifest);
+		resources = loadResource(manifest);
 		configurations = loadConfiguration(manifest);
 		readSettings();
 	}
@@ -118,31 +119,33 @@ public class PlugInPackage
 
 	public boolean hasPlugIn(int plugInType) {
 		if(plugins == null) return false;
-		for(IPlugIn p: plugins) {
+		for(PlugIn p: plugins) {
 			if((p.getType() & plugInType) != 0) return true;
 		}
 		return false;
 	}
 
-	public IPlugIn[] getPlugIn(int plugInType) {
+	public PlugIn[] getPlugIn(int plugInType) {
 		if(plugins == null) return null;
-		ArrayList<IPlugIn> list = new ArrayList<>();
-		for(IPlugIn p: plugins) {
+		ArrayList<PlugIn> list = new ArrayList<>();
+		for(PlugIn p: plugins) {
 			if((p.getType() & plugInType) != 0) list.add(p);
 		}
-		return list.toArray(new IPlugIn[list.size()]);
+		return list.toArray(new PlugIn[list.size()]);
 	}
 
-	public IPlugIn getPlugInByActionCommand(String actionCommand) {
+	public PlugIn getPlugInByActionCommand(String actionCommand) {
 		if(actionCommand == null || plugins == null) return null;
-		for(IPlugIn p: ObjectArrays.concat(plugins, pluginGroups, IPlugIn.class)) {
+		for(PlugIn p:ObjectArrays.concat(plugins, pluginGroups, PlugIn.class)) {
 			if(actionCommand.equals(p.getActionCommand())) return p;
 		}
 		return null;
 	}
 
 	public PlugInGroup getPlugInGroup(String name) {
-		if(pluginGroups == null || name == null || name.trim().isEmpty()) return null;
+		if(pluginGroups == null || name == null || name.trim().isEmpty()) {
+			return null;
+		}
 		if(name.startsWith(".")) name = manifest.packageName + name;
 		for(PlugInGroup g: pluginGroups) {
 			if(name.equals(g.getName())) return g;
@@ -162,13 +165,13 @@ public class PlugInPackage
 		return list.toArray(new PlugInGroup[list.size()]);
 	}
 
-	public IPlugIn[] getPlugInWithoutGroup() {
+	public PlugIn[] getPlugInWithoutGroup() {
 		if(plugins == null) return null;
-		ArrayList<IPlugIn> list = new ArrayList<>();
-		for(IPlugIn p: plugins) {
+		ArrayList<PlugIn> list = new ArrayList<>();
+		for(PlugIn p: plugins) {
 			if(p.getGroupName() == null) list.add(p);
 		}
-		return list.toArray(new IPlugIn[list.size()]);
+		return list.toArray(new PlugIn[list.size()]);
 	}
 
 	public boolean useNetworkSetting() {
@@ -195,7 +198,8 @@ public class PlugInPackage
 		return pluginUri.toString().endsWith(".xml");
 	}
 
-	private Manifest readManifest(URI pluginUri) throws InvalidManifestException {
+	private Manifest readManifest(URI pluginUri) throws InvalidManifestException
+	{
 		Manifest manifest = null;
 		if(isJarPackage(pluginUri)) {
 			pluginUri = getResourceUri(pluginUri, "Manifest.xml");
@@ -238,18 +242,18 @@ public class PlugInPackage
 		return pluginGroup.toArray(new PlugInGroup[pluginGroup.size()]);
 	}
 
-	private IPlugIn[] createPlugInInstance(File pluginFile, Manifest manifest) {
+	private PlugIn[] createPlugInInstance(File pluginFile, Manifest manifest) {
 		if(manifest == null) return null;
 		Log.v(manifest.packageName + " : " + fingerprint);
 		Log.v(manifest.versionCode + "");
 		Log.v(manifest.versionName);
 
-		ArrayList<IPlugIn> plugins = new ArrayList<>();
+		ArrayList<PlugIn> plugins = new ArrayList<>();
 		URLClassLoader loader = null;
 		boolean isJarPackage = isJarPackage(pluginFile.toURI());
 		if(isJarPackage) {
 			try {
-				URL classURL = new URL("jar:" + pluginFile.toURI().toString() + "!/");
+				URL classURL = new URL("jar:" + pluginFile.toURI() + "!/");
 				loader = new URLClassLoader(new URL [] {classURL});
 			} catch (MalformedURLException e) {
 				Log.e(e.getMessage());
@@ -257,7 +261,7 @@ public class PlugInPackage
 		}
 
 		for(Component c: manifest.plugin.components) {
-			IPlugIn plugin = null;
+			PlugIn plugin = null;
 			switch(c.type) {
 			case Component.TYPE_PACAKGE_SEARCHER_LINKER:
 				plugin = new PackageSearcherLinker(this, c);
@@ -272,7 +276,8 @@ public class PlugInPackage
 				break;
 			default:
 				if(!isJarPackage) {
-					Log.w("XML plug-ins need only the LINKER plug-in. This type is not supported : " +  c.type);
+					Log.w("XML plug-ins need only the LINKER plug-in. This type"
+							+ " is not supported : " +  c.type);
 					break;
 				}
 				if(loader == null) {
@@ -284,43 +289,54 @@ public class PlugInPackage
 					Log.w("error: Illegal class name : \"" + c.name + "\"");
 					continue;
 				}
-			    String className = (c.name.startsWith(".") ? manifest.packageName : "") + c.name;
+
+			    String name = c.name;
+			    if(name.startsWith(".")) {
+			    	name = manifest.packageName + name;
+			    }
 
 		        try {
-		            Class<?> clazz = loader.loadClass(className);
-		            plugin = (IPlugIn)clazz.getConstructor(PlugInPackage.class, Component.class).newInstance(this, c);
-		        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-		        	Log.e("Fail loadClass : " + className + ", " + e.getMessage());
-		        } catch (IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-		        	Log.e("Fail newInstance : " + className + ", " + e.getMessage());
+		            Class<?> clazz = loader.loadClass(name);
+		            plugin = (PlugIn)clazz.getConstructor(PlugInPackage.class,
+		            				Component.class).newInstance(this, c);
+		        } catch (ClassNotFoundException | InstantiationException
+		        		| IllegalAccessException e) {
+		        	Log.e("Fail loadClass : " + name + ", " + e.getMessage());
+		        } catch (IllegalArgumentException | InvocationTargetException
+		        		| NoSuchMethodException | SecurityException e) {
+		        	Log.e("Fail newInstance : " + name + ", " + e.getMessage());
 				}
 		        if(plugin == null) {
-		        	Log.e("plugin is null : " + className);
+		        	Log.e("plugin is null : " + name);
 		        	continue;
 		        }
 
 				switch(c.type) {
 				case Component.TYPE_PACAKGE_SEARCHER:
-					if(!(plugin instanceof IPackageSearcher)) {
-						Log.e("Class was no matched to IPackageSearcher : " + className);
+					if(!(plugin instanceof PackageSearcher)) {
+						Log.e("Class was no matched to IPackageSearcher : "
+								+ name);
 						plugin = null;
 					}
 					break;
 				case Component.TYPE_UPDATE_CHECKER:
-					if(!(plugin instanceof IUpdateChecker)) {
-						Log.e("Class was no matched to IUpdateChecker : " + className);
+					if(!(plugin instanceof UpdateChecker)) {
+						Log.e("Class was no matched to IUpdateChecker : "
+								+ name);
 						plugin = null;
 					}
 					break;
 				case Component.TYPE_EXTERNAL_TOOL:
-					if(!(plugin instanceof IExternalTool)) {
-						Log.e("Class was no matched to IExternalTool : " + className);
+					if(!(plugin instanceof ExternalTool)) {
+						Log.e("Class was no matched to IExternalTool : "
+								+ name);
 						plugin = null;
 					}
 					break;
 				case Component.TYPE_EXTRA_COMPONENT:
-					if(!(plugin instanceof IExtraComponent)) {
-						Log.e("Class was no matched to IExtraComponent : " + className);
+					if(!(plugin instanceof ExtraComponent)) {
+						Log.e("Class was no matched to IExtraComponent : "
+								+ name);
 						plugin = null;
 					}
 					break;
@@ -336,7 +352,7 @@ public class PlugInPackage
 				plugins.add(plugin);
 			}
 		}
-		return plugins.toArray(new IPlugIn[plugins.size()]);
+		return plugins.toArray(new PlugIn[plugins.size()]);
 	}
 
 	private HashMap<String, String> loadConfiguration(Manifest manifest) {
@@ -349,7 +365,8 @@ public class PlugInPackage
 		return configurations;
 	}
 
-	private HashMap<String, HashMap<String,String>> loadResource(File pluginFile, Manifest manifest) {
+	private HashMap<String, HashMap<String,String>> loadResource(
+			Manifest manifest) {
 		if(manifest == null || manifest.resources == null) return null;
 		HashMap<String, HashMap<String,String>> resources = new HashMap<>();
 
@@ -380,7 +397,8 @@ public class PlugInPackage
 					XmlPath list = resXPath.getNodeList("/resources/string");
 					for(int i=0; i < list.getCount(); i++) {
 						XmlPath node = list.getNode(i);
-						map.put(node.getAttribute("name"), node.getTextContent());
+						map.put(node.getAttribute("name"),
+								node.getTextContent());
 					}
 				} else {
 					Log.w("Can not read src : " + res.src);
@@ -402,7 +420,10 @@ public class PlugInPackage
 	}
 
 	public String getResourceString(String name) {
-		if(resources == null || name == null || !name.startsWith("@")) return name;
+		if(resources == null || name == null || !name.startsWith("@")) {
+			return name;
+		}
+
 		String lang = PlugInManager.getLang();
 		String id = name.substring(1);
 		String value = null;
@@ -425,7 +446,8 @@ public class PlugInPackage
 			}
 		}
 
-		return value != null ? value.replaceAll("\\\\n", "\n").replaceAll("\\\\t", "\t") : name;
+		return value != null ? value.replaceAll("\\\\n", "\n")
+									.replaceAll("\\\\t", "\t") : name;
 	}
 
 	public URI getResourceUri(String resPath) {
@@ -443,7 +465,8 @@ public class PlugInPackage
 			} else {
 				if(isJarPackage(pluginUri)) {
 					String temp = uri.toString();
-					uri = new URI("jar:" + pluginUri.toString() + "!/" + (temp.startsWith("/") ? temp.substring(1) : temp));
+					uri = new URI("jar:" + pluginUri + "!/"
+							+ (temp.startsWith("/") ? temp.substring(1) : uri));
 				} else {
 					uri = pluginUri.resolve(uri);
 				}
@@ -478,7 +501,8 @@ public class PlugInPackage
 		return getConfiguration(key, defaultValue, false);
 	}
 
-	public String getConfiguration(String key, String defaultValue, boolean allowGlobalConfig) {
+	public String getConfiguration(String key, String defaultValue,
+			boolean allowGlobalConfig) {
 		String value = getConfiguration(key, allowGlobalConfig);
 		return value != null ? value : defaultValue;
 	}
@@ -514,19 +538,19 @@ public class PlugInPackage
 		if(manifest.plugin.enabled != isEnabled()) {
 			data.put("enabled", isEnabled());
 		}
-		HashMap<String, String> conf = getConfigurations();
+		HashMap<String, String> cfg = getConfigurations();
 		if(manifest.configuration != null) {
 			for(Configuration c: manifest.configuration) {
-				if(conf.containsKey(c.name) && conf.get(c.name).equals(c.value)) {
-					conf.remove(c.name);
+				if(cfg.containsKey(c.name) && cfg.get(c.name).equals(c.value)) {
+					cfg.remove(c.name);
 				}
 			}
 		}
-		if(!conf.isEmpty()) {
-			data.put("configuration", conf);
+		if(!cfg.isEmpty()) {
+			data.put("configuration", cfg);
 		}
 
-		for(IPlugIn p: ObjectArrays.concat(plugins, pluginGroups, IPlugIn.class)) {
+		for(PlugIn p:ObjectArrays.concat(plugins, pluginGroups, PlugIn.class)) {
 			Map<String, Object> prop = p.getChangedProperties();
 			if(!prop.isEmpty()) {
 				data.put(p.getActionCommand(), prop);
@@ -544,7 +568,8 @@ public class PlugInPackage
 
 		if(data.containsKey("configuration")) {
 			@SuppressWarnings("unchecked")
-			Map<String, String> map = (Map<String, String>) data.get("configuration");
+			Map<String, String> map
+					= (Map<String, String>) data.get("configuration");
 			synchronized(configurations) {
 				configurations.putAll(map);
 			}
@@ -552,7 +577,7 @@ public class PlugInPackage
 		}
 
 		for(Entry<?, ?> entry: data.entrySet()) {
-			IPlugIn plugin = getPlugInByActionCommand((String) entry.getKey());
+			PlugIn plugin = getPlugInByActionCommand((String) entry.getKey());
 			if(plugin != null) {
 				plugin.restoreProperties((Map<?, ?>) entry.getValue());
 			} else {

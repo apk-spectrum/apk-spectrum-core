@@ -4,7 +4,7 @@ import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.Map;
 
-public interface IPlugIn
+public interface PlugIn
 {
 	public static final String ENABLED_PROPERTY = "enabled";
 
@@ -91,7 +91,9 @@ public interface IPlugIn
 
     public void removePropertyChangeListener(PropertyChangeListener listener);
 
-    public void addPropertyChangeListener(String prop, PropertyChangeListener listener);
+    public void addPropertyChangeListener(String prop,
+    		PropertyChangeListener listener);
 
-    public void removePropertyChangeListener(String prop, PropertyChangeListener listener);
+    public void removePropertyChangeListener(String prop,
+    		PropertyChangeListener listener);
 }

@@ -4,13 +4,16 @@ import java.util.Map;
 
 import com.apkspectrum.plugin.manifest.Component;
 
-public abstract class AbstractPackageSearcher extends AbstractPlugIn implements IPackageSearcher
+public abstract class AbstractPackageSearcher extends AbstractPlugIn
+	implements PackageSearcher
 {
 	protected boolean visibleToBasic;
 
-	public AbstractPackageSearcher(PlugInPackage pluginPackage, Component component) {
+	public AbstractPackageSearcher(PlugInPackage pluginPackage,
+			Component component) {
 		super(pluginPackage, component);
-		visibleToBasic = component.visibleToBasic == null ? true : component.visibleToBasic;
+		visibleToBasic = component.visibleToBasic == null ? true
+				: component.visibleToBasic;
 	}
 
 	@Override
@@ -18,9 +21,9 @@ public abstract class AbstractPackageSearcher extends AbstractPlugIn implements 
 		int type = 0;
 		for(String s: component.target.split("\\|")) {
 			if(s.toLowerCase().equals("package")) {
-				type |= IPackageSearcher.SEARCHER_TYPE_PACKAGE_NAME;
+				type |= PackageSearcher.SEARCHER_TYPE_PACKAGE_NAME;
 			} else if(s.toLowerCase().equals("label")) {
-				type |= IPackageSearcher.SEARCHER_TYPE_APP_NAME;
+				type |= PackageSearcher.SEARCHER_TYPE_APP_NAME;
 			}
 		}
 		return type;

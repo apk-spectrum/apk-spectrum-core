@@ -3,9 +3,11 @@ package com.apkspectrum.plugin;
 import com.apkspectrum.plugin.manifest.Component;
 import com.apkspectrum.util.SystemUtil;
 
-public abstract class AbstractExternalTool extends AbstractPlugIn implements IExternalTool
+public abstract class AbstractExternalTool extends AbstractPlugIn
+	implements ExternalTool
 {
-	public AbstractExternalTool(PlugInPackage pluginPackage, Component component) {
+	public AbstractExternalTool(PlugInPackage pluginPackage,
+			Component component) {
 		super(pluginPackage, component);
 	}
 
@@ -32,10 +34,11 @@ public abstract class AbstractExternalTool extends AbstractPlugIn implements IEx
 
 	@Override
 	public boolean isSupoortedOS() {
-		return  component.supportedOS == null || component.supportedOS.isEmpty()
-			|| (SystemUtil.isWindows() && "windows".equals(component.supportedOS))
-			|| (SystemUtil.isLinux() && "linux".equals(component.supportedOS))
-			|| (SystemUtil.isMac() && "darwin".equals(component.supportedOS));
+		String supportedOS = component.supportedOS;
+		return  supportedOS == null || supportedOS.isEmpty()
+			|| (SystemUtil.isWindows() && "windows".equals(supportedOS))
+			|| (SystemUtil.isLinux() && "linux".equals(supportedOS))
+			|| (SystemUtil.isMac() && "darwin".equals(supportedOS));
 	}
 
 	@Override

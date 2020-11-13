@@ -4,7 +4,7 @@ import java.awt.Component;
 
 import javax.swing.JOptionPane;
 
-import com.apkspectrum.plugin.IUpdateChecker;
+import com.apkspectrum.plugin.UpdateChecker;
 import com.apkspectrum.plugin.NetworkException;
 import com.apkspectrum.plugin.PlugInConfig;
 import com.apkspectrum.plugin.PlugInManager;
@@ -23,11 +23,11 @@ public class NetworkErrorDialog
 	private static final String IGNORE_TIME_OUT = PlugInConfig.CONFIG_IGNORE_NETWORK_ERR_CONNECTION_TIMEOUT;
 	private static final String IGNORE_SSH_HANDSHAKE = PlugInConfig.CONFIG_IGNORE_NETWORK_ERR_SSL_HANDSHAKE;
 
-	public static int show(Component parent, IUpdateChecker plugin) {
+	public static int show(Component parent, UpdateChecker plugin) {
 		return show(parent, plugin, false);
 	}
 
-	public static int show(Component parent, IUpdateChecker plugin, boolean force) {
+	public static int show(Component parent, UpdateChecker plugin, boolean force) {
 		NetworkException e = plugin.getLastNetworkException();
 		if(e == null) {
 			Log.v("No NetworkException : " + plugin.getName());

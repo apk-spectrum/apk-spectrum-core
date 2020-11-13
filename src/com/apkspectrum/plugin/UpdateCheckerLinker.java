@@ -21,14 +21,16 @@ import com.apkspectrum.util.Log;
 
 public class UpdateCheckerLinker extends AbstractUpdateChecker
 {
-	public UpdateCheckerLinker(PlugInPackage pluginPackage, Component component) {
+	public UpdateCheckerLinker(PlugInPackage pluginPackage, Component component)
+	{
 		super(pluginPackage, component);
 	}
 
 	public boolean getNewVersion() throws NetworkException {
 		if(!NetworkSetting.isEnabledNetworkInterface()) {
 			Log.w("No such network interface");
-			throw makeNetworkException(new NetworkNotFoundException("No such network interface"));
+			throw makeNetworkException(
+					new NetworkNotFoundException("No such network interface"));
 		}
 
 		System.setProperty("http.protocols", "TLSv1,TLSv1.1,TLSv1.2");
@@ -65,12 +67,15 @@ public class UpdateCheckerLinker extends AbstractUpdateChecker
 		request.setRequestProperty("Referer","");
 		request.setRequestProperty("Cookie","");
 		request.setRequestProperty("Origin","");
-		request.setRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate");
+		request.setRequestProperty("Cache-Control",
+										"no-cache, no-store, must-revalidate");
 		request.setRequestProperty("Pragma", "no-cache");
 		request.setRequestProperty("Expires", "0");
 
-		//request.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
-		//request.setRequestProperty("Content-length",String.valueOf(param.length()));
+		//request.setRequestProperty("Content-Type",
+		//		"application/x-www-form-urlencoded");
+		//request.setRequestProperty("Content-length",
+		//		String.valueOf(param.length()));
 
 		//request.setRequestMethod("POST");
 		//OutputStream opstrm = request.getOutputStream();
@@ -141,7 +146,8 @@ public class UpdateCheckerLinker extends AbstractUpdateChecker
 	public void launch() {
 		setState(STATUS_UPDATING);
 		try {
-			if(latestVersionInfo == null && getLastNetworkException() == null && !checkNewVersion()) {
+			if(latestVersionInfo == null && getLastNetworkException() == null
+					&& !checkNewVersion()) {
 				Log.i("Current version is latest or cann't get latest version");
 				setState(STATUS_NO_UPDATED);
 				return;
@@ -156,9 +162,13 @@ public class UpdateCheckerLinker extends AbstractUpdateChecker
 		if(latestVersionInfo != null) {
 			url = (String)latestVersionInfo.get("url");
 		}
-		if(url == null) url = component.updateUrl != null ? component.updateUrl : component.url;
+		if(url == null) {
+			url = component.updateUrl != null
+					? component.updateUrl : component.url;
+		}
 
-		Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+		Desktop desktop = Desktop.isDesktopSupported()
+				? Desktop.getDesktop() : null;
 		if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
 	        try {
 	            desktop.browse(new URI(url));

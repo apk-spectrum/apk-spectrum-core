@@ -39,7 +39,7 @@ import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
-import com.apkspectrum.plugin.IPlugIn;
+import com.apkspectrum.plugin.PlugIn;
 import com.apkspectrum.plugin.PlugInGroup;
 import com.apkspectrum.plugin.PlugInManager;
 import com.apkspectrum.plugin.PlugInPackage;
@@ -194,8 +194,8 @@ public class PlugInSettingPanel extends JPanel implements TreeSelectionListener 
 						nodeText = _RStr.TREE_NODE_NO_PLUGINS.get();
 						break;
 					}
-				} else if(userObject instanceof IPlugIn) {
-					IPlugIn plugin = (IPlugIn) userObject;
+				} else if(userObject instanceof PlugIn) {
+					PlugIn plugin = (PlugIn) userObject;
 					URL iconUrl = plugin.getIconURL();
 					if(iconUrl != null) {
 						nodeIcon = ImageScaler.getScaledImageIcon(new ImageIcon(iconUrl), 16, 16);
@@ -243,7 +243,7 @@ public class PlugInSettingPanel extends JPanel implements TreeSelectionListener 
 			MouseEvent mouseEvent = (MouseEvent) event;
 			TreePath path = tree.getPathForLocation(mouseEvent.getX(), mouseEvent.getY());
 			Object userObject = getUserObject(path);
-			return (userObject instanceof IPlugIn || userObject instanceof PlugInPackage);
+			return (userObject instanceof PlugIn || userObject instanceof PlugInPackage);
 		}
 
 		@Override
@@ -251,8 +251,8 @@ public class PlugInSettingPanel extends JPanel implements TreeSelectionListener 
 			boolean selected = itemEvent.getStateChange() == ItemEvent.SELECTED;
 			Object userObject = itemEvent.getSource();
 			//Log.v("itemStateChanged " + itemEvent.getStateChange() + ", " + userObject);
-			if(userObject instanceof IPlugIn) {
-				((IPlugIn) userObject).setEnabled(selected);
+			if(userObject instanceof PlugIn) {
+				((PlugIn) userObject).setEnabled(selected);
 			} else if(userObject instanceof PlugInPackage) {
 				((PlugInPackage) userObject).setEnabled(selected);
 			}
@@ -359,7 +359,7 @@ public class PlugInSettingPanel extends JPanel implements TreeSelectionListener 
 		root.removeAllChildren();
 		for(PlugInPackage pack: PlugInManager.getPlugInPackages()) {
 			HashMap<DefaultMutableTreeNode, PlugInGroup[]> groupMap = new HashMap<>();
-			HashMap<DefaultMutableTreeNode, IPlugIn[]> pluginMap = new HashMap<>();
+			HashMap<DefaultMutableTreeNode, PlugIn[]> pluginMap = new HashMap<>();
 			Queue<DefaultMutableTreeNode> groupQueue = new LinkedList<DefaultMutableTreeNode>();
 
 			DefaultMutableTreeNode packNode = new DefaultMutableTreeNode(pack);
@@ -376,7 +376,7 @@ public class PlugInSettingPanel extends JPanel implements TreeSelectionListener 
 					pluginMap.put(child, group.getPlugIn());
 					groupQueue.offer(child);
 				}
-				for(IPlugIn plugin: pluginMap.get(node)) {
+				for(PlugIn plugin: pluginMap.get(node)) {
 					DefaultMutableTreeNode child = new DefaultMutableTreeNode(plugin);
 					node.add(child);
 				}
@@ -410,8 +410,8 @@ public class PlugInSettingPanel extends JPanel implements TreeSelectionListener 
 
 		CardLayout extraPanelLayout = (CardLayout) extraPanel.getLayout();
 		String layoutPage = TREE_NODE_DESCRIPTION;
-		if(userObject instanceof IPlugIn) {
-			description.setText(((IPlugIn)userObject).getDescription());
+		if(userObject instanceof PlugIn) {
+			description.setText(((PlugIn)userObject).getDescription());
 			description.setCaretPosition(0);
 		} else if(userObject instanceof PlugInPackage) {
 			description.setText(((PlugInPackage)userObject).getDescription());

@@ -12,7 +12,8 @@ import java.security.cert.CertificateException;
 
 import javax.net.ssl.SSLHandshakeException;
 
-public class NetworkException extends IOException {
+public class NetworkException extends IOException
+{
 	private static final long serialVersionUID = 8466756047136472142L;
 
 	public NetworkException(String message) {
@@ -30,7 +31,8 @@ public class NetworkException extends IOException {
 
 	public boolean isProxyException() { // maybe proxy issue
 		Throwable t = this.getCause();
-		return (t instanceof SocketTimeoutException || t instanceof ConnectException);
+		return (t instanceof SocketTimeoutException
+				|| t instanceof ConnectException);
 	}
 
 	public boolean isSslCertException() { // maybe ssl cert issue

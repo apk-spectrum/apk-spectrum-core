@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 
-import com.apkspectrum.plugin.IUpdateChecker;
+import com.apkspectrum.plugin.UpdateChecker;
 import com.apkspectrum.plugin.PlugInConfig;
 import com.apkspectrum.plugin.PlugInManager;
 import com.apkspectrum.resource._RStr;
@@ -79,7 +79,7 @@ public class UpdateNotificationWindow extends JFrame implements ActionListener
 				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), ACT_CMD_CLOSE, this);
 	}
 
-	public static void show(Component parent, IUpdateChecker[] list) {
+	public static void show(Component parent, UpdateChecker[] list) {
 		if(frame == null) frame = new UpdateNotificationWindow(parent);
 		mainPanel.addUpdateList(list);
 		if(!frame.isShowing()) {

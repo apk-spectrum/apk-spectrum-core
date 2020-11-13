@@ -6,7 +6,8 @@ import com.apkspectrum.util.ConsolCmd;
 
 public class ExternalToolLinker extends AbstractExternalTool
 {
-	public ExternalToolLinker(PlugInPackage pluginPackage, Component component) {
+	public ExternalToolLinker(PlugInPackage pluginPackage,
+			Component component) {
 		super(pluginPackage, component);
 	}
 
@@ -23,7 +24,9 @@ public class ExternalToolLinker extends AbstractExternalTool
 		Thread t = new Thread(new Runnable() {
 			public void run()
 			{
-				String tmp = component.param.replaceAll("%[aA][pP][kK]_[pP][aA][tT][hH]%", src.replaceAll("\\\\", "\\\\\\\\"));
+				String tmp = component.param.replaceAll(
+						"%[aA][pP][kK]_[pP][aA][tT][hH]%",
+						src.replaceAll("\\\\", "\\\\\\\\"));
 				ConsolCmd.exec(new String[] {component.path, tmp}, true);
 			}
 		});
@@ -37,8 +40,12 @@ public class ExternalToolLinker extends AbstractExternalTool
 		Thread t = new Thread(new Runnable() {
 			public void run()
 			{
-				String tmp1 = component.param.replaceAll("%[aA][pP][kK]_[pP][aA][tT][hH]%", src1.replaceAll("\\\\", "\\\\\\\\"));
-				String tmp2 = component.param.replaceAll("%[aA][pP][kK]_[pP][aA][tT][hH]%", src2.replaceAll("\\\\", "\\\\\\\\"));
+				String tmp1 = component.param.replaceAll(
+						"%[aA][pP][kK]_[pP][aA][tT][hH]%",
+						src1.replaceAll("\\\\", "\\\\\\\\"));
+				String tmp2 = component.param.replaceAll(
+						"%[aA][pP][kK]_[pP][aA][tT][hH]%",
+						src2.replaceAll("\\\\", "\\\\\\\\"));
 				ConsolCmd.exec(new String[] {component.path, tmp1, tmp2}, true);
 			}
 		});

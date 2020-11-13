@@ -5,12 +5,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
 
+import com.apkspectrum.data.apkinfo.ApkInfo;
 import com.apkspectrum.data.apkinfo.ApkInfoHelper;
+import com.apkspectrum.data.apkinfo.ResourceInfo;
 import com.apkspectrum.plugin.manifest.Component;
 
 public class PackageSearcherLinker extends AbstractPackageSearcher
 {
-	public PackageSearcherLinker(PlugInPackage pluginPackage, Component component) {
+	public PackageSearcherLinker(PlugInPackage pluginPackage,
+			Component component) {
 		super(pluginPackage, component);
 	}
 
@@ -22,12 +25,15 @@ public class PackageSearcherLinker extends AbstractPackageSearcher
 	@Override
 	public void launch() {
 		String name = null;
+		ApkInfo apkInfo = PlugInManager.getApkInfo();
 		switch(getSupportType()) {
 		case SEARCHER_TYPE_PACKAGE_NAME:
-			name = PlugInManager.getApkInfo().manifest.packageName; 
+			name = apkInfo.manifest.packageName;
 			break;
 		case SEARCHER_TYPE_APP_NAME:
-			name = ApkInfoHelper.getResourceValue(PlugInManager.getApkInfo().manifest.application.labels, getPreferLangForAppName());
+			ResourceInfo[] labels = apkInfo.manifest.application.labels;
+			name = ApkInfoHelper.getResourceValue(labels,
+					getPreferLangForAppName());
 			break;
 		}
 
@@ -38,8 +44,10 @@ public class PackageSearcherLinker extends AbstractPackageSearcher
 			e.printStackTrace();
 			filter = name;
 		}
-		String url = component.url.replaceAll("%[tT][aA][rR][gG][eE][tT]%", filter);
-		Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+		String url = component.url.replaceAll("%[tT][aA][rR][gG][eE][tT]%",
+											filter);
+		Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop()
+														: null;
 		if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
 	        try {
 	            desktop.browse(new URI(url));

@@ -7,7 +7,8 @@ import java.util.Map;
 import com.apkspectrum.plugin.manifest.Component;
 import com.apkspectrum.util.GeneralVersionChecker;
 
-public abstract class AbstractUpdateChecker extends AbstractPlugIn implements IUpdateChecker
+public abstract class AbstractUpdateChecker extends AbstractPlugIn
+	implements UpdateChecker
 {
 	private static final long PERIOD_ONE_DAY_MS = 3600 * 1000 * 24;
 
@@ -19,7 +20,8 @@ public abstract class AbstractUpdateChecker extends AbstractPlugIn implements IU
 	private int state = STATUS_NO_UPDATED;
 	private ArrayList<StateChangeListener> listeners = new ArrayList<>();
 
-	public AbstractUpdateChecker(PlugInPackage pluginPackage, Component component) {
+	public AbstractUpdateChecker(PlugInPackage pluginPackage,
+			Component component) {
 		super(pluginPackage, component);
 		if(component.periodDay != null) {
 			int day = Integer.parseInt(component.periodDay);
@@ -96,15 +98,18 @@ public abstract class AbstractUpdateChecker extends AbstractPlugIn implements IU
 		if(latestVersionInfo == null) return false;
 
 		String version = (String)latestVersionInfo.get("version");
+		String appVersion = PlugInManager.getAppVersion();
 		String targetPackageName = getTargetPackageName();
 		if(PlugInManager.getAppPackage().equals(targetPackageName)) {
-			GeneralVersionChecker newVer = GeneralVersionChecker.parseFrom(version);
-			GeneralVersionChecker oldVer = GeneralVersionChecker.parseFrom(PlugInManager.getAppVersion());
+			GeneralVersionChecker newVer, oldVer;
+			newVer = GeneralVersionChecker.parseFrom(version);
+			oldVer = GeneralVersionChecker.parseFrom(appVersion);
 			return newVer.compareTo(oldVer) > 0;
 		} else if ("com.android.sdk".equals(targetPackageName)) {
 			return false;
 		} else {
-			PlugInPackage targetPackage = PlugInManager.getPlugInPackage(targetPackageName);
+			PlugInPackage targetPackage;
+			targetPackage = PlugInManager.getPlugInPackage(targetPackageName);
 			if(targetPackage == null) return false;
 			int curVer = targetPackage.getVersionCode();
 			int newVer = Integer.parseInt(version);
@@ -114,7 +119,8 @@ public abstract class AbstractUpdateChecker extends AbstractPlugIn implements IU
 
 	@Override
 	public int getLaunchType() {
-		return this instanceof UpdateCheckerLinker ? TYPE_LAUNCH_OPEN_LINK : TYPE_LAUNCH_DIRECT_UPDATE;
+		return this instanceof UpdateCheckerLinker ? TYPE_LAUNCH_OPEN_LINK
+												: TYPE_LAUNCH_DIRECT_UPDATE;
 	}
 
 	@Override

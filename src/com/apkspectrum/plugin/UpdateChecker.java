@@ -2,7 +2,7 @@ package com.apkspectrum.plugin;
 
 import java.util.Map;
 
-public interface IUpdateChecker extends IPlugIn
+public interface UpdateChecker extends PlugIn
 {
 	public static final String PERIOD_PROPERTY = "period";
 	public static final String LAST_UPDATE_CHECKED_PROPERTY = "lastUpdateDate";
@@ -19,7 +19,7 @@ public interface IUpdateChecker extends IPlugIn
 	public static final int STATUS_ERROR_OCCURED = 5;
 
 	public interface StateChangeListener {
-		public void stateChanged(IUpdateChecker plugin, int state);
+		public void stateChanged(UpdateChecker plugin, int state);
 	}
 
 	public boolean checkNewVersion() throws NetworkException;

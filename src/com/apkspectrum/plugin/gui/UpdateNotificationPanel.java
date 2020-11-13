@@ -24,7 +24,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
-import com.apkspectrum.plugin.IUpdateChecker;
+import com.apkspectrum.plugin.UpdateChecker;
 import com.apkspectrum.plugin.NetworkException;
 import com.apkspectrum.plugin.PlugInManager;
 import com.apkspectrum.plugin.PlugInPackage;
@@ -130,7 +130,7 @@ public class UpdateNotificationPanel extends JPanel implements ListSelectionList
 		add(btnPanel);
 	}
 
-	private Object[] makeRowObject(IUpdateChecker plugin) {
+	private Object[] makeRowObject(UpdateChecker plugin) {
 		Map<?,?> version = plugin.getLatestVersionInfo();
 		String target = plugin.getTargetPackageName();
 		if(target == null || target.isEmpty()) return null;
@@ -175,9 +175,9 @@ public class UpdateNotificationPanel extends JPanel implements ListSelectionList
 		return new Object[] { label, target, curVer, newVer, checkDate, desc, plugin };
 	}
 
-	public void addUpdateList(IUpdateChecker[] list) {
+	public void addUpdateList(UpdateChecker[] list) {
 		if(list == null || list.length == 0) return;
-		for(IUpdateChecker plugin: list) {
+		for(UpdateChecker plugin: list) {
 			Object[] data = makeRowObject(plugin);
 			if(data == null) continue;
 			updateListModel.addRow(data);
@@ -188,7 +188,7 @@ public class UpdateNotificationPanel extends JPanel implements ListSelectionList
 		}
 	}
 
-	public void updatePluginState(final IUpdateChecker plugin) {
+	public void updatePluginState(final UpdateChecker plugin) {
 		if(plugin == null) return;
 		int count = updateListModel.getRowCount();
 		for(int i=0; i<count; i++) {
@@ -207,7 +207,7 @@ public class UpdateNotificationPanel extends JPanel implements ListSelectionList
 		}
 	}
 
-	public void checkUpdate(final IUpdateChecker plugin) {
+	public void checkUpdate(final UpdateChecker plugin) {
         new SwingWorker<Void, Void>() {
 			@Override
 			protected Void doInBackground() throws Exception {
@@ -249,28 +249,28 @@ public class UpdateNotificationPanel extends JPanel implements ListSelectionList
 		if(row > -1) {
 			updateDescription.setText((String) updateListModel.getValueAt(row, 5));
 			updateDescription.setCaretPosition(0);
-			IUpdateChecker plugin = (IUpdateChecker)updateListModel.getValueAt(row, 6);
+			UpdateChecker plugin = (UpdateChecker)updateListModel.getValueAt(row, 6);
 			if(plugin.hasNewVersion()) {
 				switch(plugin.getLaunchType()) {
-				case IUpdateChecker.TYPE_LAUNCH_OPEN_LINK:
+				case UpdateChecker.TYPE_LAUNCH_OPEN_LINK:
 					btnLaunch.setText(_RStr.BTN_GO_TO_WEBSITE.get());
 					break;
-				case IUpdateChecker.TYPE_LAUNCH_DIRECT_UPDATE:
+				case UpdateChecker.TYPE_LAUNCH_DIRECT_UPDATE:
 					btnLaunch.setText(_RStr.BTN_UPDATE.get());
 					break;
-				case IUpdateChecker.TYPE_LAUNCH_DOWNLOAD:
+				case UpdateChecker.TYPE_LAUNCH_DOWNLOAD:
 					btnLaunch.setText(_RStr.BTN_DOWNLOAD.get());
 					break;
 				}
 				btnLaunch.setEnabled(true);
 			} else {
 				switch(plugin.getLaunchType()) {
-				case IUpdateChecker.TYPE_LAUNCH_OPEN_LINK:
+				case UpdateChecker.TYPE_LAUNCH_OPEN_LINK:
 					btnLaunch.setText(_RStr.BTN_GO_TO_WEBSITE.get());
 					btnLaunch.setEnabled(true);
 					break;
-				case IUpdateChecker.TYPE_LAUNCH_DIRECT_UPDATE:
-				case IUpdateChecker.TYPE_LAUNCH_DOWNLOAD:
+				case UpdateChecker.TYPE_LAUNCH_DIRECT_UPDATE:
+				case UpdateChecker.TYPE_LAUNCH_DOWNLOAD:
 					btnLaunch.setText(_RStr.BTN_NO_UPDATED.get());
 					btnLaunch.setEnabled(false);
 					break;
@@ -295,7 +295,7 @@ public class UpdateNotificationPanel extends JPanel implements ListSelectionList
 		case ACT_CMD_LAUNCH:
 			row = updateList.getSelectedRow();
 			if(row > -1) {
-				IUpdateChecker plugin = (IUpdateChecker)updateListModel.getValueAt(row, 6);
+				UpdateChecker plugin = (UpdateChecker)updateListModel.getValueAt(row, 6);
 				plugin.launch();
 			}
 			//updateList.clearSelection();
@@ -303,7 +303,7 @@ public class UpdateNotificationPanel extends JPanel implements ListSelectionList
 		case ACT_CMD_CHECK_UPDATE:
 			row = updateList.getSelectedRow();
 			if(row > -1) {
-				IUpdateChecker plugin = (IUpdateChecker)updateListModel.getValueAt(row, 6);
+				UpdateChecker plugin = (UpdateChecker)updateListModel.getValueAt(row, 6);
 				checkUpdate(plugin);
 			}
 			break;

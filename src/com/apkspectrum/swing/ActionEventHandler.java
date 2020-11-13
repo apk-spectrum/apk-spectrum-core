@@ -23,7 +23,7 @@ import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-import com.apkspectrum.plugin.IPlugIn;
+import com.apkspectrum.plugin.PlugIn;
 import com.apkspectrum.plugin.PlugInManager;
 import com.apkspectrum.resource.ResAction;
 import com.apkspectrum.util.ClassFinder;
@@ -279,7 +279,7 @@ public class ActionEventHandler
 				return;
 			}
 
-			IPlugIn plugin = PlugInManager.getPlugInByActionCommand(actCmd);
+			PlugIn plugin = PlugInManager.getPlugInByActionCommand(actCmd);
 			if(plugin != null) {
 				plugin.launch();
 				return;

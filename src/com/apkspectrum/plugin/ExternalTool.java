@@ -1,6 +1,7 @@
 package com.apkspectrum.plugin;
 
-public interface IExternalTool extends IPlugIn {
+public interface ExternalTool extends PlugIn
+{
 	public static final String TYPE_NORMAL_TOOL = "normal";
 	public static final String TYPE_DECORDER_TOOL = "decorder";
 	public static final String TYPE_DIFF_TOOL = "difftool";

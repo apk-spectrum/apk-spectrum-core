@@ -10,7 +10,7 @@ import java.util.Map;
 
 import com.apkspectrum.plugin.manifest.Component;
 
-public abstract class AbstractPlugIn implements IPlugIn
+public abstract class AbstractPlugIn implements PlugIn
 {
 	protected PlugInPackage pluginPackage;
 	protected Component component;
@@ -39,9 +39,14 @@ public abstract class AbstractPlugIn implements IPlugIn
 		return pluginPackage.getPackageName();
 	}
 
+	protected String trimAndEmptyIsNull(String str) {
+		if(str == null || (str = str.trim()).isEmpty()) return null;
+		return str;
+	}
+
 	@Override
 	public String getName() {
-		String name = (component.name != null && !component.name.trim().isEmpty()) ? component.name.trim() : null;
+		String name = trimAndEmptyIsNull(component.name);
 		if(name != null && name.startsWith(".")) {
 			name = getPackageName() + name;
 		}
@@ -50,7 +55,7 @@ public abstract class AbstractPlugIn implements IPlugIn
 
 	@Override
 	public String getGroupName() {
-		String name = (component.pluginGroup != null && !component.pluginGroup.trim().isEmpty()) ? component.pluginGroup.trim() : null;
+		String name = trimAndEmptyIsNull(component.pluginGroup);
 		if(name != null && name.startsWith(".")) {
 			name = getPackageName() + name;
 		}
@@ -109,16 +114,16 @@ public abstract class AbstractPlugIn implements IPlugIn
 
 	@Override
 	public int getType() {
-		if(this instanceof IPackageSearcher) {
+		if(this instanceof PackageSearcher) {
 			return PLUGIN_TPYE_PACKAGE_SEARCHER;
 		}
-		if(this instanceof IUpdateChecker) {
+		if(this instanceof UpdateChecker) {
 			return PLUGIN_TPYE_UPDATE_CHECKER;
 		}
-		if(this instanceof IExternalTool) {
+		if(this instanceof ExternalTool) {
 			return PLUGIN_TPYE_EXTERNAL_TOOL;
 		}
-		if(this instanceof IExtraComponent) {
+		if(this instanceof ExtraComponent) {
 			return PLUGIN_TPYE_EXTRA_COMPONENT;
 		}
 		return PLUGIN_TPYE_UNKNOWN;
@@ -135,19 +140,22 @@ public abstract class AbstractPlugIn implements IPlugIn
 		String typeName = null;
 		switch(getType()) {
 		case PLUGIN_TPYE_PACKAGE_SEARCHER:
-			typeName = IPackageSearcher.class.getSimpleName() + "#" + ((IPackageSearcher)this).getSupportType();
+			typeName = PackageSearcher.class.getSimpleName()
+						+ "#" + ((PackageSearcher)this).getSupportType();
 			break;
 		case PLUGIN_TPYE_UPDATE_CHECKER:
-			typeName = IUpdateChecker.class.getSimpleName();
+			typeName = UpdateChecker.class.getSimpleName();
 			break;
 		case PLUGIN_TPYE_EXTERNAL_TOOL:
-			typeName = IExternalTool.class.getSimpleName() + "#" + ((IExternalTool)this).getToolType();
+			typeName = ExternalTool.class.getSimpleName()
+						+ "#" + ((ExternalTool)this).getToolType();
 			break;
 		default:
-			typeName = IPlugIn.class.getName();
+			typeName = PlugIn.class.getName();
 			break;
 		}
-		return getPackageName() + "!" + typeName + "@" + getName() + "[0x" + Integer.toHexString(component.hashCode()) + "]";
+		return getPackageName() + "!" + typeName + "@" + getName()
+					+ "[0x" + Integer.toHexString(component.hashCode()) + "]";
 	}
 
 	@Override
@@ -157,7 +165,8 @@ public abstract class AbstractPlugIn implements IPlugIn
 	public Map<String, Object> getChangedProperties() {
 		HashMap<String, Object> data = new HashMap<>();
 		if(component.enabled != isEnabled(false)) {
-			if(!(this instanceof IExternalTool) || ((IExternalTool)this).isSupoortedOS()) {
+			if(!(this instanceof ExternalTool)
+					|| ((ExternalTool)this).isSupoortedOS()) {
 				data.put("enabled", isEnabled(false));
 			}
 		}
@@ -177,7 +186,8 @@ public abstract class AbstractPlugIn implements IPlugIn
 		return component.hashCode();
 	}
 
-	protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+	protected void firePropertyChange(String propertyName,
+			Object oldValue, Object newValue) {
 		if(pcs == null) return;
 		pcs.firePropertyChange(propertyName, oldValue, newValue);
     }
@@ -197,14 +207,16 @@ public abstract class AbstractPlugIn implements IPlugIn
     }
 
 	@Override
-    public void addPropertyChangeListener(String prop, PropertyChangeListener listener) {
+    public void addPropertyChangeListener(String prop,
+    		PropertyChangeListener listener) {
     	if(prop == null || listener == null) return;
     	if(pcs == null) pcs = new PropertyChangeSupport(this);
     	pcs.addPropertyChangeListener(prop, listener);
     }
 
 	@Override
-    public void removePropertyChangeListener(String prop, PropertyChangeListener listener) {
+    public void removePropertyChangeListener(String prop,
+    		PropertyChangeListener listener) {
     	if(pcs == null) return;
     	pcs.removePropertyChangeListener(prop, listener);
     	if(pcs.getPropertyChangeListeners().length == 0) pcs = null;

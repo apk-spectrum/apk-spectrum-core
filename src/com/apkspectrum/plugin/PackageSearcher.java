@@ -1,6 +1,6 @@
 package com.apkspectrum.plugin;
 
-public interface IPackageSearcher extends IPlugIn
+public interface PackageSearcher extends PlugIn
 {
 	public static final String VISIBLE_PROPERTY = "visibleToBasic";
 

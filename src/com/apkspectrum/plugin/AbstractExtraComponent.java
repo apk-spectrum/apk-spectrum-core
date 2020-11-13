@@ -9,15 +9,23 @@ import com.apkspectrum.plugin.manifest.Component;
 import com.apkspectrum.swing.ITabbedRequest;
 import com.apkspectrum.util.Log;
 
-public abstract class AbstractExtraComponent<T> extends AbstractPlugIn implements IExtraComponent<T>
+public abstract class AbstractExtraComponent<T> extends AbstractPlugIn
+	implements ExtraComponent<T>
 {
-	public static final int SEND_REQUEST_NONE = ITabbedRequest.REQUEST_NONE;
-	public static final int SEND_REQUEST_VISIBLE = ITabbedRequest.REQUEST_VISIBLE;
-	public static final int SEND_REQUEST_INVISIBLE = ITabbedRequest.REQUEST_INVISIBLE;
-	public static final int SEND_REQUEST_ENABLED = ITabbedRequest.REQUEST_ENABLED;
-	public static final int SEND_REQUEST_DISABLED = ITabbedRequest.REQUEST_DISABLED;
-	public static final int SEND_REQUEST_SELECTED = ITabbedRequest.REQUEST_SELECTED;
-	public static final int SEND_REQUEST_CHANGE_TITLE = ITabbedRequest.REQUEST_CHANGE_TITLE;
+	public static final int SEND_REQUEST_NONE
+								= ITabbedRequest.REQUEST_NONE;
+	public static final int SEND_REQUEST_VISIBLE
+								= ITabbedRequest.REQUEST_VISIBLE;
+	public static final int SEND_REQUEST_INVISIBLE
+								= ITabbedRequest.REQUEST_INVISIBLE;
+	public static final int SEND_REQUEST_ENABLED
+								= ITabbedRequest.REQUEST_ENABLED;
+	public static final int SEND_REQUEST_DISABLED
+								= ITabbedRequest.REQUEST_DISABLED;
+	public static final int SEND_REQUEST_SELECTED
+								= ITabbedRequest.REQUEST_SELECTED;
+	public static final int SEND_REQUEST_CHANGE_TITLE
+								= ITabbedRequest.REQUEST_CHANGE_TITLE;
 
 	public static final int SEND_REQUEST_CURRENT_ENABLED = 100;
 	public static final int SEND_REQUEST_CURRENT_VISIBLE = 101;
@@ -31,7 +39,8 @@ public abstract class AbstractExtraComponent<T> extends AbstractPlugIn implement
 	private boolean visible = true;
 	private boolean enabled = true;
 
-	public AbstractExtraComponent(PlugInPackage pluginPackage, Component component) {
+	public AbstractExtraComponent(PlugInPackage pluginPackage,
+			Component component) {
 		super(pluginPackage, component);
 	}
 
@@ -119,10 +128,12 @@ public abstract class AbstractExtraComponent<T> extends AbstractPlugIn implement
 			setTabbedEnabled(false);
 			return;
 		case SEND_REQUEST_CURRENT_ENABLED:
-			request = isTabbedEnabled() ? ITabbedRequest.REQUEST_ENABLED : ITabbedRequest.REQUEST_DISABLED;
+			request = isTabbedEnabled() ? ITabbedRequest.REQUEST_ENABLED
+					: ITabbedRequest.REQUEST_DISABLED;
 			break;
 		case SEND_REQUEST_CURRENT_VISIBLE:
-			request = isTabbedVisible() ? ITabbedRequest.REQUEST_VISIBLE : ITabbedRequest.REQUEST_INVISIBLE;
+			request = isTabbedVisible() ? ITabbedRequest.REQUEST_VISIBLE
+					: ITabbedRequest.REQUEST_INVISIBLE;
 			break;
 		case SEND_REQUEST_SELECTED:
 		case SEND_REQUEST_CHANGE_TITLE:

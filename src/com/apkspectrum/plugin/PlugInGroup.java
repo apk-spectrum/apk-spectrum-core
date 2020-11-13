@@ -26,14 +26,14 @@ public class PlugInGroup extends AbstractPlugIn
 		return list.toArray(new PlugInGroup[list.size()]);
 	}
 
-	public IPlugIn[] getPlugIn() {
+	public PlugIn[] getPlugIn() {
 		if(getName() == null) return null;
-		ArrayList<IPlugIn> list = new ArrayList<>();
-		for(IPlugIn g: pluginPackage.getPlugIn(PLUGIN_TPYE_ALL)) {
+		ArrayList<PlugIn> list = new ArrayList<>();
+		for(PlugIn g: pluginPackage.getPlugIn(PLUGIN_TPYE_ALL)) {
 			if(this.equals(g.getParantGroup())) {
 				list.add(g);
 			}
 		}
-		return list.toArray(new IPlugIn[list.size()]);
+		return list.toArray(new PlugIn[list.size()]);
 	}
 }
