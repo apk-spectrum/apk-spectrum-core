@@ -24,8 +24,10 @@ public class PackageSearcherLinker extends AbstractPackageSearcher
 
 	@Override
 	public void launch() {
+		ApkInfo apkInfo = PlugInManager.getApkInfoByEventSource();
+		if(apkInfo == null) return;
+
 		String name = null;
-		ApkInfo apkInfo = PlugInManager.getApkInfo();
 		switch(getSupportType()) {
 		case SEARCHER_TYPE_PACKAGE_NAME:
 			name = apkInfo.manifest.packageName;

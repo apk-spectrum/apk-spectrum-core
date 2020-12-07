@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.swing.Action;
+
 import com.apkspectrum.plugin.manifest.Component;
 import com.apkspectrum.plugin.manifest.Configuration;
 import com.apkspectrum.plugin.manifest.InvalidManifestException;
@@ -140,6 +142,11 @@ public class PlugInPackage
 			if(actionCommand.equals(p.getActionCommand())) return p;
 		}
 		return null;
+	}
+
+	public Action makePlugInAction(String actionCommand) {
+		PlugIn plugin = getPlugInByActionCommand(actionCommand);
+		return plugin != null ? plugin.makeAction() : null;
 	}
 
 	public PlugInGroup getPlugInGroup(String name) {

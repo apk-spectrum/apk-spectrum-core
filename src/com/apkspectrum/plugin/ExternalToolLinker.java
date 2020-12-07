@@ -13,7 +13,7 @@ public class ExternalToolLinker extends AbstractExternalTool
 
 	@Override
 	public void launch() {
-		ApkInfo info = PlugInManager.getApkInfo();
+		ApkInfo info = PlugInManager.getApkInfoByEventSource();
 		if(info == null) return;
 		launch(info.filePath);
 	}

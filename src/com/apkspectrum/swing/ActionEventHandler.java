@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 
 import javax.swing.AbstractButton;
 import javax.swing.Action;
@@ -23,8 +25,6 @@ import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-import com.apkspectrum.plugin.PlugIn;
-import com.apkspectrum.plugin.PlugInManager;
 import com.apkspectrum.resource.ResAction;
 import com.apkspectrum.util.ClassFinder;
 import com.apkspectrum.util.Log;
@@ -37,6 +37,7 @@ public class ActionEventHandler
 	protected Map<String, ActionListener> actionMap = new HashMap<>();
 	protected Map<Object, Object> dataMap;
 
+	protected boolean allowUpdateActionCommandKey = true;
 	protected int flags;
 
 	public ActionEventHandler() { }
@@ -124,38 +125,78 @@ public class ActionEventHandler
 				//Log.v("No such action resource : " + actCommand);
 			}
 		}
-		action.putValue(UIAction.ACTION_EVENT_HANDLER, this);
 		addActionListener(actCommand, action);
+	}
 
-		action.addPropertyChangeListener(this);
-		updateAction(action);
+	public void addAction(String actionCommand, Action action) {
+		addActionListener(actionCommand, action);
 	}
 
 	public void addActionListener(String actionCommand, ActionListener action) {
 		if(action == null) return;
+		Action oldAction = getAction(actionCommand);
+
 		if(actionMap.containsKey(actionCommand)) {
 			Log.v(String.format("addAction() %s was already existed. "
 					+ "Change to new : %s", actionCommand, action));
 		}
+
+		if(action instanceof Action) {
+			((Action) action).putValue(UIAction.ACTION_EVENT_HANDLER, this);
+			((Action) action).addPropertyChangeListener(this);
+		}
+
 		actionMap.put(actionCommand, action);
-	}
 
-	public void removeAction(Action action) {
-		if(action == null) return;
-		removeActionListener(getActionCommand(action));
-	}
+		if(oldAction != null && !actionMap.containsValue(oldAction)) {
+			oldAction.removePropertyChangeListener(this);
+			oldAction.putValue(UIAction.ACTION_EVENT_HANDLER, null);
+		}
 
-	public void removeActionListener(String actionCommand) {
-		if(actionCommand == null) return;
-		if(actionMap.containsKey(actionCommand)) {
-			actionMap.remove(actionCommand);
+		if(action instanceof Action) {
+			updateActionStatus((Action) action);
 		}
 	}
 
+	public void removeAction(Action action) {
+		if(action == null || !actionMap.containsValue(action)) return;
+
+		ArrayList<String> list = new ArrayList<>();
+		for(Entry<String, ActionListener> e : actionMap.entrySet()) {
+			if(action.equals(e.getValue())) {
+				list.add(e.getKey());
+			}
+		}
+
+		for(String actCmd : list) {
+			removeActionListener(actCmd);
+		}
+	}
+
+	public void removeActionListener(String actionCommand) {
+		if(actionCommand == null || !actionMap.containsKey(actionCommand)) {
+			return;
+		}
+
+		Action action = getAction(actionCommand);
+		actionMap.remove(actionCommand);
+		if(action != null && !actionMap.containsValue(action)) {
+			action.removePropertyChangeListener(this);
+			action.putValue(UIAction.ACTION_EVENT_HANDLER, null);
+		}
+	}
+
+	public void changeActionCommand(String oldCmd, String newCmd) {
+		Action action;
+		if(newCmd == null || (action = getAction(oldCmd)) == null) return;
+		actionMap.remove(oldCmd);
+		actionMap.put(newCmd, action);
+		firePropertyChange(Action.ACTION_COMMAND_KEY, oldCmd, newCmd);
+	}
+
 	public Action getAction(String actionCommand) {
-		if(actionCommand == null) return null;
-		ActionListener listener = actionMap.get(actionCommand);
-		return listener instanceof Action ? (Action)listener : null;
+		ActionListener listener = getActionListener(actionCommand);
+		return listener instanceof Action ? (Action) listener : null;
 	}
 
 	public Action[] getActions() {
@@ -185,7 +226,7 @@ public class ActionEventHandler
 		int oldValue = this.flags;
 		if((oldValue & flag) != flag) {
 			this.flags |= flag;
-			updateActions();
+			updateActionStatus();
 			firePropertyChange(CONDITIONS_CHANGED,
 					Integer.valueOf(oldValue), Integer.valueOf(this.flags));
 		}
@@ -195,45 +236,77 @@ public class ActionEventHandler
 		int oldValue = this.flags;
 		if((oldValue & flag) != 0) {
 			this.flags &= ~flag;
-			updateActions();
+			updateActionStatus();
 			firePropertyChange(CONDITIONS_CHANGED,
 					Integer.valueOf(oldValue), Integer.valueOf(this.flags));
 		}
 	}
 
-	protected void updateActions() {
+	public void setAllowUpdateActionCommandKey(boolean allowed) {
+		allowUpdateActionCommandKey = allowed;
+	}
+
+	public boolean isAllowUpdateActionCommandKey() {
+		return allowUpdateActionCommandKey;
+	}
+
+	protected void updateActionStatus() {
 		for(ActionListener listener: actionMap.values()) {
 			if(listener instanceof Action) {
-				updateAction((Action) listener);
+				updateActionStatus((Action) listener);
 			}
 		}
 	}
 
-	protected void updateAction(Action action) {
+	protected void updateActionStatus(Action action) {
 		if(action instanceof UIAction) {
 			((UIAction) action).setEnabled(flags);
-		} else {
-			Object data = action.getValue(UIAction.ACTION_REQUIRED_CONDITIONS);
-			if(data != null) {
-				if(data instanceof Integer) {
-					int condition = ((Integer) data).intValue();
-					action.setEnabled((flags & condition) == condition);
-				} else {
-					action.setEnabled(true);
-				}
+			return;
+		}
+
+		Object data = action.getValue(UIAction.ACTION_REQUIRED_CONDITIONS);
+		if(data != null) {
+			if(data instanceof Integer) {
+				int condition = ((Integer) data).intValue();
+				action.setEnabled((flags & condition) == condition);
+			} else {
+				action.setEnabled(true);
 			}
 		}
 	}
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if(UIAction.ACTION_REQUIRED_CONDITIONS.equals(evt.getPropertyName())
-				&& evt.getSource() instanceof Action) {
-			Action action = (Action) evt.getSource();
-			updateAction(action);
+		Action action = (Action) evt.getSource();
+		switch(evt.getPropertyName()) {
+		case UIAction.ACTION_REQUIRED_CONDITIONS:
+			updateActionStatus(action);
 			if(evt.getOldValue() != null && evt.getNewValue() == null) {
 				action.setEnabled(true);
 			}
+			break;
+		case Action.ACTION_COMMAND_KEY:
+			if(!isAllowUpdateActionCommandKey() ||
+					Objects.equals(evt.getOldValue(), evt.getNewValue())) {
+				break;
+			}
+
+			Object deny;
+			deny = action.getValue(UIAction.DENY_UPDATE_ACTION_COMMAND_KEY);
+			if(deny != null && (deny instanceof Boolean && (Boolean) deny)) {
+				break;
+			}
+
+			String oldActCmd = (String) evt.getOldValue();
+			if(action.equals(getAction(oldActCmd))) {
+				String newActCmd = (String) evt.getNewValue();
+				if(newActCmd != null) {
+					changeActionCommand(oldActCmd, (String) evt.getNewValue());
+				} else {
+					removeActionListener(oldActCmd);
+				}
+			}
+			break;
 		}
 	}
 
@@ -273,15 +346,9 @@ public class ActionEventHandler
 	public void actionPerformed(ActionEvent e) {
 		String actCmd = e.getActionCommand();
 		if(actCmd != null) {
-			ActionListener act = actionMap.get(actCmd);
+			ActionListener act = getActionListener(actCmd);
 			if(act != null) {
 				act.actionPerformed(e);
-				return;
-			}
-
-			PlugIn plugin = PlugInManager.getPlugInByActionCommand(actCmd);
-			if(plugin != null) {
-				plugin.launch();
 				return;
 			}
 		}
@@ -307,24 +374,22 @@ public class ActionEventHandler
 		firePropertyChange(key, oldValue, newValue);
 	}
 
-	private String getActionCommand(ActionListener actionListener) {
-		if(actionListener instanceof UIAction) {
-			return ((UIAction) actionListener).getActionCommand();
-		} else {
-			String actCmd = null;
-			if(actionListener instanceof Action) {
-				actCmd = (String) ((Action) actionListener)
-							.getValue(Action.ACTION_COMMAND_KEY);
-			}
-			if(actCmd == null) {
-				try {
-					actCmd = (String)actionListener.getClass().getDeclaredField(
-							UIAction.ACTION_COMMAND_FIELD).get(null);
-				} catch (Exception e) { }
-			}
-			if(actCmd == null) actCmd = actionListener.getClass().getName();
-			return actCmd;
+	private String getActionCommand(ActionListener action) {
+		if(action == null) return null;
+
+		String actCmd = null;
+		if(action instanceof Action) {
+			actCmd = (String) ((Action) action)
+						.getValue(Action.ACTION_COMMAND_KEY);
 		}
+		if(actCmd == null) {
+			try {
+				actCmd = (String) action.getClass().getDeclaredField(
+						UIAction.ACTION_COMMAND_FIELD).get(null);
+			} catch (Exception e) { }
+		}
+		if(actCmd == null) actCmd = action.getClass().getName();
+		return actCmd;
 	}
 
 	protected static Window getWindow() {

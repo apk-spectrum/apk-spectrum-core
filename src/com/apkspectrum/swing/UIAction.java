@@ -11,15 +11,25 @@ public interface UIAction extends Action {
 	public static final String ACTION_REQUIRED_CONDITIONS
 							= "ACTION_REQUIRED_CONDITIONS";
 
+	public static final String DENY_UPDATE_ACTION_COMMAND_KEY
+							= "DENY_UPDATE_ACTION_COMMAND_KEY";
+
 	public void setHandler(ActionEventHandler h);
 	public ActionEventHandler getHandler();
+
+	public Object getHandlerData(String key);
+	public void putHandlerData(String key, Object newValue);
 
 	public void setRequiredConditions(int conditions);
 	public int getRequiredConditions();
 
 	public void setEnabled(int flags);
 
+	public void setActionCommand(String actionCommand);
 	public String getActionCommand();
+
+	public void setDenyUpdateActionCommandKey(boolean deny);
+	public boolean isDenyUpdateActionCommandKey();
 
 	public String getText();
 	public void setText(String text);

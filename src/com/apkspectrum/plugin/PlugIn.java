@@ -4,9 +4,12 @@ import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.Map;
 
+import javax.swing.Action;
+import javax.swing.Icon;
+
 public interface PlugIn
 {
-	public static final String ENABLED_PROPERTY = "enabled";
+	public static final String ENABLED = "enabled";
 
 	/**
 	 * Check to latest version and update for APK Scanner.
@@ -46,6 +49,13 @@ public interface PlugIn
 	public String getName();
 
 	/**
+	 * Get the icon for plug-in
+	 *
+	 * @return the icon
+	 */
+	public Icon getIcon();
+
+	/**
 	 * Get the icon URL for plug-in
 	 *
 	 * @return the icon URL
@@ -78,6 +88,8 @@ public interface PlugIn
 	public String getGroupName();
 
 	public String getActionCommand();
+
+	public Action makeAction();
 
 	public void launch();
 

@@ -1,7 +1,10 @@
 package com.apkspectrum.plugin;
 
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.EventQueue;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
@@ -9,6 +12,7 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,35 +21,43 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.JSplitPane;
 import javax.swing.SwingWorker;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 
+import com.apkspectrum.core.scanner.ApkScanner;
 import com.apkspectrum.data.apkinfo.ApkInfo;
 import com.apkspectrum.plugin.gui.NetworkErrorDialog;
 import com.apkspectrum.plugin.gui.UpdateNotificationWindow;
 import com.apkspectrum.plugin.manifest.InvalidManifestException;
 import com.apkspectrum.resource.Res;
+import com.apkspectrum.resource._RConst;
 import com.apkspectrum.resource._RFile;
+import com.apkspectrum.swing.ActionEventHandler;
+import com.apkspectrum.swing.KeyStrokeAction;
 import com.apkspectrum.util.Log;
 
 public final class PlugInManager
 {
 	private static List<PlugInPackage> pluginPackages = new ArrayList<>();
-	private static ApkInfo apkinfo = null;
 	private static String lang = "";
 
 	private static List<PlugInEventListener> eventListeners = new ArrayList<>();
 	private static final Object sLock = eventListeners;
 
-	protected static String appPackageName;
-	protected static String appVersion;
-	protected static Res<String> appName;
-	protected static Res<Image> appIcon;
+	private static String appPackageName;
+	private static String appVersion;
+	private static Res<String> appName;
+	private static Res<Image> appIcon;
 
-	protected static UpdateChecker[] latestUpdatedList;
+	private static UpdateChecker[] latestUpdatedList;
+
+	private static ActionEventHandler actionHandler;
 
 	private PlugInManager() { }
 
@@ -196,12 +208,103 @@ public final class PlugInManager
 				: pack.getPlugInByActionCommand(actionCommand);
 	}
 
-	public static void setApkInfo(ApkInfo info) {
-		apkinfo = info;
+	public static Action getPlugInAction(PlugIn plugin) {
+		return getPlugInAction(plugin.getActionCommand());
 	}
 
-	public static ApkInfo getApkInfo() {
-		return apkinfo;
+	public static Action getPlugInAction(String actionCommand) {
+		if(actionCommand == null) return null;
+
+		Action action = getActionEventHandler().getAction(actionCommand);
+		if(action != null) return action;
+
+		String packageName = actionCommand.replaceAll("!.*", "");
+
+		PlugInPackage pack = getPlugInPackage(packageName);
+		if(pack == null) return null;
+
+		action = pack.makePlugInAction(actionCommand);
+		if(action == null) return null;
+
+		getActionEventHandler().addAction(actionCommand, action);
+		return action;
+	}
+
+	public static ActionEventHandler getActionEventHandler() {
+		if(actionHandler == null) {
+			actionHandler = new ActionEventHandler();
+		}
+		return actionHandler;
+	}
+
+	public static void setActionEventHandler(ActionEventHandler handler) {
+		actionHandler = handler;
+	}
+
+	public static ApkInfo getApkInfoByEventSource() {
+		return getApkInfoByEventSource(null);
+	}
+
+	public static ApkInfo getApkInfoByEventSource(EventObject e) {
+		if(actionHandler == null) return null;
+
+		Object source = actionHandler.getData(_RConst.APK_SCANNER_KEY);
+		if(source instanceof ApkScanner) {
+			return ((ApkScanner) source).getApkInfo();
+		}
+
+		source = actionHandler.getData(_RConst.MULTI_APK_SCANNER_KEY);
+		if(!(source instanceof ApkScanner[])) return null;
+
+		ApkScanner[] multiSacnner = (ApkScanner[]) source;
+		if(multiSacnner.length == 0) return null;
+
+		source = null;
+		if(e == null) e = EventQueue.getCurrentEvent();
+		if(e != null) source = e.getSource();
+
+		if(source instanceof KeyStrokeAction) {
+			source = ((KeyStrokeAction) source).getComponent();
+		}
+		if(!(source instanceof Component)) return null;
+
+		int position = -1;
+		Component parent = (Component) source;
+        while(parent != null) {
+        	if(parent instanceof JComponent) {
+    			JComponent comp = (JComponent) parent;
+    			Integer pos;
+    			pos = (Integer) comp.getClientProperty(_RConst.POSITION_KEY);
+    			if(pos != null) {
+    				position = pos.intValue();
+    				break;
+    			}
+    		}
+        	if(parent instanceof JSplitPane) {
+        		Component c = ((JSplitPane) parent).getLeftComponent();
+        		if(source.equals(c) || (c instanceof Container
+        				&& ((Container) c).isAncestorOf((Component) source))) {
+        			position = 0;
+        			break;
+        		}
+        		c = ((JSplitPane) parent).getRightComponent();
+        		if(source.equals(c) || (c instanceof Container
+        				&& ((Container) c).isAncestorOf((Component) source))) {
+        			position = 1;
+        			break;
+        		}
+        	}
+        	source = parent;
+            parent = parent.getParent();
+        }
+
+        if(position == -1 || multiSacnner.length <= position
+        		|| multiSacnner[position] == null) {
+    		Log.e("Unknown position or null : " + position);
+    		return null;
+        }
+
+		return multiSacnner[position].getApkInfo();
 	}
 
 	public static void setLang(String newLang) {
@@ -272,6 +375,16 @@ public final class PlugInManager
 				}
 			}
 		}
+	}
+
+	public static void actionPerformed(ActionEvent e) {
+		String actCmd = e.getActionCommand();
+		if(actCmd == null) return;
+
+		Action action = getPlugInAction(actCmd);
+		if(action == null) return;
+
+		action.actionPerformed(e);
 	}
 
 	public static void checkForUpdates() {

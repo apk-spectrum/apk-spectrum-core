@@ -1,5 +1,8 @@
 package com.apkspectrum.plugin;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.net.MalformedURLException;
@@ -8,7 +11,14 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+
 import com.apkspectrum.plugin.manifest.Component;
+import com.apkspectrum.resource._RConst;
+import com.apkspectrum.swing.AbstractUIAction;
 
 public abstract class AbstractPlugIn implements PlugIn
 {
@@ -76,6 +86,13 @@ public abstract class AbstractPlugIn implements PlugIn
 	}
 
 	@Override
+	public Icon getIcon() {
+		URL url = getIconURL();
+		if(url == null) return null;
+		return new ImageIcon(url);
+	}
+
+	@Override
 	public String getLabel() {
 		String label = pluginPackage.getResourceString(component.label);
 		return label != null ? label : pluginPackage.getLabel();
@@ -91,7 +108,7 @@ public abstract class AbstractPlugIn implements PlugIn
 	public void setEnabled(boolean enabled) {
 		if(this.enabled == enabled) return;
 		this.enabled = enabled;
-		firePropertyChange(ENABLED_PROPERTY, !enabled, enabled);
+		firePropertyChange(ENABLED, !enabled, enabled);
 	}
 
 	@Override
@@ -159,7 +176,63 @@ public abstract class AbstractPlugIn implements PlugIn
 	}
 
 	@Override
-	public void launch() { }
+	public Action makeAction() {
+		return makeAction(this instanceof ActionListener ? (ActionListener) this
+														: null);
+	}
+
+	@SuppressWarnings("serial")
+	protected Action makeAction(final ActionListener listener) {
+		final Action action;
+		if(listener instanceof Action) {
+			action = (Action) listener;
+		} else {
+			action = new AbstractUIAction() {
+				static final String POSITION = _RConst.POSITION_KEY;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					Object posision = getValue(POSITION);
+					if(posision != null
+							&& e.getSource() instanceof JComponent) {
+						JComponent comp = (JComponent) e.getSource();
+						if(comp.getClientProperty(POSITION) == null) {
+							comp.putClientProperty(POSITION, posision);
+						}
+					}
+					if(listener != null) listener.actionPerformed(e);
+					else launch();
+				}
+			};
+		}
+		action.putValue(Action.ACTION_COMMAND_KEY, getActionCommand());
+		action.putValue(Action.NAME, getLabel());
+		action.putValue(Action.LARGE_ICON_KEY, getIcon());
+		action.putValue(Action.SHORT_DESCRIPTION, getDescription());
+		action.setEnabled(isEnabled());
+
+		PropertyChangeListener pcl = new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if(ENABLED.equals(evt.getPropertyName())) {
+					boolean enabled = (boolean) evt.getNewValue();
+					if(evt.getSource() == action) {
+						if(enabled != isEnabled(false)) {
+							setEnabled(enabled);
+						}
+					} else {
+						if(enabled != action.isEnabled()) {
+							action.setEnabled(enabled);
+						}
+					}
+				}
+			}
+		};
+		action.addPropertyChangeListener(pcl);
+		addPropertyChangeListener(ENABLED, pcl);
+
+		return action;
+	}
 
 	@Override
 	public Map<String, Object> getChangedProperties() {
@@ -167,7 +240,7 @@ public abstract class AbstractPlugIn implements PlugIn
 		if(component.enabled != isEnabled(false)) {
 			if(!(this instanceof ExternalTool)
 					|| ((ExternalTool)this).isSupoortedOS()) {
-				data.put("enabled", isEnabled(false));
+				data.put(ENABLED, isEnabled(false));
 			}
 		}
 		return data;
@@ -176,8 +249,8 @@ public abstract class AbstractPlugIn implements PlugIn
 	@Override
 	public void restoreProperties(Map<?, ?> data) {
 		if(data == null) return;
-		if(data.containsKey("enabled")) {
-			setEnabled((boolean)data.get("enabled"));
+		if(data.containsKey(ENABLED)) {
+			setEnabled((boolean)data.get(ENABLED));
 		}
 	}
 

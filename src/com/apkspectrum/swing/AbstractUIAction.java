@@ -7,7 +7,6 @@ import java.awt.Window;
 import java.util.EventObject;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.SwingUtilities;
 
@@ -21,7 +20,7 @@ public abstract class AbstractUIAction extends AbstractAction
 	public AbstractUIAction() { }
 
 	public AbstractUIAction(ActionEventHandler h) {
-		setHandler(h);
+		if(h != null) setHandler(h);
 	}
 
 	protected Window getWindow(EventObject e) {
@@ -47,30 +46,63 @@ public abstract class AbstractUIAction extends AbstractAction
 
 	@Override
 	public void putValue(String key, Object newValue) {
-		if(ACTION_EVENT_HANDLER.equals(key)
-				&& newValue instanceof ActionEventHandler) {
-			setHandler((ActionEventHandler) newValue);
-		} else if(ACTION_REQUIRED_CONDITIONS.equals(key)) {
+		switch(key) {
+		case ACTION_EVENT_HANDLER:
+			setHandler(newValue instanceof ActionEventHandler ?
+					(ActionEventHandler) newValue : null);
+			break;
+		case ACTION_REQUIRED_CONDITIONS:
 			setRequiredConditions(newValue instanceof Integer ?
 					((Integer) newValue).intValue() : 0);
-		} else {
+			break;
+		default:
 			super.putValue(key, newValue);
 		}
 	}
 
-	public void setHandler(ActionEventHandler h) {
-		handler = h;
-		super.putValue(ACTION_EVENT_HANDLER, h);
+	@Override
+	public Object getValue(String key) {
+		switch(key) {
+		case ACTION_EVENT_HANDLER:
+			return getHandler();
+		case ACTION_REQUIRED_CONDITIONS:
+			return getRequiredConditions();
+		case ACTION_COMMAND_KEY:
+			return getActionCommand();
+		default:
+			return super.getValue(key);
+		}
 	}
 
+	@Override
+	public void setHandler(ActionEventHandler h) {
+		if(h == handler) return;
+		Object old = handler;
+		handler = h;
+		firePropertyChange(ACTION_EVENT_HANDLER, old, handler);
+	}
+
+	@Override
 	public ActionEventHandler getHandler() {
 		return handler;
 	}
 
 	@Override
+	public void putHandlerData(String key, Object newValue) {
+		if(handler == null) return;
+		handler.putData(key, newValue);
+	}
+
+	@Override
+	public Object getHandlerData(String key) {
+		return handler != null ? handler.getData(key) : null;
+	}
+
+	@Override
 	public void setRequiredConditions(int conditions) {
+		Integer old = Integer.valueOf(this.conditions);
 		this.conditions = conditions;
-		super.putValue(ACTION_REQUIRED_CONDITIONS, Integer.valueOf(conditions));
+		firePropertyChange(ACTION_REQUIRED_CONDITIONS, old, conditions);
 	}
 
 	@Override
@@ -84,76 +116,93 @@ public abstract class AbstractUIAction extends AbstractAction
 	}
 
 	@Override
+	public void setActionCommand(String actionCommand) {
+		putValue(ACTION_COMMAND_KEY, actionCommand);
+	}
+
+	@Override
 	public String getActionCommand() {
-		String actCmd = (String) getValue(ACTION_COMMAND_KEY);
+		String actCmd = (String) super.getValue(ACTION_COMMAND_KEY);
 		if(actCmd == null) {
 			try {
 				actCmd = (String) getClass().getDeclaredField(
-						UIAction.ACTION_COMMAND_FIELD).get(null);
+						ACTION_COMMAND_FIELD).get(null);
 			} catch (Exception e) { }
 		}
 		return actCmd != null ? actCmd : getClass().getName();
 	}
 
 	@Override
+	public void setDenyUpdateActionCommandKey(boolean deny) {
+		putValue(DENY_UPDATE_ACTION_COMMAND_KEY, Boolean.valueOf(deny));
+	}
+
+	@Override
+	public boolean isDenyUpdateActionCommandKey() {
+		Object deny = getValue(DENY_UPDATE_ACTION_COMMAND_KEY);
+		return deny != null && (deny instanceof Boolean && (Boolean) deny);
+	}
+
+	@Override
 	public String getText() {
-		return (String) getValue(Action.NAME);
+		return (String) getValue(NAME);
 	}
 
 	@Override
 	public void setText(String text) {
-		putValue(Action.NAME, text);
+		putValue(NAME, text);
 	}
 
 	@Override
 	public Icon getIcon() {
-		return (Icon) getValue(Action.LARGE_ICON_KEY);
+		return (Icon) getValue(LARGE_ICON_KEY);
 	}
 
 	@Override
 	public void setIcon(Icon icon) {
-		putValue(Action.LARGE_ICON_KEY, icon);
+		putValue(LARGE_ICON_KEY, icon);
 	}
 
 	@Override
 	public String getToolTipText() {
-		return (String) getValue(Action.SHORT_DESCRIPTION);
+		return (String) getValue(SHORT_DESCRIPTION);
 	}
 
 	@Override
 	public void setToolTipText(String text) {
-		putValue(Action.SHORT_DESCRIPTION, text);
+		putValue(SHORT_DESCRIPTION, text);
 	}
 
 	@Override
 	public int getMnemonic() {
-		Integer mnemonic = (Integer) getValue(Action.MNEMONIC_KEY);
+		Integer mnemonic = (Integer) getValue(MNEMONIC_KEY);
 		return mnemonic != null ? mnemonic.intValue() : '\0';
 	}
 
 	@Override
 	public void setMnemonic(int mnemonic) {
-		putValue(Action.MNEMONIC_KEY, Integer.valueOf(mnemonic));
+		putValue(MNEMONIC_KEY, Integer.valueOf(mnemonic));
 	}
 
 	@Override
 	public int getDisplayedMnemonicIndex() {
-		Integer index = (Integer) getValue(Action.DISPLAYED_MNEMONIC_INDEX_KEY);
+		Integer index = (Integer) getValue(DISPLAYED_MNEMONIC_INDEX_KEY);
 		return index != null ? index.intValue() : -1;
 	}
 
 	@Override
 	public void setDisplayedMnemonicIndex(int index) {
-		putValue(Action.DISPLAYED_MNEMONIC_INDEX_KEY, Integer.valueOf(index));
+		putValue(DISPLAYED_MNEMONIC_INDEX_KEY,
+				Integer.valueOf(index));
 	}
 
 	@Override
 	public boolean isSelected() {
-		return Boolean.TRUE.equals(getValue(Action.SELECTED_KEY));
+		return Boolean.TRUE.equals(getValue(SELECTED_KEY));
 	}
 
 	@Override
 	public void setSelected(boolean b) {
-		putValue(Action.SELECTED_KEY, Boolean.valueOf(b));
+		putValue(SELECTED_KEY, Boolean.valueOf(b));
 	}
 }

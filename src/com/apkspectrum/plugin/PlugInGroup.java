@@ -36,4 +36,7 @@ public class PlugInGroup extends AbstractPlugIn
 		}
 		return list.toArray(new PlugIn[list.size()]);
 	}
+
+	@Override
+	public void launch() { }
 }

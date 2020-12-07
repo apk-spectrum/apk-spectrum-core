@@ -1,10 +1,5 @@
 package com.apkspectrum.plugin;
 
-import java.net.URL;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-
 import com.apkspectrum.plugin.manifest.Component;
 import com.apkspectrum.swing.ITabbedRequest;
 import com.apkspectrum.util.Log;
@@ -65,13 +60,6 @@ public abstract class AbstractExtraComponent<T> extends AbstractPlugIn
 		String tooltip = getDescription();
 		if(tooltip == null) tooltip = getLabel();
 		return tooltip;
-	}
-
-	@Override
-	public Icon getIcon() {
-		URL url = getIconURL();
-		if(url == null) return null;
-		return new ImageIcon(url);
 	}
 
 	@Override
