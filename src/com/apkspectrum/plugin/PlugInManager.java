@@ -40,6 +40,7 @@ import com.apkspectrum.resource._RConst;
 import com.apkspectrum.resource._RFile;
 import com.apkspectrum.swing.ActionEventHandler;
 import com.apkspectrum.swing.KeyStrokeAction;
+import com.apkspectrum.util.GeneralVersionChecker;
 import com.apkspectrum.util.Log;
 
 public final class PlugInManager
@@ -332,6 +333,8 @@ public final class PlugInManager
 				}
 			});
 
+			GeneralVersionChecker coreVer, minVer;
+			coreVer = GeneralVersionChecker.parseFrom(_RConst.CORE_VERSION);
 			for(File pluginFile: pluginFiles) {
 				PlugInPackage pack = null;
 				try {
@@ -341,6 +344,13 @@ public final class PlugInManager
 				}
 				if(pack != null) {
 					String packageName = pack.getPackageName();
+					minVer = GeneralVersionChecker.parseFrom(
+							pack.getMinCoreVersion());
+					if(coreVer.compareTo(minVer) < 0) {
+						Log.w(packageName + " requires core version " + minVer
+								+ " or higher.");
+						continue;
+					}
 					PlugInPackage oldPack = getPlugInPackage(packageName);
 					if(oldPack != null) {
 						Log.i(packageName + " was already existed "

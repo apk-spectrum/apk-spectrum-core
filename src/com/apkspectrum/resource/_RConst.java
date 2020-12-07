@@ -6,6 +6,8 @@ import com.apkspectrum.util.SystemUtil;
 
 public interface _RConst
 {
+	public static final String CORE_VERSION = "1.0";
+
 	public static final String SAMSUNG_KEY_MD5 
 						= "D0:87:E7:29:12:FB:A0:64:CA:FA:78:DC:34:AE:A8:39";
 	public static final String SS_TEST_KEY_MD5

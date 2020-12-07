@@ -14,7 +14,8 @@ public class ManifestReader
 {
 	private ManifestReader() { }
 
-	static public Manifest readManifest(@NonNull File path)  throws InvalidManifestException  {
+	static public Manifest readManifest(@NonNull File path)
+			throws InvalidManifestException  {
 		if(path == null || !path.canRead()) {
 			Log.w("path is null or can not read");
 			return null;
@@ -22,7 +23,8 @@ public class ManifestReader
 		return makeManifest(new XmlPath(path));
 	}
 
-	static public Manifest readManifest(@NonNull InputStream input)  throws InvalidManifestException  {
+	static public Manifest readManifest(@NonNull InputStream input)
+			throws InvalidManifestException  {
 		if(input == null) {
 			Log.w("input is null");
 			return null;
@@ -30,21 +32,26 @@ public class ManifestReader
 		return makeManifest(new XmlPath(input));
 	}
 
-	static private Manifest makeManifest(@NonNull XmlPath manifest) throws InvalidManifestException {
+	static private Manifest makeManifest(@NonNull XmlPath manifest)
+			throws InvalidManifestException {
 		if(manifest == null) {
-			throw new InvalidManifestException("XmlPath is null", new NullPointerException());
+			throw new InvalidManifestException("XmlPath is null",
+					new NullPointerException());
 		}
 
 		if(manifest.getLastException() != null) {
-			throw new InvalidManifestException("Fail to parse xml", manifest.getLastException());
+			throw new InvalidManifestException("Fail to parse xml",
+					manifest.getLastException());
 		}
 
 		if(manifest.getCount("/manifest") != 1) {
-			throw new InvalidManifestException("Must have only one <manifest> tag on root");
+			throw new InvalidManifestException(
+					"Must have only one <manifest> tag on root");
 		}
 
 		if(manifest.getCount("/manifest/plugin") != 1) {
-			throw new InvalidManifestException("Must have only one <plugin> tag on manifest");
+			throw new InvalidManifestException(
+					"Must have only one <plugin> tag on manifest");
 		}
 
 		if(manifest.getNode("/manifest/plugin").getChildCount() == 0) {
@@ -54,14 +61,16 @@ public class ManifestReader
 		XmlPath node = manifest.getNode("/manifest");
 		String packageName = node.getAttribute("package");
 		String versionName = node.getAttribute("versionName");
-		int versionCode = node.getAttribute("versionCode") != null ? Integer.valueOf(node.getAttribute("versionCode")) : 0;
-		String minScannerVersion = node.getAttribute("minScannerVersion");
+		int versionCode = node.getAttribute("versionCode") == null ? 0
+							: Integer.valueOf(node.getAttribute("versionCode"));
+		String minCoreVersion = node.getAttribute("minCoreVersion");
 
 		PlugIn plugin = makePlugin(manifest);
 		Resources[] resources = makeResources(manifest);
 		Configuration[] configuration = makeConfigurations(manifest);
 
-		return new Manifest(packageName, versionName, versionCode, minScannerVersion, plugin, resources, configuration);
+		return new Manifest(packageName, versionName, versionCode,
+				minCoreVersion, plugin, resources, configuration);
 	}
 
 	static private PlugIn makePlugin(@NonNull XmlPath manifest) {
@@ -70,11 +79,14 @@ public class ManifestReader
 		String label = node.getAttribute("label");
 		String icon = node.getAttribute("icon");
 		String description = node.getAttribute("description");
-		boolean useNetworkSetting = "true".equals(node.getAttribute("useNetworkSetting"));
-		boolean useConfigurationSetting = "true".equals(node.getAttribute("useConfigurationSetting"));
+		boolean useNetworkSetting = "true".equals(
+								node.getAttribute("useNetworkSetting"));
+		boolean useConfigurationSetting = "true".equals(
+								node.getAttribute("useConfigurationSetting"));
 
 		Component[] components =  makeComponents(manifest);
-		return new PlugIn(enabled, label, icon, description, components, useNetworkSetting, useConfigurationSetting);
+		return new PlugIn(enabled, label, icon, description, components,
+							useNetworkSetting, useConfigurationSetting);
 	}
 
 	static private Component[] makeComponents(@NonNull XmlPath manifest) {
@@ -85,15 +97,24 @@ public class ManifestReader
 			if(node.getNodeType() == Node.ELEMENT_NODE) {
 				int type;
 				switch(node.getNodeName()) {
-					case "package-searcher": type = Component.TYPE_PACAKGE_SEARCHER; break;
-					case "package-searcher-linker": type = Component.TYPE_PACAKGE_SEARCHER_LINKER; break;
-					case "update-checker": type = Component.TYPE_UPDATE_CHECKER; break;
-					case "update-checker-linker": type = Component.TYPE_UPDATE_CHECKER_LINKER; break;
-					case "external-tool": type = Component.TYPE_EXTERNAL_TOOL; break;
-					case "external-tool-linker": type = Component.TYPE_EXTERNAL_TOOL_LINKER; break;
-					case "extra-component": type = Component.TYPE_EXTRA_COMPONENT; break;
-					case "plugin-group" : type = Component.TYPE_PLUGIN_GROUP; break;
-					default: type = Component.TYPE_UNKNWON;
+					case "package-searcher":
+						type = Component.TYPE_PACAKGE_SEARCHER; break;
+					case "package-searcher-linker":
+						type = Component.TYPE_PACAKGE_SEARCHER_LINKER; break;
+					case "update-checker":
+						type = Component.TYPE_UPDATE_CHECKER; break;
+					case "update-checker-linker":
+						type = Component.TYPE_UPDATE_CHECKER_LINKER; break;
+					case "external-tool":
+						type = Component.TYPE_EXTERNAL_TOOL; break;
+					case "external-tool-linker":
+						type = Component.TYPE_EXTERNAL_TOOL_LINKER; break;
+					case "extra-component":
+						type = Component.TYPE_EXTRA_COMPONENT; break;
+					case "plugin-group" :
+						type = Component.TYPE_PLUGIN_GROUP; break;
+					default:
+						type = Component.TYPE_UNKNWON;
 				}
 				boolean enabled = !"false".equals(node.getAttribute("enabled"));
 				String label = node.getAttribute("label");
@@ -120,7 +141,8 @@ public class ManifestReader
 					target = node.getAttribute("target");
 					preferLang = node.getAttribute("preferLanguage");
 				case Component.TYPE_PACAKGE_SEARCHER:
-					visibleToBasic = !"false".equals(node.getAttribute("visibleToBasic"));
+					visibleToBasic = !"false".equals(
+										node.getAttribute("visibleToBasic"));
 					break;
 				case Component.TYPE_UPDATE_CHECKER_LINKER:
 					updateUrl = node.getAttribute("updateUrl");
@@ -135,8 +157,11 @@ public class ManifestReader
 					like = node.getAttribute("like");
 					break;
 				}
-				components.add(new Component(type, enabled, label, icon, description, name, url, /* linkers */
-						target, preferLang, path, param, updateUrl, pluginGroup, like, supportedOS, visibleToBasic, periodDay, targetPackageName));
+				components.add(new Component(type, enabled, label, icon,
+						description, name, url, /* linkers */
+						target, preferLang, path, param, updateUrl, pluginGroup,
+						like, supportedOS, visibleToBasic, periodDay,
+						targetPackageName));
 			}
 		}
 		return components.toArray(new Component[components.size()]);
@@ -159,7 +184,8 @@ public class ManifestReader
 			String preferLang = node.getAttribute(i, "preferLang");
 			linkers.add(new Linker(url, target, preferLang));
 		}
-		return !linkers.isEmpty() ? linkers.toArray(new Linker[linkers.size()]) : null;
+		return linkers.isEmpty() ? null
+								: linkers.toArray(new Linker[linkers.size()]);
 	}
 
 	private static Resources[] makeResources(XmlPath manifest) {
@@ -180,9 +206,10 @@ public class ManifestReader
 				}
 				String name = child.getAttribute(j, "name");
 				String data = child.getTextContent(j);
-				datas.add(new StringData(name, data));	
+				datas.add(new StringData(name, data));
 			}
-			resources.add(new Resources(src, lang, datas.toArray(new StringData[datas.size()])));
+			resources.add(new Resources(src, lang,
+								datas.toArray(new StringData[datas.size()])));
 		}
 		return resources.toArray(new Resources[resources.size()]);
 	}

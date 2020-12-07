@@ -111,8 +111,8 @@ public class PlugInPackage
 		return manifest.versionName;
 	}
 
-	public String getMinScannerVersionName() {
-		return manifest.minScannerVersion;
+	public String getMinCoreVersion() {
+		return manifest.minCoreVersion;
 	}
 
 	public String getFingerPrint() {
@@ -251,9 +251,8 @@ public class PlugInPackage
 
 	private PlugIn[] createPlugInInstance(File pluginFile, Manifest manifest) {
 		if(manifest == null) return null;
-		Log.v(manifest.packageName + " : " + fingerprint);
-		Log.v(manifest.versionCode + "");
-		Log.v(manifest.versionName);
+		Log.v(manifest.packageName + " : " + fingerprint +
+				", ver " + manifest.versionCode + ", " + manifest.versionName);
 
 		ArrayList<PlugIn> plugins = new ArrayList<>();
 		URLClassLoader loader = null;
@@ -413,7 +412,8 @@ public class PlugInPackage
 			}
 			for(StringData data: res.strings) {
 				if(data.name == null || data.name.trim().isEmpty()) {
-					Log.w("String name is null or empty : " + data.name);
+//					Log.v("String name is null or empty : " + data.name
+//							+ ", " + data.data);
 					continue;
 				}
 				map.put(data.name, data.data);

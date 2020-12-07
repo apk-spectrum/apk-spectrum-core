@@ -11,7 +11,9 @@ public class PlugIn
 
 	public final Component[] components;
 
-	PlugIn(boolean enable, String label, String icon, String description, Component[] components, boolean useNetworkSetting, boolean useConfigurationSetting) {
+	PlugIn(boolean enable, String label, String icon, String description,
+			Component[] components, boolean useNetworkSetting,
+			boolean useConfigurationSetting) {
 		this.enabled = enable;
 		this.label = label;
 		this.icon = icon;

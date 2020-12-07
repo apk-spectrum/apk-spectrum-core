@@ -33,9 +33,12 @@ public class Component
 	public final String periodDay;
 	public final String targetPackageName;
 
-	Component(int type, boolean enable, String label, String icon, String description, String name, String url, /* Linker[] linkers */
-			String target, String preferLang, String path, String param, String updateUrl, String pluginGroup, String like, String supportedOS,
-			Boolean visibleToBasic, String periodDay, String targetPackageName) {
+	Component(int type, boolean enable, String label, String icon,
+			String description, String name, String url, /* Linker[] linkers */
+			String target, String preferLang, String path, String param,
+			String updateUrl, String pluginGroup, String like,
+			String supportedOS, Boolean visibleToBasic, String periodDay,
+			String targetPackageName) {
 		this.type = type;
 		this.enabled = enable;
 		this.label = label;
@@ -62,7 +65,8 @@ public class Component
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((description == null) ? 0 : description.hashCode());
+		result = prime * result + ((description == null) ? 0
+										: description.hashCode());
 		result = prime * result + (enabled ? 1231 : 1237);
 		result = prime * result + ((icon == null) ? 0 : icon.hashCode());
 		result = prime * result + ((label == null) ? 0 : label.hashCode());
@@ -70,16 +74,23 @@ public class Component
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((param == null) ? 0 : param.hashCode());
 		result = prime * result + ((path == null) ? 0 : path.hashCode());
-		result = prime * result + ((pluginGroup == null) ? 0 : pluginGroup.hashCode());
-		result = prime * result + ((preferLang == null) ? 0 : preferLang.hashCode());
-		result = prime * result + ((supportedOS == null) ? 0 : supportedOS.hashCode());
+		result = prime * result + ((pluginGroup == null) ? 0
+										: pluginGroup.hashCode());
+		result = prime * result + ((preferLang == null) ? 0
+										: preferLang.hashCode());
+		result = prime * result + ((supportedOS == null) ? 0
+										: supportedOS.hashCode());
 		result = prime * result + ((target == null) ? 0 : target.hashCode());
 		result = prime * result + type;
-		result = prime * result + ((updateUrl == null) ? 0 : updateUrl.hashCode());
+		result = prime * result + ((updateUrl == null) ? 0
+										: updateUrl.hashCode());
 		result = prime * result + ((url == null) ? 0 : url.hashCode());
-		result = prime * result + ((visibleToBasic == null) ? 0 : (visibleToBasic ? 1231 : 1237));
-		result = prime * result + ((periodDay == null) ? 0 : periodDay.hashCode());
-		result = prime * result + ((targetPackageName == null) ? 0 : targetPackageName.hashCode());
+		result = prime * result + ((visibleToBasic == null) ? 0
+										: (visibleToBasic ? 1231 : 1237));
+		result = prime * result + ((periodDay == null) ? 0
+										: periodDay.hashCode());
+		result = prime * result + ((targetPackageName == null) ? 0
+										: targetPackageName.hashCode());
 		return result;
 	}
 
