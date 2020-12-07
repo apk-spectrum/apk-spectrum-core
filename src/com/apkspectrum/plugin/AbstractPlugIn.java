@@ -1,5 +1,6 @@
 package com.apkspectrum.plugin;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -19,6 +20,7 @@ import javax.swing.JComponent;
 import com.apkspectrum.plugin.manifest.Component;
 import com.apkspectrum.resource._RConst;
 import com.apkspectrum.swing.AbstractUIAction;
+import com.apkspectrum.swing.ImageScaler;
 
 public abstract class AbstractPlugIn implements PlugIn
 {
@@ -90,6 +92,19 @@ public abstract class AbstractPlugIn implements PlugIn
 		URL url = getIconURL();
 		if(url == null) return null;
 		return new ImageIcon(url);
+	}
+
+	@Override
+	public Icon getIcon(Dimension size) {
+		return getIcon(size.width, size.height);
+	}
+
+	@Override
+	public Icon getIcon(int w, int h) {
+		URL url = getIconURL();
+		if(url == null) return null;
+
+		return ImageScaler.getScaledImageIcon(new ImageIcon(url), w, h);
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package com.apkspectrum.plugin;
 
+import java.awt.Dimension;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.Map;
@@ -54,6 +55,8 @@ public interface PlugIn
 	 * @return the icon
 	 */
 	public Icon getIcon();
+	public Icon getIcon(int w, int h);
+	public Icon getIcon(Dimension size);
 
 	/**
 	 * Get the icon URL for plug-in

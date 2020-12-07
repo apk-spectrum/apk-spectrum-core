@@ -2,12 +2,15 @@ package com.apkspectrum.swing;
 
 import java.awt.AWTEvent;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.util.EventObject;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 
 @SuppressWarnings("serial")
@@ -69,6 +72,10 @@ public abstract class AbstractUIAction extends AbstractAction
 			return getRequiredConditions();
 		case ACTION_COMMAND_KEY:
 			return getActionCommand();
+		case LARGE_ICON_KEY:
+			return getLargeIcon();
+		case SMALL_ICON:
+			return getSmallIcon();
 		default:
 			return super.getValue(key);
 		}
@@ -155,7 +162,52 @@ public abstract class AbstractUIAction extends AbstractAction
 
 	@Override
 	public Icon getIcon() {
-		return (Icon) getValue(LARGE_ICON_KEY);
+		Icon icon = getLargeIcon();
+		return icon != null ? icon : getSmallIcon();
+	}
+
+	@Override
+	public Icon getIcon(Dimension size) {
+		return getIcon(size.width, size.height);
+	}
+
+	@Override
+	public Icon getIcon(int w, int h) {
+        Icon icon = null;
+        icon = (Icon) getValue(Action.LARGE_ICON_KEY);
+        if (icon == null) {
+            icon = (Icon) getValue(Action.SMALL_ICON);
+        }
+        if(icon instanceof ImageIcon) {
+        	icon = ImageScaler.getScaledImageIcon((ImageIcon) icon, w, h);
+        }
+		return icon;
+	}
+
+	public Icon getLargeIcon() {
+        Icon icon = null;
+        icon = (Icon) super.getValue(Action.LARGE_ICON_KEY);
+        if(!(icon instanceof ImageIcon)) return icon;
+
+        Object size = getValue(LARGE_ICON_SIZE_KEY);
+        if(!(size instanceof Dimension)) size = getValue(ICON_SIZE_KEY);
+        if(!(size instanceof Dimension)) return icon;
+
+        return ImageScaler.getScaledImageIcon((ImageIcon) icon,
+        			((Dimension) size).width, ((Dimension) size).height);
+	}
+
+	public Icon getSmallIcon() {
+        Icon icon = null;
+        icon = (Icon) super.getValue(Action.SMALL_ICON);
+        if(!(icon instanceof ImageIcon)) return icon;
+
+        Object size = getValue(SMALL_ICON_SIZE_KEY);
+        if(!(size instanceof Dimension)) size = getValue(ICON_SIZE_KEY);
+        if(!(size instanceof Dimension)) return icon;
+
+        return ImageScaler.getScaledImageIcon((ImageIcon) icon,
+					((Dimension) size).width, ((Dimension) size).height);
 	}
 
 	@Override
