@@ -4,8 +4,6 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.apkspectrum.annotations.NonNull;
-
 public class GeneralVersionChecker {
     public static final GeneralVersionChecker UNKNOWN = new GeneralVersionChecker(-1, -1, -1);
 
@@ -40,8 +38,8 @@ public class GeneralVersionChecker {
         return micro - o.micro;
     }
 
-    @NonNull
-    public static GeneralVersionChecker parseFrom(@NonNull String input) {
+    public static GeneralVersionChecker parseFrom(String input) {
+    	if(input == null) return new GeneralVersionChecker(0, 0, 0);
         Matcher matcher = GENERAL_VERSION_PATTERN.matcher(input);
         if (matcher.matches()) {
             int major = Integer.parseInt(matcher.group(1));
