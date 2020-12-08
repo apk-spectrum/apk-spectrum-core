@@ -57,7 +57,7 @@ public class Log {
 	}
 
 	static public void e(Object msg) {
-		e(Objects.toString(msg));
+		e(getCaller(), Objects.toString(msg));
 	}
 
 	static public void e(String msg) {
@@ -73,7 +73,7 @@ public class Log {
 	}
 
 	static public void w(Object msg) {
-		w(Objects.toString(msg));
+		w(getCaller(), Objects.toString(msg));
 	}
 
 	static public void w(String msg) {
@@ -89,7 +89,7 @@ public class Log {
 	}
 
 	static public void i(Object msg) {
-		i(Objects.toString(msg));
+		i(getCaller(), Objects.toString(msg));
 	}
 
 	static public void i(String msg) {
@@ -105,7 +105,7 @@ public class Log {
 	}
 
 	static public void d(Object msg) {
-		d(Objects.toString(msg));
+		d(getCaller(), Objects.toString(msg));
 	}
 
 	static public void d(String msg) {
@@ -121,7 +121,7 @@ public class Log {
 	}
 
 	static public void v(Object msg) {
-		v(Objects.toString(msg));
+		v(getCaller(), Objects.toString(msg));
 	}
 
 	static public void v(String msg) {

@@ -10,8 +10,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,27 +81,31 @@ public class ActionEventHandler
 		try {
 			for(Class<?> cls : ClassFinder.getClasses(packageName)) {
 				if(cls.isMemberClass() || cls.isInterface()
+					|| Modifier.isAbstract(cls.getModifiers())
 					|| !ActionListener.class.isAssignableFrom(cls)) continue;
 				ActionListener listener = null;
 				if (UIAction.class.isAssignableFrom(cls)) {
 					try {
-						listener = (ActionListener) cls.getDeclaredConstructor(
-								ActionEventHandler.class).newInstance(this);
+						Constructor<?> def = null;
+						for(Constructor<?> c :cls.getDeclaredConstructors()) {
+							Class<?>[] t = c.getParameterTypes();
+							if(t.length == 0) def = c;
+							if(t.length != 1) continue;
+							if(t[0].isAssignableFrom(getClass())) {
+								listener = (ActionListener) c.newInstance(this);
+								break;
+							};
+						}
+						if(listener == null && def != null) {
+							listener = (ActionListener) def.newInstance();
+						}
 					} catch (Exception e) { }
 				}
-				if(listener == null) {
-					try {
-						listener = (ActionListener) cls.getDeclaredConstructor()
-								.newInstance();
-					} catch (Exception e1) { }
-				}
-				if(listener != null) {
-					if (listener instanceof Action) {
-						Action action = (Action) listener;
-						addAction(action, actResEnum);
-					} else {
-						addActionListener(getActionCommand(listener), listener);
-					}
+				if (listener instanceof Action) {
+					Action action = (Action) listener;
+					addAction(action, actResEnum);
+				} else if(listener != null) {
+					addActionListener(getActionCommand(listener), listener);
 				}
 			}
 		} catch (ClassNotFoundException | IOException e) {
