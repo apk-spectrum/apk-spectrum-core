@@ -18,6 +18,7 @@ public abstract class AbstractUIAction extends AbstractAction
 	implements UIAction
 {
 	protected ActionEventHandler handler;
+    protected boolean enabled = true;
 	protected int conditions;
 
 	public AbstractUIAction() { }
@@ -118,8 +119,15 @@ public abstract class AbstractUIAction extends AbstractAction
 	}
 
 	@Override
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+		int flags = handler != null ? handler.getFlag() : -1;
+		super.setEnabled(enabled && (flags & conditions) == conditions);
+	}
+
+	@Override
 	public void setEnabled(int flags) {
-		setEnabled((flags & conditions) == conditions);
+		super.setEnabled(enabled && (flags & conditions) == conditions);
 	}
 
 	@Override

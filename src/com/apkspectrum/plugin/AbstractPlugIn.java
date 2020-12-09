@@ -137,7 +137,7 @@ public abstract class AbstractPlugIn implements PlugIn
 		if(enabled && inheritance) {
 			enabled = pluginPackage.isEnabled();
 			if(enabled) {
-				PlugInGroup parent = getParantGroup();
+				PlugIn parent = getParantGroup();
 				enabled = (parent == null) || parent.isEnabled();
 			}
 		}
@@ -226,25 +226,12 @@ public abstract class AbstractPlugIn implements PlugIn
 		action.putValue(Action.SHORT_DESCRIPTION, getDescription());
 		action.setEnabled(isEnabled());
 
-		PropertyChangeListener pcl = new PropertyChangeListener() {
+		addPropertyChangeListener(ENABLED, new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				if(ENABLED.equals(evt.getPropertyName())) {
-					boolean enabled = (boolean) evt.getNewValue();
-					if(evt.getSource() == action) {
-						if(enabled != isEnabled(false)) {
-							setEnabled(enabled);
-						}
-					} else {
-						if(enabled != action.isEnabled()) {
-							action.setEnabled(enabled);
-						}
-					}
-				}
+				action.setEnabled(enabled);
 			}
-		};
-		action.addPropertyChangeListener(pcl);
-		addPropertyChangeListener(ENABLED, pcl);
+		});
 
 		return action;
 	}

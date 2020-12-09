@@ -34,7 +34,7 @@ import com.apkspectrum.util.Log;
 public class ActionEventHandler
 	implements ActionListener, PropertyChangeListener
 {
-	public static final String CONDITIONS_CHANGED = "conditions_changed";
+	public static final String CONDITIONS_KEY = "conditions_key";
 
 	protected Map<String, ActionListener> actionMap = new HashMap<>();
 	protected Map<Object, Object> dataMap;
@@ -233,7 +233,7 @@ public class ActionEventHandler
 		if((oldValue & flag) != flag) {
 			this.flags |= flag;
 			updateActionStatus();
-			firePropertyChange(CONDITIONS_CHANGED,
+			firePropertyChange(CONDITIONS_KEY,
 					Integer.valueOf(oldValue), Integer.valueOf(this.flags));
 		}
 	}
@@ -243,7 +243,7 @@ public class ActionEventHandler
 		if((oldValue & flag) != 0) {
 			this.flags &= ~flag;
 			updateActionStatus();
-			firePropertyChange(CONDITIONS_CHANGED,
+			firePropertyChange(CONDITIONS_KEY,
 					Integer.valueOf(oldValue), Integer.valueOf(this.flags));
 		}
 	}
@@ -362,10 +362,18 @@ public class ActionEventHandler
 	}
 
 	public Object getData(String key) {
+		if(CONDITIONS_KEY.equals(key)) {
+			return Integer.valueOf(getFlag());
+		}
 		return dataMap != null ? dataMap.get(key) : null;
 	}
 
 	public void putData(String key, Object newValue) {
+		if(CONDITIONS_KEY.equals(key)) {
+			setFlag(!(newValue instanceof Integer) ? 0
+					: ((Integer) newValue).intValue());
+			return;
+		}
 		Object oldValue = null;
 		if(dataMap == null) {
 			dataMap = new HashMap<>();
