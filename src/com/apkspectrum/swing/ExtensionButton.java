@@ -12,6 +12,7 @@ import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.util.Map;
 
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
@@ -52,9 +53,15 @@ public class ExtensionButton extends JButton {
 		super(text, icon);
 	}
 
+	public ExtensionButton(Action action) {
+		super(action);
+	}
+
 	public void setArrowVisible(boolean visible) {
 		arrowVisible = visible;
-		setMargin(new Insets(0, 1, 0, visible && isEnabled() ? arrowSize*arrowCount + 3 : 0));
+		setMargin(new Insets(0, 1, 0, visible && isEnabled()
+											? arrowSize*arrowCount + 3 : 0));
+		repaint();
 	}
 
 	public boolean getArrowVisible() {
@@ -69,6 +76,7 @@ public class ExtensionButton extends JButton {
 			Insets l = new Insets(0, 0, 0, arrowSize*arrowCount + 3);
 			setMargin(l);
 		}
+		repaint();
 	}
 
 	/**
@@ -90,6 +98,7 @@ public class ExtensionButton extends JButton {
 	 */
 	public void setDirection(int direction) {
 		this.direction = direction;
+		repaint();
 	}
 
 	/** Returns the number of arrows. */
@@ -100,6 +109,7 @@ public class ExtensionButton extends JButton {
 	/** Sets the number of arrows. */
 	public void setArrowCount(int arrowCount) {
 		this.arrowCount = arrowCount;
+		repaint();
 	}
 
 	/** Returns the arrow size. */
@@ -110,10 +120,12 @@ public class ExtensionButton extends JButton {
 	/** Sets the arrow size. */
 	public void setArrowSize(int arrowSize) {
 		this.arrowSize = arrowSize;
+		repaint();
 	}
 
 	public void setBadge(int count) {
 		this.badgeCount = count;
+		repaint();
 	}
 
 	public int getBadge() {
@@ -122,10 +134,12 @@ public class ExtensionButton extends JButton {
 
 	public void incrementBadge(int increment) {
 		this.badgeCount += increment;
+		repaint();
 	}
 
 	public void clearBadge() {
 		this.badgeCount = 0;
+		repaint();
 	}
 
 	/*
@@ -166,12 +180,14 @@ public class ExtensionButton extends JButton {
 		int h = getSize().height;
 
 		if(arrowVisible) {
+			boolean isSideDir = direction == SwingConstants.EAST
+							 || direction == SwingConstants.WEST;
 			for (int i = 0; i < arrowCount; i++) {
 				paintArrow(g,
-					(w - 5 - arrowSize * (direction == SwingConstants.EAST || direction == SwingConstants.WEST ? arrowCount : 1)) // / 2
-						+ arrowSize * (direction == SwingConstants.EAST || direction == SwingConstants.WEST ? i : 0),
-					(h - arrowSize * (direction == SwingConstants.EAST || direction == SwingConstants.WEST ? 1 : arrowCount)) / 2
-						+ arrowSize * (direction == SwingConstants.EAST || direction == SwingConstants.WEST ? 0 : i) + 1,
+					(w - 5 - arrowSize * (isSideDir ? arrowCount : 1)) // / 2
+						+ arrowSize * (isSideDir ? i : 0),
+					(h - arrowSize * (isSideDir ? 1 : arrowCount)) / 2
+						+ arrowSize * (isSideDir ? 0 : i) + 1,
 					g.getColor()
 				);
 			}
@@ -184,15 +200,19 @@ public class ExtensionButton extends JButton {
 			g.setColor(new Color(237, 125, 49));
 			g.fillOval(w-size-5, 5, size, size);
 			if(size > 12) {
-				Map<?, ?> desktopHints = (Map<?, ?>) Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");
+				Map<?, ?> desktopHints = (Map<?, ?>) Toolkit.getDefaultToolkit()
+								.getDesktopProperty("awt.font.desktophints");
 				Graphics2D g2 = (Graphics2D) g;
 				if (desktopHints != null) {
 				    g2.setRenderingHints(desktopHints);
 				} else {
-					g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-					g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+					g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+							RenderingHints.VALUE_ANTIALIAS_ON);
+					g2.setRenderingHint(RenderingHints.KEY_RENDERING,
+							RenderingHints.VALUE_RENDER_QUALITY);
 				}
-				String badge = badgeCount < 10 ? Integer.toString(badgeCount) : "!";
+				String badge;
+				badge = badgeCount < 10 ? Integer.toString(badgeCount) : "!";
 				Font font = UIManager.getFont("Label.font");
 				g.setFont(font.deriveFont((float)size-3));
 				FontMetrics fm = g.getFontMetrics();
