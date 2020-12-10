@@ -107,23 +107,19 @@ public class DefaultResFile implements ResFile<File>
 	}
 
 	public String getString() {
-		switch(type){
-		case RES_VALUE:
-			try (InputStream is= getURL().openStream();
-				 InputStreamReader ir = new InputStreamReader(is);
-				 BufferedReader br = new BufferedReader(ir)) {
-		        StringBuilder out = new StringBuilder();
-		        String line;
-		        while ((line = br.readLine()) != null) {
-		            out.append(line);
-		        }
-		        return out.toString();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		default:
-			return null;
+		try (InputStream is= getURL().openStream();
+			 InputStreamReader ir = new InputStreamReader(is);
+			 BufferedReader br = new BufferedReader(ir)) {
+	        StringBuilder out = new StringBuilder();
+	        String line;
+	        while ((line = br.readLine()) != null) {
+	            out.append(line);
+	        }
+	        return out.toString();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		return null;
 	}
 
 	@Override
