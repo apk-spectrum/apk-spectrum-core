@@ -24,7 +24,12 @@ public abstract class AbstractUIAction extends AbstractAction
 	public AbstractUIAction() { }
 
 	public AbstractUIAction(ActionEventHandler h) {
-		if(h != null) setHandler(h);
+		if(h != null) {
+			h.addAction(this);
+			if(h != getHandler()) {
+				setHandler(h);
+			}
+		}
 	}
 
 	protected Window getWindow(EventObject e) {

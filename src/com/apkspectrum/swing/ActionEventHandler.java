@@ -11,7 +11,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -77,35 +76,20 @@ public class ActionEventHandler
 	}
 
 	public void loadActions(String packageName,
-			Class<? extends Enum<? extends ResAction<?>>> actResEnum) {
+			Class<? extends Enum<? extends ResAction<?>>> actRes) {
 		try {
 			for(Class<?> cls : ClassFinder.getClasses(packageName)) {
 				if(cls.isMemberClass() || cls.isInterface()
 					|| Modifier.isAbstract(cls.getModifiers())
 					|| !ActionListener.class.isAssignableFrom(cls)) continue;
-				ActionListener listener = null;
-				if (UIAction.class.isAssignableFrom(cls)) {
-					try {
-						Constructor<?> def = null;
-						for(Constructor<?> c :cls.getDeclaredConstructors()) {
-							Class<?>[] t = c.getParameterTypes();
-							if(t.length == 0) def = c;
-							if(t.length != 1) continue;
-							if(t[0].isAssignableFrom(getClass())) {
-								listener = (ActionListener) c.newInstance(this);
-								break;
-							};
-						}
-						if(listener == null && def != null) {
-							listener = (ActionListener) def.newInstance();
-						}
-					} catch (Exception e) { }
-				}
+				ActionListener listener = createActionInstance(cls);
+				String actCmd = getActionCommand(listener);
 				if (listener instanceof Action) {
-					Action action = (Action) listener;
-					addAction(action, actResEnum);
-				} else if(listener != null) {
-					addActionListener(getActionCommand(listener), listener);
+					ResAction<?> res = getResAction(actRes, actCmd);
+					if(res != null) res.set((Action) listener);
+				}
+				if(listener != null && !actionMap.containsValue(listener)) {
+					addActionListener(actCmd, listener);
 				}
 			}
 		} catch (ClassNotFoundException | IOException e) {
@@ -113,25 +97,44 @@ public class ActionEventHandler
 		}
 	}
 
-	public void addAction(Action action) {
-		addAction(action, null);
+	private ActionListener createActionInstance(Class<?> cls) {
+		ActionListener listener = null;
+		try {
+			Constructor<?> def = null;
+			for(Constructor<?> c :cls.getConstructors()) {
+				Class<?>[] t = c.getParameterTypes();
+				if(t.length == 0) def = c;
+				if(t.length != 1) continue;
+				if(t[0].isAssignableFrom(getClass())) {
+					listener = (ActionListener) c.newInstance(this);
+					break;
+				};
+			}
+			if(listener == null && def != null) {
+				listener = (ActionListener) def.newInstance();
+			}
+		} catch (Exception e) { }
+		return listener;
 	}
 
-	private void addAction(Action action,
-			Class<? extends Enum<? extends ResAction<?>>> actResEnum) {
-		String actCommand = getActionCommand(action);
-		if(actResEnum != null) {
+	private ResAction<?> getResAction(
+			Class<? extends Enum<? extends ResAction<?>>> actRes,
+			String actionCommand) {
+		ResAction<?> res = null;
+		if(actRes != null) {
+			Method method;
 			try {
-				Method method = actResEnum.getMethod("valueOf", String.class);
-				ResAction<?> res = (ResAction<?>)
-						method.invoke(null, actCommand);
-				res.set(action);
-			} catch (IllegalAccessException | InvocationTargetException
-					| NoSuchMethodException | SecurityException e) {
+				method = actRes.getMethod("valueOf", String.class);
+				res = (ResAction<?>) method.invoke(null, actionCommand);
+			} catch (Exception e) {
 				//Log.v("No such action resource : " + actCommand);
 			}
 		}
-		addActionListener(actCommand, action);
+		return res;
+	}
+
+	public void addAction(Action action) {
+		addActionListener(getActionCommand(action), action);
 	}
 
 	public void addAction(String actionCommand, Action action) {
