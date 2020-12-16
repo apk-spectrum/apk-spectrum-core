@@ -13,7 +13,6 @@ import org.json.simple.parser.JSONParser;
 
 public class DefaultResProp implements ResProp<Object>
 {
-
 	private static JSONObject property;
 	private static PropertyChangeSupport pcs;
 
@@ -73,7 +72,8 @@ public class DefaultResProp implements ResProp<Object>
 	}
 
 	public String getString() {
-		return String.valueOf(getData());
+		Object result = getData();
+		return result != null ? String.valueOf(result) : "";
 	}
 
 	public int getInt() {
@@ -148,20 +148,22 @@ public class DefaultResProp implements ResProp<Object>
 		}
 	}
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-    	addPropertyChangeListener(this, listener);
+    public void addPropertyChangeListener(PropertyChangeListener l) {
+    	addPropertyChangeListener(this, l);
     }
 
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-    	removePropertyChangeListener(this, listener);
+    public void removePropertyChangeListener(PropertyChangeListener l) {
+    	removePropertyChangeListener(this, l);
     }
 
-    public static void addPropertyChangeListener(ResProp<?> prop, PropertyChangeListener listener) {
-    	pcs.addPropertyChangeListener(prop != null ? prop.getValue() : null, listener);
+    public static void addPropertyChangeListener(ResProp<?> prop,
+    		PropertyChangeListener l) {
+    	pcs.addPropertyChangeListener(prop != null ? prop.getValue() : null, l);
     }
 
-    public static void removePropertyChangeListener(ResProp<?> prop, PropertyChangeListener listener) {
-    	pcs.removePropertyChangeListener(prop != null ? prop.getValue() : null, listener);
+    public static void removePropertyChangeListener(ResProp<?> prop,
+    		PropertyChangeListener l) {
+    	pcs.removePropertyChangeListener(prop != null ? prop.getValue() : null, l);
     }
 
 	private static void loadProperty() {
@@ -183,7 +185,8 @@ public class DefaultResProp implements ResProp<Object>
 		String transMultiLine = property.toJSONString()
 				.replaceAll("^\\{(.*)\\}$", "{\n$1\n}")
 				.replaceAll("(\"[^\"]*\":(\"[^\"]*\")?([^\",]*)?,)", "$1\n");
-		//.replaceAll("(\"[^\"]*\":(\"[^\"]*\")?([^\",\\[]*(\\[[^\\]]\\])?)?,)", "$1\n");
+		//.replaceAll("(\"[^\"]*\":(\"[^\"]*\")?([^\",\\[]*(\\[[^\\]]\\])?)?,)",
+		//"$1\n");
 
 		try( FileWriter fw = new FileWriter(_RFile.ETC_SETTINGS_FILE.getPath());
 			BufferedWriter writer = new BufferedWriter(fw) ) {

@@ -1,6 +1,8 @@
 package com.apkspectrum.resource;
 
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.UIManager;
 
@@ -37,29 +39,34 @@ public enum _RProp implements ResProp<Object>
 		PRINT_MULTILINE_ATTR,
 		; // ENUM END
 
+		private B() {}
+		private B(boolean defValue) {
+			getProp(name()).setDefaultValue(Boolean.valueOf(defValue));
+		}
+
 		@Override
 		public Boolean get() {
-			return _RProp.valueOf(name()).getBoolean();
+			return getProp(name()).getBoolean();
 		}
 
 		@Override
 		public void set(Boolean data) {
-			_RProp.valueOf(name()).setData(data);
+			getProp(name()).setData(data);
 		}
 
 		@Override
 		public String getValue() {
-			return _RProp.valueOf(name()).getValue();
+			return getProp(name()).getValue();
 		}
 
 		@Override
-		public void addPropertyChangeListener(PropertyChangeListener listener) {
-			_RProp.valueOf(name()).addPropertyChangeListener(listener);
+		public void addPropertyChangeListener(PropertyChangeListener l) {
+			getProp(name()).addPropertyChangeListener(l);
 		}
 
 		@Override
-		public void removePropertyChangeListener(PropertyChangeListener listener) {
-			_RProp.valueOf(name()).removePropertyChangeListener(listener);
+		public void removePropertyChangeListener(PropertyChangeListener l) {
+			getProp(name()).removePropertyChangeListener(l);
 		}
 	}
 
@@ -74,29 +81,34 @@ public enum _RProp implements ResProp<Object>
 		PREFERRED_LANGUAGE,
 		; // ENUM END
 
+		private S() {}
+		private S(String defValue) {
+			getProp(name()).setDefaultValue(defValue);
+		}
+
 		@Override
 		public String get() {
-			return _RProp.valueOf(name()).getString();
+			return getProp(name()).getString();
 		}
 
 		@Override
 		public void set(String data) {
-			_RProp.valueOf(name()).setData(data);
+			getProp(name()).setData(data);
 		}
 
 		@Override
 		public String getValue() {
-			return _RProp.valueOf(name()).getValue();
+			return getProp(name()).getValue();
 		}
 
 		@Override
-		public void addPropertyChangeListener(PropertyChangeListener listener) {
-			_RProp.valueOf(name()).addPropertyChangeListener(listener);
+		public void addPropertyChangeListener(PropertyChangeListener l) {
+			getProp(name()).addPropertyChangeListener(l);
 		}
 
 		@Override
-		public void removePropertyChangeListener(PropertyChangeListener listener) {
-			_RProp.valueOf(name()).removePropertyChangeListener(listener);
+		public void removePropertyChangeListener(PropertyChangeListener l) {
+			getProp(name()).removePropertyChangeListener(l);
 		}
 	}
 
@@ -104,33 +116,39 @@ public enum _RProp implements ResProp<Object>
 		// EMPTY
 		; // ENUM END
 
+		private I() {}
+		private I(int defValue) {
+			getProp(name()).setDefaultValue(Integer.valueOf(defValue));
+		}
+
 		@Override
 		public Integer get() {
-			return _RProp.valueOf(name()).getInt();
+			return getProp(name()).getInt();
 		}
 
 		@Override
 		public void set(Integer data) {
-			_RProp.valueOf(name()).setData(data);
+			getProp(name()).setData(data);
 		}
 
 		@Override
 		public String getValue() {
-			return _RProp.valueOf(name()).getValue();
+			return getProp(name()).getValue();
 		}
 
 		@Override
-		public void addPropertyChangeListener(PropertyChangeListener listener) {
-			_RProp.valueOf(name()).addPropertyChangeListener(listener);
+		public void addPropertyChangeListener(PropertyChangeListener l) {
+			getProp(name()).addPropertyChangeListener(l);
 		}
 
 		@Override
-		public void removePropertyChangeListener(PropertyChangeListener listener) {
-			_RProp.valueOf(name()).removePropertyChangeListener(listener);
+		public void removePropertyChangeListener(PropertyChangeListener l) {
+			getProp(name()).removePropertyChangeListener(l);
 		}
 	}
 
 	private DefaultResProp res;
+	private static Map<String, DefaultResProp> others;
 
 	private _RProp() {
 		res = new DefaultResProp(name(), getDefaultValue());
@@ -155,8 +173,10 @@ public enum _RProp implements ResProp<Object>
 		case "PREFERRED_LANGUAGE":
 			String propPreferredLanguage = SystemUtil.getUserLanguage();
 			String propStrLanguage = (String) LANGUAGE.getData();
-			if(!propPreferredLanguage.equals(propStrLanguage) && !"en".equals(propPreferredLanguage)) {
-				propPreferredLanguage += ";" + (propStrLanguage.isEmpty() ? "en" : propStrLanguage);
+			if(!propPreferredLanguage.equals(propStrLanguage)
+					&& !"en".equals(propPreferredLanguage)) {
+				propPreferredLanguage += ";" + (propStrLanguage.isEmpty()
+												? "en" : propStrLanguage);
 			}
 			obj = propPreferredLanguage + ";";
 			break;
@@ -189,13 +209,13 @@ public enum _RProp implements ResProp<Object>
 	}
 
 	@Override
-	public void addPropertyChangeListener(PropertyChangeListener listener) {
-		res.addPropertyChangeListener(listener);
+	public void addPropertyChangeListener(PropertyChangeListener l) {
+		res.addPropertyChangeListener(l);
 	}
 
 	@Override
-	public void removePropertyChangeListener(PropertyChangeListener listener) {
-		res.removePropertyChangeListener(listener);
+	public void removePropertyChangeListener(PropertyChangeListener l) {
+		res.removePropertyChangeListener(l);
 	}
 
 	public Object getData() {
@@ -230,6 +250,29 @@ public enum _RProp implements ResProp<Object>
 		res.setData(data);
 	}
 
+	public DefaultResProp getProp() {
+		return res;
+	}
+
+	public static DefaultResProp getProp(String name) {
+		_RProp prop = null;
+		try {
+			prop = valueOf(name);
+		} catch (Exception e) {}
+
+		DefaultResProp res;
+		if(prop != null) {
+			res = prop.res;
+		} else {
+			if(others == null) others = new HashMap<>();
+			res = others.get(name);
+			if(res == null) {
+				others.put(name, res = new DefaultResProp(name));
+			}
+		}
+		return res;
+	}
+
 	public static Object getPropData(String key) {
 		return DefaultResProp.getPropData(key);
 	}
@@ -242,11 +285,13 @@ public enum _RProp implements ResProp<Object>
 		DefaultResProp.setPropData(key, data);
 	}
 
-    public static void addPropertyChangeListener(ResProp<?> prop, PropertyChangeListener listener) {
-    	DefaultResProp.addPropertyChangeListener(prop, listener);
+    public static void addPropertyChangeListener(ResProp<?> prop,
+    		PropertyChangeListener l) {
+    	DefaultResProp.addPropertyChangeListener(prop, l);
     }
 
-    public static void removePropertyChangeListener(ResProp<?> prop, PropertyChangeListener listener) {
-    	DefaultResProp.removePropertyChangeListener(prop, listener);
+    public static void removePropertyChangeListener(ResProp<?> prop,
+    		PropertyChangeListener l) {
+    	DefaultResProp.removePropertyChangeListener(prop, l);
     }
 }

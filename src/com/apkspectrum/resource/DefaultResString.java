@@ -27,8 +27,6 @@ public class DefaultResString implements ResString<String>
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				setLanguage((String) evt.getNewValue());
-				fireLanguageChange((String) evt.getOldValue(),
-						(String) evt.getNewValue());
 			}
 		});
 	}
@@ -95,8 +93,11 @@ public class DefaultResString implements ResString<String>
 
 	public static void setLanguage(String l) {
 		if(lang == l) return;
+		String old = lang;
 		lang = l;
 		xmlPaths.clear();
+
+		fireLanguageChange(old, lang);
 	}
 
 	public static String getLanguage() {

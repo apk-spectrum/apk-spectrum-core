@@ -1,6 +1,8 @@
 package com.apkspectrum.resource;
 
 import java.awt.Dimension;
+import java.util.Collection;
+import java.util.HashSet;
 
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -11,6 +13,8 @@ public class DefaultResAction implements ResAction<ResAction<?>>
 	private ResImage<?> image;
 	private Icon icon;
 	private Dimension iconSize;
+
+	private Collection<Action> actions;
 
 	public DefaultResAction(ResString<?> text) {
 		this(text, (Icon) null, null);
@@ -39,6 +43,16 @@ public class DefaultResAction implements ResAction<ResAction<?>>
 		this.text = text;
 		this.icon = icon;
 		this.toolTipText = toolTipText;
+
+		if(text != null || toolTipText != null) {
+			_RStr.addLanguageChangeListener(new LanguageChangeListener() {
+				@Override
+				public void languageChange(String oldLang, String newLang) {
+					if(actions == null || actions.isEmpty()) return;
+					for(Action a: actions) applyText(a);
+				}
+			});
+		}
 	}
 
 	@Override
@@ -72,12 +86,19 @@ public class DefaultResAction implements ResAction<ResAction<?>>
 	public void set(Action a) {
 		if(a == null) return;
 
-		Object data;
-		data = getText();
-		if(data != null) a.putValue(Action.NAME, data);
-
-		data = getIcon();
+		Object data = getIcon();
 		if(data != null) a.putValue(Action.LARGE_ICON_KEY, data);
+
+		if(text != null || toolTipText != null) {
+			applyText(a);
+			if(actions == null) actions = new HashSet<>();
+			if(!actions.contains(a)) actions.add(a);
+		}
+	}
+
+	private void applyText(Action a) {
+		Object data = getText();
+		if(data != null) a.putValue(Action.NAME, data);
 
 		data = getToolTipText();
 		if(data != null) a.putValue(Action.SHORT_DESCRIPTION, data);
