@@ -24,6 +24,7 @@ import com.apkspectrum.plugin.manifest.Manifest;
 import com.apkspectrum.plugin.manifest.ManifestReader;
 import com.apkspectrum.plugin.manifest.Resources;
 import com.apkspectrum.plugin.manifest.StringData;
+import com.apkspectrum.resource._RStr;
 import com.apkspectrum.util.FileUtil;
 import com.apkspectrum.util.Log;
 import com.apkspectrum.util.XmlPath;
@@ -431,7 +432,7 @@ public class PlugInPackage
 			return name;
 		}
 
-		String lang = PlugInManager.getLang();
+		String lang = _RStr.getLanguage();
 		String id = name.substring(1);
 		String value = null;
 		if(resources.containsKey(lang) && resources.get(lang).containsKey(id)) {

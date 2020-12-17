@@ -40,7 +40,6 @@ import com.apkspectrum.util.Log;
 public final class PlugInManager
 {
 	private static List<PlugInPackage> pluginPackages = new ArrayList<>();
-	private static String lang = "";
 
 	private static List<PlugInEventListener> eventListeners = new ArrayList<>();
 	private static final Object sLock = eventListeners;
@@ -252,14 +251,6 @@ public final class PlugInManager
 	public static ApkInfo getApkInfoByEventSource(EventObject e) {
 		return actionHandler != null ? actionHandler.getApkInfoByEventSource(e)
 				: null;
-	}
-
-	public static void setLang(String newLang) {
-		lang = newLang != null ? newLang.trim() : "";
-	}
-
-	public static String getLang() {
-		return lang != null ? lang : "";
 	}
 
 	public static void loadPlugIn() {

@@ -24,10 +24,10 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
-import com.apkspectrum.plugin.UpdateChecker;
 import com.apkspectrum.plugin.NetworkException;
 import com.apkspectrum.plugin.PlugInManager;
 import com.apkspectrum.plugin.PlugInPackage;
+import com.apkspectrum.plugin.UpdateChecker;
 import com.apkspectrum.resource._RStr;
 import com.apkspectrum.util.Log;
 
@@ -154,8 +154,8 @@ public class UpdateNotificationPanel extends JPanel implements ListSelectionList
 			desc = (String) rawData;
 		} else if(rawData instanceof Map<?,?>) {
 			Map<?,?> descMap = (Map<?,?>) rawData;
-			if(descMap.containsKey(PlugInManager.getLang())) {
-				desc = (String) descMap.get(PlugInManager.getLang());
+			if(descMap.containsKey(_RStr.getLanguage())) {
+				desc = (String) descMap.get(_RStr.getLanguage());
 			} else if(descMap.containsKey("en")) {
 				desc = (String) descMap.get("en");
 			} else if(!descMap.isEmpty()) {

@@ -18,7 +18,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
 import com.apkspectrum.plugin.manifest.Component;
+import com.apkspectrum.resource.LanguageChangeListener;
 import com.apkspectrum.resource._RConst;
+import com.apkspectrum.resource._RStr;
 import com.apkspectrum.swing.AbstractUIAction;
 import com.apkspectrum.swing.ImageScaler;
 
@@ -221,10 +223,9 @@ public abstract class AbstractPlugIn implements PlugIn
 			};
 		}
 		action.putValue(Action.ACTION_COMMAND_KEY, getActionCommand());
-		action.putValue(Action.NAME, getLabel());
 		action.putValue(Action.LARGE_ICON_KEY, getIcon());
-		action.putValue(Action.SHORT_DESCRIPTION, getDescription());
 		action.setEnabled(isEnabled());
+		boolean hasTextRes = applyText(action);
 
 		addPropertyChangeListener(ENABLED, new PropertyChangeListener() {
 			@Override
@@ -233,7 +234,24 @@ public abstract class AbstractPlugIn implements PlugIn
 			}
 		});
 
+		if(hasTextRes) {
+			_RStr.addLanguageChangeListener(new LanguageChangeListener() {
+				@Override
+				public void languageChange(String oldLang, String newLang) {
+					applyText(action);
+				}
+			});
+		}
+
 		return action;
+	}
+
+	private boolean applyText(Action action) {
+		String label = getLabel();
+		String desc = getDescription();
+		if(label != null) action.putValue(Action.NAME, label);
+		if(desc != null) action.putValue(Action.SHORT_DESCRIPTION, desc);
+		return label != null || desc != null;
 	}
 
 	@Override
