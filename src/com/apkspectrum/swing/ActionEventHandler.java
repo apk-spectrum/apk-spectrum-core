@@ -84,12 +84,14 @@ public class ActionEventHandler
 					|| !ActionListener.class.isAssignableFrom(cls)) continue;
 				ActionListener listener = createActionInstance(cls);
 				String actCmd = getActionCommand(listener);
-				if (listener instanceof Action) {
-					ResAction<?> res = getResAction(actRes, actCmd);
-					if(res != null) res.set((Action) listener);
-				}
-				if(listener != null && !actionMap.containsValue(listener)) {
-					addActionListener(actCmd, listener);
+				if(actCmd != null && !actCmd.isEmpty()) {
+					if (listener instanceof Action) {
+						ResAction<?> res = getResAction(actRes, actCmd);
+						if(res != null) res.set((Action) listener);
+					}
+					if(listener != null && !actionMap.containsValue(listener)) {
+						addActionListener(actCmd, listener);
+					}
 				}
 			}
 		} catch (ClassNotFoundException | IOException e) {
@@ -142,7 +144,9 @@ public class ActionEventHandler
 	}
 
 	public void addActionListener(String actionCommand, ActionListener action) {
-		if(action == null) return;
+		if(action == null || actionCommand == null || actionCommand.isEmpty()) {
+			return;
+		}
 		Action oldAction = getAction(actionCommand);
 
 		if(actionMap.containsKey(actionCommand)) {
