@@ -9,7 +9,6 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -41,6 +40,8 @@ public class ActionEventHandler
 	protected boolean allowUpdateActionCommandKey = true;
 	protected int flags;
 
+	protected Class<? extends Enum<? extends ResAction<?>>> defRes;
+
 	public ActionEventHandler() { }
 
 	public ActionEventHandler(Package actionPackage) {
@@ -49,7 +50,8 @@ public class ActionEventHandler
 
 	public ActionEventHandler(Package actionPackage,
 			Class<? extends Enum<? extends ResAction<?>>> actResEnum) {
-		loadActions(actionPackage, actResEnum);
+		setDefaultActionResourceClass(actResEnum);
+		loadActions(actionPackage);
 	}
 
 	public ActionEventHandler(String packageName) {
@@ -58,11 +60,22 @@ public class ActionEventHandler
 
 	public ActionEventHandler(String packageName,
 			Class<? extends Enum<? extends ResAction<?>>> actResEnum) {
-		loadActions(packageName, actResEnum);
+		setDefaultActionResourceClass(actResEnum);
+		loadActions(packageName);
+	}
+
+	public void setDefaultActionResourceClass(
+			Class<? extends Enum<? extends ResAction<?>>> actResEnum) {
+		defRes = actResEnum;
+	}
+
+	public Class<? extends Enum<? extends ResAction<?>>>
+			getDefaultActionResourceClass() {
+		return defRes;
 	}
 
 	public void loadActions(Package actionPackage) {
-		loadActions(actionPackage, null);
+		loadActions(actionPackage, defRes);
 	}
 
 	public void loadActions(Package actionPackage,
@@ -72,30 +85,30 @@ public class ActionEventHandler
 	}
 
 	public void loadActions(String packageName) {
-		loadActions(packageName, null);
+		loadActions(packageName, defRes);
 	}
 
 	public void loadActions(String packageName,
 			Class<? extends Enum<? extends ResAction<?>>> actRes) {
+		Class<?>[] classes = null;
 		try {
-			for(Class<?> cls : ClassFinder.getClasses(packageName)) {
-				if(cls.isMemberClass() || cls.isInterface()
-					|| Modifier.isAbstract(cls.getModifiers())
-					|| !ActionListener.class.isAssignableFrom(cls)) continue;
-				ActionListener listener = createActionInstance(cls);
-				String actCmd = getActionCommand(listener);
-				if(actCmd != null && !actCmd.isEmpty()) {
-					if (listener instanceof Action) {
-						ResAction<?> res = getResAction(actRes, actCmd);
-						if(res != null) res.set((Action) listener);
-					}
-					if(listener != null && !actionMap.containsValue(listener)) {
-						addActionListener(actCmd, listener);
-					}
-				}
+			classes = ClassFinder.getClasses(packageName);
+		} catch (Exception e) {}
+		if(classes == null || classes.length <= 0) return;
+		for(Class<?> cls : classes) {
+			if(cls.isMemberClass() || cls.isInterface()
+				|| Modifier.isAbstract(cls.getModifiers())
+				|| !ActionListener.class.isAssignableFrom(cls)) continue;
+			ActionListener listener = createActionInstance(cls);
+			String actCmd = getActionCommand(listener);
+			if(actCmd == null || actCmd.isEmpty()) continue;
+
+			if(listener != null && !actionMap.containsValue(listener)) {
+				addActionListener(actCmd, listener, actRes);
+			} else if (listener instanceof Action && actRes != defRes) {
+				ResAction<?> res = getResAction(actRes, actCmd);
+				if(res != null) res.set((Action) listener);
 			}
-		} catch (ClassNotFoundException | IOException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -124,12 +137,20 @@ public class ActionEventHandler
 			String actionCommand) {
 		ResAction<?> res = null;
 		if(actRes != null) {
-			Method method;
+			Method method = null;
 			try {
-				method = actRes.getMethod("valueOf", String.class);
+				method = actRes.getMethod("getResAction", String.class);
+				if(!ResAction.class.isAssignableFrom(method.getReturnType())) {
+					method = actRes.getMethod("valueOf", String.class);
+				}
 				res = (ResAction<?>) method.invoke(null, actionCommand);
 			} catch (Exception e) {
-				//Log.v("No such action resource : " + actCommand);
+				try {
+					method = actRes.getMethod("valueOf", String.class);
+					res = (ResAction<?>) method.invoke(null, actionCommand);
+				} catch (Exception e1) {
+					//Log.v("No such action resource : " + actCommand);
+				}
 			}
 		}
 		return res;
@@ -144,6 +165,11 @@ public class ActionEventHandler
 	}
 
 	public void addActionListener(String actionCommand, ActionListener action) {
+		addActionListener(actionCommand, action, defRes);
+	}
+
+	private void addActionListener(String actionCommand, ActionListener action,
+			Class<? extends Enum<? extends ResAction<?>>> actRes) {
 		if(action == null || actionCommand == null || actionCommand.isEmpty()) {
 			return;
 		}
@@ -155,6 +181,8 @@ public class ActionEventHandler
 		}
 
 		if(action instanceof Action) {
+			ResAction<?> res = getResAction(actRes, actionCommand);
+			if(res != null) res.set((Action) action);
 			((Action) action).putValue(UIAction.ACTION_EVENT_HANDLER, this);
 			((Action) action).addPropertyChangeListener(this);
 		}

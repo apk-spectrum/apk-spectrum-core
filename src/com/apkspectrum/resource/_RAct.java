@@ -60,4 +60,12 @@ public enum _RAct implements ResAction<ResAction<?>>
 	public void set(javax.swing.Action a) {
 		res.set(a);
 	}
+
+	public static ResAction<?> getResAction(String name) {
+		ResAction<?> res = null;
+		try {
+			res = valueOf(name);
+		} catch (Exception e) {}
+		return res;
+	}
 }
