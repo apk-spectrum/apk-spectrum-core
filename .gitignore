@@ -28,3 +28,6 @@ hs_err_pid*
 
 # p4merge
 *.orig
+
+# vscode
+/.vscode
