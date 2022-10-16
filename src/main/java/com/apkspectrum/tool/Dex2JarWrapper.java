@@ -68,9 +68,10 @@ public class Dex2JarWrapper
 				Log.i("End DEX2JAR");
 
 				if(!successed) {
-					if(listener != null)
+					if(listener != null) {
 						listener.onError(sb.toString());
-					listener.onCompleted();
+						listener.onCompleted();
+					}
 					return;
 				}
 

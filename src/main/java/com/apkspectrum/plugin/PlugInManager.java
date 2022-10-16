@@ -22,7 +22,6 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.Action;
 import javax.swing.SwingWorker;
 
-import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 
@@ -471,7 +470,9 @@ public final class PlugInManager
 		for(Entry<String, Object> entry: data.entrySet()) {
 			PlugInPackage pack = getPlugInPackage((String) entry.getKey());
 			if(pack != null) {
-				pack.restoreProperties((Map<String, Object>) entry.getValue());
+				@SuppressWarnings("unchecked")
+				Map<String, Object> m = (Map<String, Object>) entry.getValue();
+				pack.restoreProperties(m);
 			} else {
 				Log.w("unknown package : " + entry.getKey());
 			}
@@ -482,9 +483,11 @@ public final class PlugInManager
 	{
 		File file = _RFile.PLUGIN_CONF_PATH.get();
 		if(!file.exists() || file.length() == 0) return;
-		try(FileReader fileReader = new FileReader(file)) {
+		try(FileReader reader = new FileReader(file)) {
 			JSONParser parser = new JSONParser();
-			restoreProperties((JSONObject)parser.parse(fileReader));
+			@SuppressWarnings("unchecked")
+			Map<String, Object> m = (Map<String, Object>) parser.parse(reader);
+			restoreProperties(m);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

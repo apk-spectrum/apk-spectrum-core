@@ -247,7 +247,7 @@ public class AdbDeviceHelper {
 				Log.d("ddms", "read: channel EOF");
 				throw new IOException("EOF");
 			} else if (count == 0) {
-				// TODO: need more accurate timeout?
+				// TO-DO: need more accurate timeout?
 				if (timeout != 0 && numWaits * WAIT_TIME > timeout) {
 					Log.d("ddms", "read: timeout");
 					throw new TimeoutException();
@@ -296,7 +296,7 @@ public class AdbDeviceHelper {
 				Log.d("ddms", "write: channel EOF");
 				throw new IOException("channel EOF");
 			} else if (count == 0) {
-				// TODO: need more accurate timeout?
+				// TO-DO: need more accurate timeout?
 				if (timeout != 0 && numWaits * WAIT_TIME > timeout) {
 					Log.d("ddms", "write: timeout");
 					throw new TimeoutException();
@@ -583,7 +583,7 @@ public class AdbDeviceHelper {
 	public static void tryDismissKeyguard(IDevice device) {
 		String unlockCmd = "wm dismiss-keyguard;";
 
-		if(!AdbDeviceHelper.isPosibleDismissKeyguard(device) 
+		if(!AdbDeviceHelper.isPosibleDismissKeyguard(device)
 				&& AdbDeviceHelper.isShowingLockscreen(device)) {
 			Dimension screenSize = AdbDeviceHelper.getPhysicalScreenSize(device);
 			if(screenSize != null) {

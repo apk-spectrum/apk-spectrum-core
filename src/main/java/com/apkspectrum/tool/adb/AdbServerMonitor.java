@@ -408,7 +408,7 @@ public final class AdbServerMonitor {
 				try{
 					AndroidDebugBridge.init(false);
 				} catch (Exception e) {}
-				AndroidDebugBridge.createBridge();
+				AndroidDebugBridge.createBridge(10, TimeUnit.SECONDS);
 				Log.i("AndroidDebugBridge createBridge() notifyAll");
 				state = STATUS_CREATE_BRIDGE;
 				sLock.notifyAll();
@@ -432,7 +432,7 @@ public final class AdbServerMonitor {
 							adbVersion = AdbVersionManager.getAdbVersion(runningAdbPath);
 							mAdbServerMonitor.adbDemonConnected(runningAdbPath, adbVersion);
 						} else {
-							if(adbPath.length > 1) {
+							if(adbPath != null && adbPath.length > 1) {
 								Log.d("current running adb is multiple.");
 								for(String s: adbPath) {
 									Log.d("adb:" + s + ", " + AdbVersionManager.getAdbVersion(s));
@@ -458,14 +458,14 @@ public final class AdbServerMonitor {
 							mAdbServerMonitor.adbDemonDisconnected();
 						}
 					} else {
-						AndroidDebugBridge.disconnectBridge();
+						AndroidDebugBridge.disconnectBridge(10, TimeUnit.SECONDS);
 					}
 				} else if(!isConnected && adb == null) {
 					String[] adbPath = getRunningAdbPath();
 					if(adbPath != null) {
 						if(adbPath.length == 1) {
 							runningAdbPath = adbPath[0];
-							AndroidDebugBridge.createBridge();
+							AndroidDebugBridge.createBridge(10, TimeUnit.SECONDS);
 						} else if(adbPath.length > 1) {
 							Log.d("current running adb is multiple.");
 							for(String s: adbPath) {

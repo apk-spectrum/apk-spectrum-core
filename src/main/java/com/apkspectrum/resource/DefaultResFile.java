@@ -36,7 +36,7 @@ public class DefaultResFile implements ResFile<File>
 	}
 
 	public DefaultResFile(Type type, ResFile<?>[] cfgResources) {
-		if(cfgResources == null | cfgResources.length == 0) {
+		if(cfgResources == null || cfgResources.length == 0) {
 			throw new IllegalArgumentException();
 		}
 

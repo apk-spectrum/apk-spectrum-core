@@ -511,7 +511,8 @@ public class AaptManifestReader
 				widgets = shortcutList;
 			}
 		}
-		Log.v("getLuncherShortCuts() " + xmlRes.configuration + ", " + xmlRes.name);
+		Log.v("getLuncherShortCuts() " + (xmlRes == null ? "null" :
+				xmlRes.configuration + ", " + xmlRes.name));
 
 		return widgets;
 	}

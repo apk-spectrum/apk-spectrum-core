@@ -147,7 +147,8 @@ public class PSTabbedPaneUI extends BasicTabbedPaneUI
 
 	protected void paintContentBorderTopEdge(Graphics g, int tabPlacement, int selectedIndex, int x, int y, int w, int h)
 	{
-		Rectangle selectedRect = selectedIndex < 0 ? null : getTabBounds(selectedIndex, calcRect);
+		if (selectedIndex < 0) return;
+		Rectangle selectedRect = getTabBounds(selectedIndex, calcRect);
 
 		selectedRect.width = selectedRect.width + (selectedRect.height / 2) - 1;
 

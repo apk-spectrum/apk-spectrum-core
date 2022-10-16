@@ -587,7 +587,9 @@ public class PlugInPackage
 		for(Entry<String, Object> entry: data.entrySet()) {
 			PlugIn plugin = getPlugInByActionCommand((String) entry.getKey());
 			if(plugin != null) {
-				plugin.restoreProperties((Map<String, Object>) entry.getValue());
+				@SuppressWarnings("unchecked")
+				Map<String, Object> m = (Map<String, Object>) entry.getValue();
+				plugin.restoreProperties(m);
 			} else {
 				Log.w("unknown plugin : " + entry.getKey());
 			}

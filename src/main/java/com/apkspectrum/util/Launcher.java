@@ -107,8 +107,10 @@ public final class Launcher
 			if(param != null) {
 				command.addAll(Arrays.asList(param));
 			}
+			Log.v("command " + command.toString());
+		} else {
+			Log.w("command is null");
 		}
-		Log.v("command " + command.toString());
 		return command;
 	}
 

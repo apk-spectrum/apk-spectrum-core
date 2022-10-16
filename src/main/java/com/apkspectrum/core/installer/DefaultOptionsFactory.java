@@ -35,14 +35,16 @@ public class DefaultOptionsFactory {
 		minSdkVersion = (apkInfo != null && apkInfo.minSdkVersion != null) ? apkInfo.minSdkVersion : 1;
 
 		archList = new ArrayList<String>();
-		for(String lib: apkInfo.libraries) {
-			if(!lib.startsWith("lib/")) {
-				Log.v("Unknown lib path : " + lib);
-				continue;
-			}
-			String arch = lib.replaceAll("lib/([^/]*)/.*", "$1");
-			if(!archList.contains(arch)) {
-				archList.add(arch);
+		if (apkInfo != null) {
+			for(String lib: apkInfo.libraries) {
+				if(!lib.startsWith("lib/")) {
+					Log.v("Unknown lib path : " + lib);
+					continue;
+				}
+				String arch = lib.replaceAll("lib/([^/]*)/.*", "$1");
+				if(!archList.contains(arch)) {
+					archList.add(arch);
+				}
 			}
 		}
 	}

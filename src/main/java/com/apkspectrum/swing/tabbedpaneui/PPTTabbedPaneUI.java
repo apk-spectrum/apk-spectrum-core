@@ -150,7 +150,8 @@ public class PPTTabbedPaneUI extends BasicTabbedPaneUI
 
 	protected void paintContentBorderTopEdge(Graphics g, int tabPlacement, int selectedIndex, int x, int y, int w, int h)
 	{
-		Rectangle selectedRect = selectedIndex < 0 ? null : getTabBounds(selectedIndex, calcRect);
+		if (selectedIndex < 0) return;
+		Rectangle selectedRect = getTabBounds(selectedIndex, calcRect);
 		g.setColor(darkShadow);
 		g.drawLine(x, y, selectedRect.x - (selectedRect.height / 4), y);
 		g.drawLine(selectedRect.x + selectedRect.width + (selectedRect.height / 4), y, x + w, y);

@@ -2,6 +2,8 @@ package com.apkspectrum.tool.adb;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -274,7 +276,7 @@ public class PackageManager {
 			errMessage = "Invalid APK file. Cannot read package name";
 		}
 
-		if(errMessage != null) {
+		if(device == null || errMessage != null) {
 			return errMessage; 
 		}
 
@@ -323,7 +325,7 @@ public class PackageManager {
 			}
 		}
 
-		if(errMessage != null) {
+		if(packageInfo == null || errMessage != null) {
 			return errMessage; 
 		}
 
@@ -354,6 +356,7 @@ public class PackageManager {
 
 		if(packageInfo == null || packageInfo.packageName == null) {
 			errMessage = "PackageInfo is null";
+			return errMessage;
 		} else if(packageInfo.device == null) {
 			errMessage = "Device is null";
 		} else if(packageInfo.device.getState() != DeviceState.ONLINE) {
@@ -381,8 +384,8 @@ public class PackageManager {
 		}
 
 		if(errMessage == null && packageInfo.isSystemApp()) {
-			try {
-				AdbDeviceHelper.remount(AndroidDebugBridge.getSocketAddress(), packageInfo.device);
+			try (SocketChannel adbChannel = AndroidDebugBridge.openConnection()) {
+				AdbDeviceHelper.remount((InetSocketAddress) adbChannel.getRemoteAddress(), packageInfo.device);
 				packageInfo.device.executeShellCommand("su root setenforce 0", new NullOutputReceiver());
 			} catch (TimeoutException | CommandRejectedException | IOException | ShellCommandUnresponsiveException e1) {
 				errMessage = e1.getMessage();
@@ -451,6 +454,7 @@ public class PackageManager {
 
 		if(packageInfo == null || packageInfo.packageName == null) {
 			errMessage = "PackageInfo is null";
+			return errMessage;
 		} else if(packageInfo.device == null) {
 			errMessage = "Device is null";
 		} else if(packageInfo.device.getState() != DeviceState.ONLINE) {
@@ -499,7 +503,7 @@ public class PackageManager {
 		ArrayList<WindowStateInfo> windows = new ArrayList<WindowStateInfo>();  
 		ArrayList<String> windowDump = new ArrayList<String>();
 		boolean isWindowInfoBlock = false;
-		WindowStateInfo winStateInfo = null;
+		WindowStateInfo winStateInfo = new WindowStateInfo();
 		String blockEndRegex = "";
 
 		String currentFocus = null;

@@ -2,6 +2,8 @@ package com.apkspectrum.core.installer;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 
 import com.android.ddmlib.AdbCommandRejectedException;
@@ -14,9 +16,9 @@ import com.android.ddmlib.TimeoutException;
 import com.apkspectrum.data.apkinfo.CompactApkInfo;
 import com.apkspectrum.resource._RProp;
 import com.apkspectrum.tool.adb.AdbDeviceHelper;
+import com.apkspectrum.tool.adb.AdbDeviceHelper.CommandRejectedException;
 import com.apkspectrum.tool.adb.PackageManager;
 import com.apkspectrum.tool.adb.SimpleOutputReceiver;
-import com.apkspectrum.tool.adb.AdbDeviceHelper.CommandRejectedException;
 import com.apkspectrum.util.FileUtil;
 import com.apkspectrum.util.Log;
 import com.apkspectrum.util.ZipFileUtil;
@@ -58,9 +60,9 @@ public class ApkInstaller
 		}
 
 		if(errMessage == null) {
-			if(options.isInstallOptions()) {
+			if (options == null || options.isInstallOptions()) {
 				errMessage = installApk(device, apkInfo, options);
-			} else if(options.isPushOptions()) {
+			} else if (options.isPushOptions()) {
 				errMessage = pushApk(device, apkInfo, options);
 			}
 		}
@@ -126,8 +128,8 @@ public class ApkInstaller
 		} else if(!AdbDeviceHelper.isRoot(device)) {
 			errMessage = "Permission denied: System is not root, try again after change root mode by 'adb root' command";
 		} else {
-			try {
-				AdbDeviceHelper.remount(AndroidDebugBridge.getSocketAddress(), device);
+			try (SocketChannel adbChannel = AndroidDebugBridge.openConnection()) {
+				AdbDeviceHelper.remount((InetSocketAddress) adbChannel.getRemoteAddress(), device);
 				device.executeShellCommand("su root setenforce 0", new NullOutputReceiver());
 			} catch (TimeoutException | CommandRejectedException | IOException e) {
 				errMessage = "Failure: Can not remount";

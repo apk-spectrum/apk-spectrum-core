@@ -49,7 +49,7 @@ public interface ProcessPathKernel32 extends Kernel32 {
 		}
 	}
 
-	ProcessPathKernel32 INSTANCE = (ProcessPathKernel32)Native.loadLibrary(ProcessPathKernel32.class, W32APIOptions.UNICODE_OPTIONS);
+	ProcessPathKernel32 INSTANCE = (ProcessPathKernel32)Native.load(ProcessPathKernel32.class, W32APIOptions.UNICODE_OPTIONS);
 	boolean Module32First(HANDLE hSnapshot, MODULEENTRY32.ByReference lpme);
 	boolean Module32Next(HANDLE hSnapshot, MODULEENTRY32.ByReference lpme);
 }

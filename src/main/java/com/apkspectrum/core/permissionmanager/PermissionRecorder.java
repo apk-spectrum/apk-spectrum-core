@@ -109,7 +109,7 @@ public class PermissionRecorder {
 			String[] rawResXml = new String[repo.config.length];
 			try {
 				rawXml = getSource(url);
-				if(rawXml != null) {
+				if(rawXml != null && decoder != null) {
 					if(isAOSP) rawXml = new String(decoder.decode(rawXml));
 					sourcePath = new XmlPath(rawXml);
 				}
@@ -119,7 +119,7 @@ public class PermissionRecorder {
 							resourcePath.replace("${config}", !repo.config[j].equals("default") ? "-" + repo.config[j] : "");
 					Log.v(resUrl);
 					rawResXml[j] = getSource(resUrl);
-					if(rawResXml[j] != null) {
+					if(rawResXml[j] != null && decoder != null) {
 						if(isAOSP) rawResXml[j] = new String(decoder.decode(rawResXml[j]));
 						resPath[j] = new XmlPath(rawResXml[j]);
 					} else {
@@ -138,35 +138,38 @@ public class PermissionRecorder {
 			ArrayList<String> permissionList = new ArrayList<>();
 			ArrayList<String> permissionGroupList = new ArrayList<>();
 
-			XmlPath permList = sourcePath.getNodeList("/manifest/permission");
-			for(int j=permList.getCount()-1; j>=0; --j) {
-				PermissionInfoExt info = makePermissionInfo(permList.getNode(j));
-				info.sdk = sdk;
-				info.labels = getResource(info.label, repo.config, resPath);
-				info.descriptions = getResource(info.description, repo.config, resPath);
+			XmlPath permList = new XmlPath();
+			if (sourcePath != null) {
+				permList = sourcePath.getNodeList("/manifest/permission");
+				for(int j=permList.getCount()-1; j>=0; --j) {
+					PermissionInfoExt info = makePermissionInfo(permList.getNode(j));
+					info.sdk = sdk;
+					info.labels = getResource(info.label, repo.config, resPath);
+					info.descriptions = getResource(info.description, repo.config, resPath);
 
-				PermissionInfoExt preInfo = map.get(info.name);
-				if(preInfo == null) {
-					PermissionInfoExt recordInfo = info;
-					if(!isLatestSdk) {
-						// deleted permission
-						//Log.d("deleted permission " + info.name + ", sdk " + info.sdk);
-						recordInfo = new PermissionInfoExt(info);
-						recordInfo.comment = " @Removed" + (info.comment != null ? info.comment : "");
+					PermissionInfoExt preInfo = map.get(info.name);
+					if(preInfo == null) {
+						PermissionInfoExt recordInfo = info;
+						if(!isLatestSdk) {
+							// deleted permission
+							//Log.d("deleted permission " + info.name + ", sdk " + info.sdk);
+							recordInfo = new PermissionInfoExt(info);
+							recordInfo.comment = " @Removed" + (info.comment != null ? info.comment : "");
+						}
+						recordPermission(recordInfo);
+					} else if(info.sdk == preInfo.sdk) {
+						Log.w("Duplicated declared : " + info.name);
+						continue;
+					} else if(!info.equals(preInfo)) {
+						// compare pre
+						recordPermissionPatch(info, preInfo);
+						//Log.d("diff to pre info");
 					}
-					recordPermission(recordInfo);
-				} else if(info.sdk == preInfo.sdk) {
-					Log.w("Duplicated declared : " + info.name);
-					continue;
-				} else if(!info.equals(preInfo)) {
-					// compare pre
-					recordPermissionPatch(info, preInfo);
-					//Log.d("diff to pre info");
-				}
-				map.put(info.name, info);
-				permissionList.add(info.name);
-				if(preSdkPermissionList.contains(info.name)) {
-					preSdkPermissionList.remove(info.name);
+					map.put(info.name, info);
+					permissionList.add(info.name);
+					if(preSdkPermissionList.contains(info.name)) {
+						preSdkPermissionList.remove(info.name);
+					}
 				}
 			}
 
@@ -187,37 +190,39 @@ public class PermissionRecorder {
 			preSdkPermissionList.clear();
 			preSdkPermissionList = permissionList;
 
-			XmlPath groupList = sourcePath.getNodeList("/manifest/permission-group");
-			Log.d("sdk " + sdk + ", permList " + permList.getCount() + ", groupList " + groupList.getCount());
-			for(int j=groupList.getCount()-1; j>=0; --j) {
-				PermissionGroupInfoExt info = makePermissionGroupInfo(groupList.getNode(j));;
-				info.sdk = sdk;
-				info.labels = getResource(info.label, repo.config, resPath);
-				info.descriptions = getResource(info.description, repo.config, resPath);
-				info.requests = getResource(info.request, repo.config, resPath);
+			if (sourcePath != null) {
+				XmlPath groupList = sourcePath.getNodeList("/manifest/permission-group");
+				Log.d("sdk " + sdk + ", permList " + permList.getCount() + ", groupList " + groupList.getCount());
+				for(int j=groupList.getCount()-1; j>=0; --j) {
+					PermissionGroupInfoExt info = makePermissionGroupInfo(groupList.getNode(j));;
+					info.sdk = sdk;
+					info.labels = getResource(info.label, repo.config, resPath);
+					info.descriptions = getResource(info.description, repo.config, resPath);
+					info.requests = getResource(info.request, repo.config, resPath);
 
-				PermissionGroupInfoExt preInfo = groupMap.get(info.name);
-				if(preInfo == null) {
-					PermissionGroupInfoExt recordInfo = info;
-					if(!isLatestSdk) {
-						// deleted permission
-						//Log.d("deleted permission " + info.name + ", sdk " + info.sdk);
-						recordInfo = new PermissionGroupInfoExt(info);
-						recordInfo.comment = " @Removed" + (info.comment != null ? info.comment : "");
+					PermissionGroupInfoExt preInfo = groupMap.get(info.name);
+					if(preInfo == null) {
+						PermissionGroupInfoExt recordInfo = info;
+						if(!isLatestSdk) {
+							// deleted permission
+							//Log.d("deleted permission " + info.name + ", sdk " + info.sdk);
+							recordInfo = new PermissionGroupInfoExt(info);
+							recordInfo.comment = " @Removed" + (info.comment != null ? info.comment : "");
+						}
+						recordPermissionGroup(recordInfo);
+					} else if(info.sdk == preInfo.sdk) {
+						Log.w("Duplicated declared : " + info.name);
+						continue;
+					} else if(!info.equals(preInfo)) {
+						// compare pre
+						recordPermissionGroupPatch(info, preInfo);
+						//Log.d("diff to pre info");
 					}
-					recordPermissionGroup(recordInfo);
-				} else if(info.sdk == preInfo.sdk) {
-					Log.w("Duplicated declared : " + info.name);
-					continue;
-				} else if(!info.equals(preInfo)) {
-					// compare pre
-					recordPermissionGroupPatch(info, preInfo);
-					//Log.d("diff to pre info");
-				}
-				groupMap.put(info.name, info);
-				permissionGroupList.add(info.name);
-				if(preSdkPermissionGroupList.contains(info.name)) {
-					preSdkPermissionGroupList.remove(info.name);
+					groupMap.put(info.name, info);
+					permissionGroupList.add(info.name);
+					if(preSdkPermissionGroupList.contains(info.name)) {
+						preSdkPermissionGroupList.remove(info.name);
+					}
 				}
 			}
 
