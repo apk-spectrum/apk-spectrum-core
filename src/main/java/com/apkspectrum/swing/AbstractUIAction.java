@@ -13,10 +13,11 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 
-@SuppressWarnings("serial")
 public abstract class AbstractUIAction extends AbstractAction
 	implements UIAction
 {
+	private static final long serialVersionUID = -8303828282071187422L;
+
 	protected ActionEventHandler handler;
     protected boolean enabled = true;
 	protected int conditions;

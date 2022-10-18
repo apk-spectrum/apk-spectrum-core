@@ -23,10 +23,11 @@ import javax.swing.text.JTextComponent;
  *
  *  https://tips4java.wordpress.com/2009/11/29/text-prompt/
  */
-@SuppressWarnings("serial")
 public class TextPrompt extends JLabel
 	implements FocusListener, DocumentListener
 {
+	private static final long serialVersionUID = 7525550650414765820L;
+
 	public enum Show
 	{
 		ALWAYS,

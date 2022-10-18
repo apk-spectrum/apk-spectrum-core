@@ -198,13 +198,14 @@ public abstract class AbstractPlugIn implements PlugIn
 														: null);
 	}
 
-	@SuppressWarnings("serial")
 	protected Action makeAction(final ActionListener listener) {
 		final Action action;
 		if(listener instanceof Action) {
 			action = (Action) listener;
 		} else {
 			action = new AbstractUIAction() {
+				private static final long serialVersionUID = -5686129110928401546L;
+
 				static final String POSITION = _RConst.POSITION_KEY;
 
 				@Override

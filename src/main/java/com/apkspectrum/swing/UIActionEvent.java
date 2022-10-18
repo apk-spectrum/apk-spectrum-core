@@ -2,9 +2,10 @@ package com.apkspectrum.swing;
 
 import java.awt.event.ActionEvent;
 
-@SuppressWarnings("serial")
 public class UIActionEvent extends ActionEvent
 {
+	private static final long serialVersionUID = 1671481463754718828L;
+
 	private Object userData;
 
 	public UIActionEvent(Object source, int id, String command) {

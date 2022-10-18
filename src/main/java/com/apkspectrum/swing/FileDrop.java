@@ -725,10 +725,10 @@ public class FileDrop
      * @author  rob@iharder.net
      * @version 1.2
      */
-    @SuppressWarnings("serial")
 	public static class Event extends java.util.EventObject {
+        private static final long serialVersionUID = 3901819171303238236L;
 
-        private java.io.File[] files;
+		private java.io.File[] files;
 
         /**
          * Constructs an {@link Event} with the array
