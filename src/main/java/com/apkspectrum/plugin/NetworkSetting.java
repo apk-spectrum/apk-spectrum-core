@@ -14,6 +14,7 @@ import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.SocketException;
 import java.net.URI;
+import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -110,6 +111,11 @@ public class NetworkSetting
 			ProxySelector proxySelector = null;
 			List<Proxy> l = null;
 			if(useSystemProxy) {
+				try {
+					// I don't know the cause. but this works for me.
+					Log.v("Prevent TimeoutExcption for UrlPacScriptSource");
+					new URL("http://0.0.0.0").openConnection().connect();
+				} catch (IOException e) { }
 				System.setProperty("java.net.useSystemProxies", "true");
 	            // Use proxy vole to find the default proxy
 	            ProxySearch proxySearch = ProxySearch.getDefaultProxySearch();
