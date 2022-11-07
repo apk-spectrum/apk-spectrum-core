@@ -7,7 +7,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EventObject;
@@ -261,17 +260,11 @@ public final class PlugInManager
 				Log.v("No such plugins: " + _RFile.PLUGIN_PATH.getPath());
 				return;
 			}
-
-			File[] pluginFiles = pluginFolder.listFiles(new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String name) {
-					return name.endsWith(".xml") || name.endsWith(".jar");
-				}
-			});
+			List<File> plugins = suchPluginFile(pluginFolder, true);
 
 			GeneralVersionChecker coreVer, minVer;
 			coreVer = GeneralVersionChecker.parseFrom(_RConst.CORE_VERSION);
-			for(File pluginFile: pluginFiles) {
+			for(File pluginFile: plugins) {
 				PlugInPackage pack = null;
 				try {
 					pack = new PlugInPackage(pluginFile);
@@ -321,6 +314,21 @@ public final class PlugInManager
 				}
 			}
 		}
+	}
+
+	private static List<File> suchPluginFile(File pluginFolder, boolean subDir) {
+		List<File> plugins = new ArrayList<>();
+		for (File pluginFile: pluginFolder.listFiles()) {
+			if (pluginFile.isFile()) {
+				String name = pluginFile.getName();
+				if (name.endsWith(".jar") || name.endsWith(".xml")) {
+					plugins.add(pluginFile);
+				}
+			} else if (subDir && pluginFile.isDirectory()) {
+				plugins.addAll(suchPluginFile(pluginFile, false));
+			}
+		}
+		return plugins;
 	}
 
 	public static void actionPerformed(ActionEvent e) {
