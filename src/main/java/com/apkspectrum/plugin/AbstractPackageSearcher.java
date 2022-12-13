@@ -24,6 +24,8 @@ public abstract class AbstractPackageSearcher extends AbstractPlugIn
 				type |= PackageSearcher.SEARCHER_TYPE_PACKAGE_NAME;
 			} else if(s.toLowerCase().equals("label")) {
 				type |= PackageSearcher.SEARCHER_TYPE_APP_NAME;
+			} else if(s.toLowerCase().equals("hash")) {
+				type |= PackageSearcher.SEARCHER_TYPE_PACKAGE_HASH;
 			}
 		}
 		return type;
