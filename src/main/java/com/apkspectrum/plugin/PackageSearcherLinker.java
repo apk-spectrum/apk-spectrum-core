@@ -3,12 +3,14 @@ package com.apkspectrum.plugin;
 import java.awt.Desktop;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLEncoder;
+import java.net.URLEncoder;;
+import java.io.File;
 
 import com.apkspectrum.data.apkinfo.ApkInfo;
 import com.apkspectrum.data.apkinfo.ApkInfoHelper;
 import com.apkspectrum.data.apkinfo.ResourceInfo;
 import com.apkspectrum.plugin.manifest.Component;
+import com.apkspectrum.util.FileUtil
 
 public class PackageSearcherLinker extends AbstractPackageSearcher
 {
@@ -37,6 +39,10 @@ public class PackageSearcherLinker extends AbstractPackageSearcher
 			name = ApkInfoHelper.getResourceValue(labels,
 					getPreferLangForAppName());
 			break;
+        	case SEARCHER_TYPE_PACKAGE_HASH :
+            		File apkFile = new File(apkInfo.filePath);
+            		name = FileUtil.getMessageDigest(apkFile, "SHA-256").replaceAll(":","");
+            		break;
 		}
 
 		String filter = null;
