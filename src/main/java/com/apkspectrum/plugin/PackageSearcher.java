@@ -6,6 +6,7 @@ public interface PackageSearcher extends PlugIn
 
 	public static final int SEARCHER_TYPE_PACKAGE_NAME = 1;
 	public static final int SEARCHER_TYPE_APP_NAME = 2;
+	public static final int SEARCHER_TYPE_PACKAGE_HASH = 3;
 
 	/**
 	 * Get the type of search supported
