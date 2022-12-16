@@ -40,9 +40,9 @@ public class PackageSearcherLinker extends AbstractPackageSearcher
 					getPreferLangForAppName());
 			break;
         	case SEARCHER_TYPE_PACKAGE_HASH :
-            		File apkFile = new File(apkInfo.filePath);
-            		name = FileUtil.getMessageDigest(apkFile, "SHA-256").replaceAll(":","");
-            		break;
+			File apkFile = new File(apkInfo.filePath);
+			name = FileUtil.getMessageDigest(apkFile, "SHA-256").replaceAll(":","");
+			break;
 		}
 
 		String filter = null;
