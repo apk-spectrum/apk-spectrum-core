@@ -3,7 +3,7 @@ package com.apkspectrum.plugin;
 import java.awt.Desktop;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLEncoder;;
+import java.net.URLEncoder;
 import java.io.File;
 
 import com.apkspectrum.data.apkinfo.ApkInfo;
