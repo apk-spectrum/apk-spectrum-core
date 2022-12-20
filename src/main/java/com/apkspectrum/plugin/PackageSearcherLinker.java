@@ -39,7 +39,7 @@ public class PackageSearcherLinker extends AbstractPackageSearcher
 			name = ApkInfoHelper.getResourceValue(labels,
 					getPreferLangForAppName());
 			break;
-			case SEARCHER_TYPE_PACKAGE_HASH :
+		case SEARCHER_TYPE_PACKAGE_HASH :
 			File apkFile = new File(apkInfo.filePath);
 			name = FileUtil.getMessageDigest(apkFile, "SHA-256").replaceAll(":","");
 			break;
@@ -57,12 +57,12 @@ public class PackageSearcherLinker extends AbstractPackageSearcher
 		Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop()
 														: null;
 		if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-			try {
-				desktop.browse(new URI(url));
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
-		}
+	        try {
+	            desktop.browse(new URI(url));
+	        } catch (Exception e1) {
+	            e1.printStackTrace();
+	        }
+	    }
 	}
 
 }
