@@ -9,6 +9,22 @@ extern "C" {
 #endif
 /*
  * Class:     com_apkspectrum_core_scanner_AaptNativeScanner
+ * Method:    init
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_apkspectrum_core_scanner_AaptNativeScanner_nativeInit
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     com_apkspectrum_core_scanner_AaptNativeScanner
+ * Method:    realease
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_apkspectrum_core_scanner_AaptNativeScanner_nativeRealease
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     com_apkspectrum_core_scanner_AaptNativeScanner
  * Method:    createAssetManager
  * Signature: ()J
  */
