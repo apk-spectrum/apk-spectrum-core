@@ -1,31 +1,35 @@
 #include "JniCharacterSet.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <locale.h>
+
+bool gInitEncodingCharaset;
 jstring gEncodingCharaset;
 
-char *jbyteArray2cstr( JNIEnv *env, jbyteArray javaBytes )
-{
-    if(env == NULL || javaBytes == NULL) return NULL;
-    char *nativeStr = NULL;
-    jbyte *nativeBytes = env->GetByteArrayElements(javaBytes,0);
-    if(nativeBytes == NULL) return NULL;
+char *jbyteArray2cstr(JNIEnv *env, jbyteArray javaBytes) {
+    if (env == NULL || javaBytes == NULL) return NULL;
+    char* nativeStr = NULL;
+    jbyte* nativeBytes = env->GetByteArrayElements(javaBytes, 0);
+    if (nativeBytes == NULL) return NULL;
     size_t len = env->GetArrayLength(javaBytes);
-    nativeStr = (char *)malloc(len+1);
-    if(nativeStr != NULL) {
-        strncpy(nativeStr, (const char*)nativeBytes, len);
+    nativeStr = (char*) malloc(len+1);
+    if (nativeStr != NULL) {
+        strncpy(nativeStr, (const char*) nativeBytes, len);
         nativeStr[len] = '\0';
     }
     env->ReleaseByteArrayElements(javaBytes, nativeBytes, JNI_ABORT);
     return nativeStr;
 }
 
-jbyteArray cstr2jbyteArray( JNIEnv *env, const char *nativeStr)
-{
-    if(env == NULL || nativeStr == NULL) return NULL;
+jbyteArray cstr2jbyteArray(JNIEnv *env, const char *nativeStr) {
+    if (env == NULL || nativeStr == NULL) return NULL;
     jbyteArray javaBytes = NULL;
     int len = strlen(nativeStr);
     javaBytes = env->NewByteArray(len);
-    if(javaBytes != NULL) {
-        env->SetByteArrayRegion(javaBytes, 0, len, (jbyte *)nativeStr);
+    if (javaBytes != NULL) {
+        env->SetByteArrayRegion(javaBytes, 0, len, (jbyte*) nativeStr);
     }
     return javaBytes;
 }
@@ -34,12 +38,12 @@ const char *getNativeCharacterSet() {
     setlocale(LC_ALL, "");
     char* locstr = setlocale(LC_CTYPE, NULL);
 
-    if(!locstr || !*locstr) {
+    if (!locstr || !*locstr) {
         fprintf(stderr, "Failure : read system character set\n");
         return NULL;
     }
 
-    while(*locstr && *locstr++ != '.');
+    while (*locstr && *locstr++ != '.');
 
 #ifdef _WIN32
 // MS Code Page Identifiers
@@ -60,7 +64,7 @@ const char *getNativeCharacterSet() {
         }
     }
 */
-    if('0' <= *locstr && '9' >= *locstr) {
+    if ('0' <= *locstr && '9' >= *locstr) {
         int locint = 0;
         sscanf(locstr, "%d", &locint);
         switch(locint) {
@@ -117,7 +121,7 @@ const char *getNativeCharacterSet() {
             case 1256: return "windows-1256";
             case 1257: return "windows-1257";
             case 1258: return "windows-1258";
-            case 1361: return "x-Johab";      // Korean, ms1361, ksc5601_1992, johab
+            case 1361: return "x-Johab"; // Korean, ms1361, ksc5601_1992, johab
             case 10000: return "macintosh";
             case 10001: return "x-mac-japanese";
             case 10002: return "x-mac-chinesetrad";
@@ -225,21 +229,23 @@ const char *getNativeCharacterSet() {
 #endif
     //fprintf(stderr, "Character Set Code : %s\n", locstr);
 
-	return locstr;
+    return locstr;
 }
 
 jstring getJvmCharacterSet(JNIEnv *env) {
     // Java Character Set
     // System.getProperty("file.encoding");
-    if(env == NULL) return NULL;
+    if (env == NULL) return NULL;
     jstring charset = NULL;
     jclass java_lang_System = env->FindClass("java/lang/System");
-    if(java_lang_System != NULL) {
-        jmethodID java_lang_System_getProperty = env->GetStaticMethodID(java_lang_System, "getProperty", "(Ljava/lang/String;)Ljava/lang/String;");
-        if(java_lang_System_getProperty != NULL) {
+    if (java_lang_System != NULL) {
+        jmethodID java_lang_System_getProperty = env->GetStaticMethodID(
+            java_lang_System, "getProperty", "(Ljava/lang/String;)Ljava/lang/String;");
+        if (java_lang_System_getProperty != NULL) {
             jstring file_encoding = env->NewStringUTF("file.encoding");
-            if(file_encoding != NULL) {
-                charset = static_cast<jstring>(env->CallStaticObjectMethod(java_lang_System, java_lang_System_getProperty, file_encoding));
+            if (file_encoding != NULL) {
+                charset = static_cast<jstring>(env->CallStaticObjectMethod(
+                    java_lang_System, java_lang_System_getProperty, file_encoding));
                 env->DeleteLocalRef(file_encoding);
             }
         }
@@ -251,24 +257,29 @@ jstring getJvmCharacterSet(JNIEnv *env) {
 jstring getPosibleCharacterSet(JNIEnv *env, const char *nativ_char_set) {
     jstring charset = NULL;
     
-    if(env == NULL || nativ_char_set == NULL) return NULL;
+    if (env == NULL || nativ_char_set == NULL) return NULL;
     
     //java.nio.charset.Charset
     jclass java_nio_charset_Charset = env->FindClass("java/nio/charset/Charset");
-    if(java_nio_charset_Charset != NULL) {
-        jmethodID java_nio_charset_Charset_forName = env->GetStaticMethodID(java_nio_charset_Charset, "forName", "(Ljava/lang/String;)Ljava/nio/charset/Charset;");
-        if(java_nio_charset_Charset_forName != NULL) {
+    if (java_nio_charset_Charset != NULL) {
+        jmethodID java_nio_charset_Charset_forName = env->GetStaticMethodID(
+            java_nio_charset_Charset, "forName", "(Ljava/lang/String;)Ljava/nio/charset/Charset;");
+        if (java_nio_charset_Charset_forName != NULL) {
             jstring nativeCharset = env->NewStringUTF(nativ_char_set);
-            if(nativeCharset != NULL) {
-                jobject jCharset = env->CallStaticObjectMethod(java_nio_charset_Charset, java_nio_charset_Charset_forName, nativeCharset);
-                if(env->ExceptionCheck()) {
-                    fprintf(stderr, "getPosibleCharacterSet() UnsupportedEncodingException occurred : %s\n", nativ_char_set);
+            if (nativeCharset != NULL) {
+                jobject jCharset = env->CallStaticObjectMethod(
+                    java_nio_charset_Charset, java_nio_charset_Charset_forName, nativeCharset);
+                if (env->ExceptionCheck()) {
+                    fprintf(stderr, "UnsupportedEncodingException occurred : %s\n"
+                            , nativ_char_set);
                     env->ExceptionClear();
                 }
-                if(jCharset != NULL) {
-                    jmethodID java_nio_charset_Charset_name = env->GetMethodID(java_nio_charset_Charset, "name", "()Ljava/lang/String;");
-                    if(java_nio_charset_Charset_name != NULL) {
-                        charset = static_cast<jstring>(env->CallObjectMethod(jCharset, java_nio_charset_Charset_name));
+                if (jCharset != NULL) {
+                    jmethodID java_nio_charset_Charset_name = env->GetMethodID(
+                        java_nio_charset_Charset, "name", "()Ljava/lang/String;");
+                    if (java_nio_charset_Charset_name != NULL) {
+                        charset = static_cast<jstring>(env->CallObjectMethod(
+                            jCharset, java_nio_charset_Charset_name));
                     }
                     env->DeleteLocalRef(jCharset);
                 }
@@ -284,15 +295,15 @@ jstring getPosibleCharacterSet(JNIEnv *env, const char *nativ_char_set) {
 jstring getEncodingCharacterSet(JNIEnv *env) {
     jstring encodingSet = NULL;
     
-    if(env == NULL) return NULL;
+    if (env == NULL) return NULL;
 
     const char *nativeCharSet = getNativeCharacterSet();
-    if(nativeCharSet != NULL && *nativeCharSet != '\0') {
+    if (nativeCharSet != NULL && *nativeCharSet != '\0') {
         jstring jvmCharSet = getJvmCharacterSet(env);
-        if(jvmCharSet != NULL) {
+        if (jvmCharSet != NULL) {
             const char *jcharset = env->GetStringUTFChars(jvmCharSet, 0);
-            if(jcharset != NULL) {
-                if(strcmp(jcharset, nativeCharSet) != 0) {
+            if (jcharset != NULL) {
+                if (strcmp(jcharset, nativeCharSet) != 0) {
                     encodingSet = getPosibleCharacterSet(env, nativeCharSet);
                 } else {
                     printf("Same character set : %s\n", nativeCharSet);
@@ -311,9 +322,9 @@ jstring getEncodingCharacterSet(JNIEnv *env) {
         fprintf(stderr, "Failure : getNativeCharacterSet...\n");
     }
     
-    if(encodingSet != NULL) {
+    if (encodingSet != NULL) {
         const char *encoding = env->GetStringUTFChars(encodingSet, 0);
-        if(encoding != NULL) {
+        if (encoding != NULL) {
             //printf("Get encoding character set : %s\n", encoding);
             env->ReleaseStringUTFChars(encodingSet, encoding);
         } else {
@@ -325,37 +336,48 @@ jstring getEncodingCharacterSet(JNIEnv *env) {
 }
 
 jstring getStickyEncodingCharacterSet(JNIEnv *env) {
-    if(gEncodingCharaset == NULL) {
-        jstring encodingCharaset = getEncodingCharacterSet(env);
-        if(encodingCharaset != NULL) {
-            gEncodingCharaset = static_cast<jstring>(env->NewGlobalRef(encodingCharaset));
-            env->DeleteLocalRef(encodingCharaset);
+    if (!gInitEncodingCharaset) {
+        gInitEncodingCharaset = true;
+        jstring set = getEncodingCharacterSet(env);
+        if (set != NULL) {
+            gEncodingCharaset = static_cast<jstring>(env->NewGlobalRef(set));
+            env->DeleteLocalRef(set);
         }
     }
     return gEncodingCharaset;
 }
 
 void releaseStickyEncodingCharacterSet(JNIEnv *env) {
-    if(env != NULL && gEncodingCharaset != NULL) {
+    if (env != NULL && gEncodingCharaset != NULL) {
         env->DeleteWeakGlobalRef(gEncodingCharaset);
         gEncodingCharaset = NULL;
     }
 }
 
-char* jstring2cstr( JNIEnv *env, jstring jstr)
-{
+char* jstring2utfstr(JNIEnv *env, jstring jstr) {
+    const char *jchar = env->GetStringUTFChars(jstr, 0);
+    char *cstr = (char *)malloc(4096);
+    if (cstr != NULL) {
+        sprintf(cstr, "%s", (char*)jchar);
+    }
+    env->ReleaseStringUTFChars(jstr, jchar);
+    return cstr;
+}
+
+char* jstring2cstr(JNIEnv *env, jstring jstr) {
     jstring encoding = getStickyEncodingCharacterSet(env);
     jclass java_lang_String = NULL;
     jmethodID java_lang_String_getBytes = NULL;
 
-    if(encoding != NULL) {
+    if (encoding != NULL) {
         java_lang_String = env->FindClass("java/lang/String");
-        if(java_lang_String != NULL) {
-            java_lang_String_getBytes = env->GetMethodID(java_lang_String, "getBytes", "(Ljava/lang/String;)[B");
+        if (java_lang_String != NULL) {
+            java_lang_String_getBytes = env->GetMethodID(
+                    java_lang_String, "getBytes", "(Ljava/lang/String;)[B");
         }
-        if(java_lang_String_getBytes == NULL) {
+        if (java_lang_String_getBytes == NULL) {
             encoding = NULL;
-            if(java_lang_String != NULL) {
+            if (java_lang_String != NULL) {
                 env->DeleteLocalRef(java_lang_String);
                 java_lang_String = NULL;
             }
@@ -363,19 +385,22 @@ char* jstring2cstr( JNIEnv *env, jstring jstr)
     }
 
     char *cstr;
-    if(encoding != NULL) {
-        jbyteArray bytes = static_cast<jbyteArray>(env->CallObjectMethod(jstr, java_lang_String_getBytes, encoding));
+    if (encoding != NULL) {
+        jbyteArray bytes = static_cast<jbyteArray>(env->CallObjectMethod(
+                jstr, java_lang_String_getBytes, encoding));
         // check UnsupportedEncodingException
-        if(env->ExceptionCheck()) {
+        if (env->ExceptionCheck()) {
             fprintf(stderr, "UnsupportedEncodingException occurred\n");
             env->ExceptionClear();
             
-            jmethodID java_lang_String_getBytes_ = env->GetMethodID(java_lang_String, "getBytes", "()[B");
-            if(java_lang_String_getBytes_ != NULL) {
-                bytes = static_cast<jbyteArray>(env->CallObjectMethod(jstr, java_lang_String_getBytes_));
+            jmethodID java_lang_String_getBytes_ = env->GetMethodID(
+                    java_lang_String, "getBytes", "()[B");
+            if (java_lang_String_getBytes_ != NULL) {
+                bytes = static_cast<jbyteArray>(env->CallObjectMethod(
+                        jstr, java_lang_String_getBytes_));
             }
         }
-        if(bytes != NULL) {
+        if (bytes != NULL) {
             cstr = jbyteArray2cstr(env, bytes);
             env->DeleteLocalRef(bytes);
         } else {
@@ -384,7 +409,7 @@ char* jstring2cstr( JNIEnv *env, jstring jstr)
     } else {
         const char *jchar = env->GetStringUTFChars(jstr, 0);
         cstr = (char *)malloc(4096);
-        if(cstr != NULL) {
+        if (cstr != NULL) {
             sprintf(cstr, "%s", (char*)jchar);
         }
         env->ReleaseStringUTFChars(jstr, jchar);

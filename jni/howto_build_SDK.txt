@@ -7,10 +7,17 @@
 # sudo cp ./ca-bundle.crt /etc/ssl/certs/ca-certificates.crt
 
 // Source sync
-export SSL_CERT_FILE=./ca-bundle.crt
-repo init -u https://android.googlesource.com/platform/manifest -b master -g all,-notdefault,tools
-repo sync
+# export SSL_CERT_FILE=./ca-bundle.crt
 
+mkdir aosp-platform-tools-33.0.3
+cd aosp-platform-tools-33.0.3
+repo init --depth=1 -u https://android.googlesource.com/platform/manifest -b platform-tools-33.0.3 -g all,-notdefault,tools 
+repo sync -c -j8
+
+cd frameworks/base
+git remote add spectrum https://github.com/apk-spectrum/platform_frameworks_base.git
+git fetch --depth 10 spectrum spectrum-tools-33.0.3
+git checkout spectrum-tools-33.0.3
 
 // Build
 . build/envsetup.sh
