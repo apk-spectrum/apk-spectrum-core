@@ -220,15 +220,15 @@ public class AaptNativeScanner extends ApkScanner
 
 	static {
 		if("64".equals(System.getProperty("sun.arch.data.model"))) {
-			System.load(_RFile.BIN_AAPT_LIB64.getPath());
 			if(!SystemUtil.isWindows()) {
 				System.load(_RFile.BIN_AAPT_LIBC64.getPath());
 			}
+			System.load(_RFile.BIN_AAPT_LIB64.getPath());
 		} else {
-			System.load(_RFile.BIN_AAPT_LIB32.getPath());
 			if(!SystemUtil.isWindows()) {
 				System.load(_RFile.BIN_AAPT_LIBC32.getPath());
 			}
+			System.load(_RFile.BIN_AAPT_LIB32.getPath());
 		}
 	}
 }
