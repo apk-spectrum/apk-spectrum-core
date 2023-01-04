@@ -17,7 +17,7 @@ public enum _RFile implements ResFile<java.io.File>
 	BIN_AAPT_LIBC32				(Type.BIN, new _RFile[]{ BIN_AAPT_LIBC32_LNX }),
 
 	BIN_AAPT_LIBC64_LNX			(Type.BIN, "linux/libc++64.so", "nux"),
-	BIN_AAPT_LIBC64_MAC			(Type.BIN, "darwin/libc++64.dylib", "mac"),
+	BIN_AAPT_LIBC64_MAC			(Type.BIN, "darwin/libc++.dylib", "mac"),
 	BIN_AAPT_LIBC64				(Type.BIN, new _RFile[]{ BIN_AAPT_LIBC64_LNX, BIN_AAPT_LIBC64_MAC }),
 
 	BIN_ADB_LNX					(Type.BIN, "linux/adb", "nux"),
