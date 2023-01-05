@@ -205,6 +205,9 @@ public class AaptNativeScanner extends ApkScanner
 		return ret;
 	}
 
+	private native static void nativeInit();
+	private native static void nativeRealease();
+
 	private native static long nativeCreateAssetManager();
 	private native static void nativeRealeaseAssetManager(long handle);
 
@@ -230,5 +233,6 @@ public class AaptNativeScanner extends ApkScanner
 			}
 			System.load(_RFile.BIN_AAPT_LIB32.getPath());
 		}
+		nativeInit();
 	}
 }
