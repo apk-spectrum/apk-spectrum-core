@@ -6,11 +6,13 @@ import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import com.android.ddmlib.AdbCommandRejectedException;
 import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;
+import com.android.ddmlib.IShellOutputReceiver;
 import com.android.ddmlib.IDevice.DeviceState;
 import com.android.ddmlib.InstallException;
 import com.android.ddmlib.NullOutputReceiver;
@@ -175,6 +177,12 @@ public class PackageManager {
 					if(pack.apkPath == null) {
 						pack.apkPath = pack.codePath;
 					}
+					String path = pack.apkPath;
+					if (!path.endsWith(".apk") && path.contains("/")) {
+						String name = path.substring(path.lastIndexOf("/"));
+						pack.apkPath += name + ".apk";
+						Log.v("Change a path to " + pack.apkPath);
+					}
 					pack.label = pack.apkPath.replaceAll(".*/", "") + " - [" + pack.packageName + "] - " + verName + "/" + verCode;
 					list.add(pack);
 				}
@@ -204,6 +212,12 @@ public class PackageManager {
 		if(pack != null) {
 			if(pack.apkPath == null) {
 				pack.apkPath = pack.codePath;
+			}
+			String path = pack.apkPath;
+			if (!path.endsWith(".apk") && path.contains("/")) {
+				String name = path.substring(path.lastIndexOf("/"));
+				pack.apkPath += name + ".apk";
+				Log.v("Change a path to " + pack.apkPath);
 			}
 			pack.label = pack.apkPath.replaceAll(".*/", "") + " - [" + pack.packageName + "] - " + verName + "/" + verCode;
 			list.add(pack);
@@ -266,7 +280,7 @@ public class PackageManager {
 			errMessage = "Device is null";
 		} else if(device.getState() != DeviceState.ONLINE) {
 			errMessage = "Device is no online : " + device.getState();
-		} else if(localApkPath == null || localApkPath.isEmpty() 
+		} else if(localApkPath == null || localApkPath.isEmpty()
 				|| !new File(localApkPath).isFile()) {
 			errMessage = "No Such local apk file : " + localApkPath;
 		}
@@ -277,7 +291,7 @@ public class PackageManager {
 		}
 
 		if(device == null || errMessage != null) {
-			return errMessage; 
+			return errMessage;
 		}
 
 		try {
@@ -326,7 +340,7 @@ public class PackageManager {
 		}
 
 		if(packageInfo == null || errMessage != null) {
-			return errMessage; 
+			return errMessage;
 		}
 
 		try {
@@ -405,7 +419,7 @@ public class PackageManager {
 		}
 
 		if(errMessage != null) {
-			return errMessage; 
+			return errMessage;
 		}
 
 		try {
@@ -431,15 +445,51 @@ public class PackageManager {
 		return errMessage;
 	}
 
-	public static String pullApk(final IDevice device, final String srcApkPath, final String destApkPath)
-	{
+	public static String pullApk(final IDevice device, final String srcApkPath
+			, final String destApkPath) {
 		String errMessage = null;
 		try {
-			device.pullFile(srcApkPath, destApkPath);
-		} catch (SyncException | IOException | TimeoutException e) {
-			errMessage = e.getMessage();
-			e.printStackTrace();
-		} catch (AdbCommandRejectedException e1) {
+			try {
+				device.pullFile(srcApkPath, destApkPath);
+			} catch (SyncException e) {
+				Log.w("Unable to pull from " + srcApkPath);
+
+				final String tmpPath = "/sdcard/tmp";
+				StringBuilder cmd = new StringBuilder();
+				cmd.append("ls ").append(srcApkPath).append(" > /dev/null && ")
+				   .append("mkdir -p ").append(tmpPath)
+				   .append(srcApkPath.substring(0, srcApkPath.lastIndexOf("/")))
+				   .append(" && ")
+				   .append("cp ").append(srcApkPath).append(" ").append(tmpPath)
+				   .append(srcApkPath);
+				Log.v(cmd.toString());
+
+				final StringBuilder output = new StringBuilder();
+				device.executeShellCommand(cmd.toString()
+						, new IShellOutputReceiver() {
+					@Override
+					public void addOutput(byte[] data, int offset, int length) {
+						output.append(new String(data));
+					}
+
+					@Override
+					public void flush() {
+						Log.v(output.toString());
+					}
+
+					@Override
+					public boolean isCancelled() {
+						return false;
+					}
+				});
+				if (output.length() > 0) {
+					throw new IOException(output.toString());
+				}
+				device.pullFile(tmpPath + srcApkPath, destApkPath);
+			}
+		} catch (AdbCommandRejectedException | IOException | TimeoutException
+				| SyncException | ShellCommandUnresponsiveException e1) {
+			errMessage = e1.getMessage();
 			Log.w(e1.getMessage());
 		}
 
@@ -487,7 +537,7 @@ public class PackageManager {
 		return errMessage;
 	}
 
-	public static WindowStateInfo[] getCurrentlyDisplayedPackages(IDevice device) {
+	public static List<WindowStateInfo> getCurrentlyDisplayedPackages(IDevice device) {
 		SimpleOutputReceiver outputReceiver = new SimpleOutputReceiver();
 		outputReceiver.setTrimLine(false);
 		try {
@@ -500,7 +550,7 @@ public class PackageManager {
 		String[] result = outputReceiver.getOutput();
 		//ArrayList<String> pkgList = new ArrayList<String>();
 
-		ArrayList<WindowStateInfo> windows = new ArrayList<WindowStateInfo>();  
+		ArrayList<WindowStateInfo> windows = new ArrayList<WindowStateInfo>();
 		ArrayList<String> windowDump = new ArrayList<String>();
 		boolean isWindowInfoBlock = false;
 		WindowStateInfo winStateInfo = new WindowStateInfo();
@@ -575,13 +625,13 @@ public class PackageManager {
 			//Log.v("info.pakc : " + info.packageName + ", curFocus : " + info.isCurrentFocus + ", focused : " + info.isFocusedApp);
 		}
 
-		return windows.toArray(new WindowStateInfo[windows.size()]);
+		return windows;
 	}
 
 	public static String getCurrentFocusPackage(IDevice device, boolean force) {
 		// Q OS not supported.
 		int apiLevel = Integer.parseInt(device.getProperty(IDevice.PROP_BUILD_API_LEVEL));
-		if(apiLevel >= 29) { 
+		if(apiLevel >= 29) {
 			return null;
 		}
 		if(force || !focusPackageCache.containsKey(device)) {
@@ -590,7 +640,7 @@ public class PackageManager {
 		return focusPackageCache.get(device);
 	}
 
-	public static String[] getRecentlyActivityPackages(IDevice device) {
+	public static List<String> getRecentlyActivityPackages(IDevice device) {
 		SimpleOutputReceiver outputReceiver = new SimpleOutputReceiver();
 		outputReceiver.setTrimLine(false);
 		try {
@@ -605,7 +655,7 @@ public class PackageManager {
 		boolean isLegacy = false;
 		for(String line: result) {
 			if(line.startsWith("  taskId=")) {
-				String pkg = line.replaceAll("  taskId=[0-9]*:\\s([^/]*)/.*", "$1").trim(); 
+				String pkg = line.replaceAll("  taskId=[0-9]*:\\s([^/]*)/.*", "$1").trim();
 				if(pkg != null && !pkg.isEmpty() && !pkg.equals(line)) {
 					if(!pkg.contains(" ") && !pkgList.contains(pkg)) {
 						if(line.indexOf("visible=true") >= 0)
@@ -629,10 +679,10 @@ public class PackageManager {
 			return getRecentlyActivityPackagesLegacy(device);
 		}
 
-		return pkgList.toArray(new String[0]);
+		return pkgList;
 	}
 
-	private static String[] getRecentlyActivityPackagesLegacy(IDevice device) {
+	private static List<String> getRecentlyActivityPackagesLegacy(IDevice device) {
 		SimpleOutputReceiver outputReceiver = new SimpleOutputReceiver();
 		outputReceiver.setTrimLine(false);
 		try {
@@ -646,7 +696,7 @@ public class PackageManager {
 		ArrayList<String> pkgList = new ArrayList<String>();
 		for(String line: result) {
 			if(line.startsWith("    taskId=")) {
-				String pkg = line.replaceAll("    taskId=[0-9]*:\\s([^/]*)/.*", "$1").trim(); 
+				String pkg = line.replaceAll("    taskId=[0-9]*:\\s([^/]*)/.*", "$1").trim();
 				if(pkg != null && !pkg.isEmpty() && !pkg.equals(line)) {
 					if(!pkg.contains(" ") && !pkgList.contains(pkg)) {
 						pkgList.add(0, pkg);
@@ -656,10 +706,10 @@ public class PackageManager {
 				}
 			}
 		}
-		return pkgList.toArray(new String[pkgList.size()]);
+		return pkgList;
 	}
 
-	public static String[] getCurrentlyRunningPackages(IDevice device) {
+	public static List<String> getCurrentlyRunningPackages(IDevice device) {
 		SimpleOutputReceiver outputReceiver = new SimpleOutputReceiver();
 		outputReceiver.setTrimLine(false);
 		try {
@@ -684,6 +734,6 @@ public class PackageManager {
 		if(pkgList.size() > 0 && pkgList.get(0).equals("NAME")) {
 			pkgList.remove(0);
 		}
-		return pkgList.toArray(new String[pkgList.size()]);
+		return pkgList;
 	}
 }

@@ -38,9 +38,8 @@ public class ConsolCmd
 		String s = "";
 		List<String> buffer = new ArrayList<String>();
 
-		if(showLog) {
-			Log.i(echoCmd(cmd));
-		}
+		Log.v(echoCmd(cmd));
+
     	if(observer != null) {
     		observer.ConsolOutput(echoCmd(cmd));
     	}
