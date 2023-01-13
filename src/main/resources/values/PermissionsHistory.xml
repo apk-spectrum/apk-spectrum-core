@@ -5746,7 +5746,7 @@
         <permission name="android.permission.LOOP_RADIO" protectionLevel="signature|privileged">
             <patch permissionGroup="android.permission-group.NETWORK" protectionLevel="signature|system" sdk="22"/>
             <!-- Allows access to the loop radio (Android@Home mesh network) device.
-	@hide -->
+    @hide -->
             <patch sdk="20"/>
             <patch action="added" sdk="18"/>
         </permission>

@@ -121,10 +121,10 @@ public final class AdbServerMonitor {
 		AdbVersionManager.loadCache();
 
 		String adbPath = (_RProp.S.ADB_PATH.get()).trim();
-		if(adbPath == null || adbPath.isEmpty()
+		if (adbPath == null || adbPath.isEmpty()
 				|| !AdbVersionManager.checkAdbVersion(adbPath)) {
 			adbPath = AdbVersionManager.getAdbLastestVersionFromCache();
-			if(adbPath == null){
+			if (adbPath == null){
 				AdbVersionManager.loadDefaultAdbs(); // very higher cost
 				adbPath = AdbVersionManager.getAdbLastestVersionFromCache();
 			}
@@ -136,10 +136,11 @@ public final class AdbServerMonitor {
 				_RProp.B.ADB_DEVICE_MONITORING.get());
 	}
 
-	public static AdbServerMonitor startServerAndCreateBridge(String adbPath, boolean demonShared, boolean allowRestart) {
+	public static AdbServerMonitor startServerAndCreateBridge(String adbPath
+			, boolean demonShared, boolean allowRestart) {
 		synchronized (sLock) {
 			if (sThis != null) {
-				if(demonShared || (sThis.mAdbPath != null && sThis.mAdbPath.equals(adbPath))) {
+				if (demonShared || (sThis.mAdbPath != null && sThis.mAdbPath.equals(adbPath))) {
 					return sThis;
 				} else {
 					sThis.stop();
@@ -172,12 +173,12 @@ public final class AdbServerMonitor {
 
 	public static AndroidDebugBridge getAndroidDebugBridge(int waitMs) {
 		synchronized (sLock) {
-			if(sThis == null) {
+			if (sThis == null) {
 				startServerAndCreateBridge();
 			}
-			if(sThis.mAdbDemonMonitorTask.state == AdbServerMonitorTask.STATUS_NEW
+			if (sThis.mAdbDemonMonitorTask.state == AdbServerMonitorTask.STATUS_NEW
 					|| sThis.mAdbDemonMonitorTask.state == AdbServerMonitorTask.STATUS_STARTED) {
-				if(null == AndroidDebugBridge.getBridge()) {
+				if (null == AndroidDebugBridge.getBridge()) {
 					try {
 						Log.i("Wait to created AndroidDebugBridge");
 						sLock.wait(waitMs);
@@ -324,22 +325,22 @@ public final class AdbServerMonitor {
 
 	public static String[] getRunningAdbPath() {
 		String processName = null;
-		if(SystemUtil.isWindows()) {
+		if (SystemUtil.isWindows()) {
 			processName = "adb.exe";
-		} else if(SystemUtil.isLinux() || SystemUtil.isMac()) {
+		} else if (SystemUtil.isLinux() || SystemUtil.isMac()) {
 			processName = "adb";
 		} else {
 			Log.e("Unknown OS " + SystemUtil.OS);
 		}
 
 		ArrayList<String> adbList = new ArrayList<String>();
-		if(processName != null) {
+		if (processName != null) {
 			String[] list = SystemUtil.getRunningProcessFullPath(processName);
-			if(list != null) {
+			if (list != null) {
 				Log.v("adb process list size : " + list.length);
-				for(String s: list) {
+				for (String s: list) {
 					Log.v("adb process : " + s);
-					if(s != null && !s.isEmpty() && !adbList.contains(s)) {
+					if (s != null && !s.isEmpty() && !adbList.contains(s)) {
 						adbList.add(s);
 					}
 				}
@@ -372,12 +373,12 @@ public final class AdbServerMonitor {
 			Log.v("startServerAndCreateBridge");
 			String runningAdbPath = null;
 			AdbVersion adbVersion = null;
-			if(mAdbServerMonitor.mDemonShared) {
+			if (mAdbServerMonitor.mDemonShared) {
 				String[] runProcess = null;
 				int waitCnt = 0;
 				do {
-					if(runProcess != null) {
-						if(waitCnt++ > 5) {
+					if (runProcess != null) {
+						if (waitCnt++ > 5) {
 							Log.d("waiting for running adb daemon only one. but any daemon be not exit. " + runProcess.length);
 							break;
 						};
@@ -385,11 +386,11 @@ public final class AdbServerMonitor {
 						Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
 					}
 					runProcess = getRunningAdbPath();
-				} while(runProcess.length > 1);
-				if(runProcess != null && runProcess.length > 0) {
+				} while (runProcess.length > 1);
+				if (runProcess != null && runProcess.length > 0) {
 					runningAdbPath = runProcess[0];
 					adbVersion = AdbVersionManager.getAdbVersion(runningAdbPath);
-					if(AdbVersionManager.checkAdbVersion(adbVersion)) {
+					if (AdbVersionManager.checkAdbVersion(adbVersion)) {
 						isConnected = true;
 					} else {
 						runningAdbPath = null;
@@ -398,7 +399,7 @@ public final class AdbServerMonitor {
 			}
 			Log.v("runningAdbPath " + runningAdbPath + ", version " + adbVersion);
 
-			if(runningAdbPath == null){
+			if (runningAdbPath == null){
 				isConnected = mAdbServerMonitor.startAdb();
 				runningAdbPath = mAdbServerMonitor.mAdbPath;
 				adbVersion = AdbVersionManager.getAdbVersion(runningAdbPath);
@@ -414,7 +415,7 @@ public final class AdbServerMonitor {
 				sLock.notifyAll();
 			}
 
-			if(isConnected) {
+			if (isConnected) {
 				mAdbServerMonitor.adbDemonConnected(runningAdbPath, adbVersion);
 			}
 
@@ -423,18 +424,18 @@ public final class AdbServerMonitor {
 			state = STATUS_RUNNABLE;
 			do {
 				AndroidDebugBridge adb = AndroidDebugBridge.getBridge();
-				if(isConnected != isConnected(adb)) {
+				if (isConnected != isConnected(adb)) {
 					isConnected = !isConnected;
-					if(isConnected) {
+					if (isConnected) {
 						String[] adbPath = getRunningAdbPath();
-						if(adbPath != null && adbPath.length == 1) {
+						if (adbPath != null && adbPath.length == 1) {
 							runningAdbPath = adbPath[0];
 							adbVersion = AdbVersionManager.getAdbVersion(runningAdbPath);
 							mAdbServerMonitor.adbDemonConnected(runningAdbPath, adbVersion);
 						} else {
-							if(adbPath != null && adbPath.length > 1) {
+							if (adbPath != null && adbPath.length > 1) {
 								Log.d("current running adb is multiple.");
-								for(String s: adbPath) {
+								for (String s: adbPath) {
 									Log.d("adb:" + s + ", " + AdbVersionManager.getAdbVersion(s));
 								}
 							} else {
@@ -445,30 +446,30 @@ public final class AdbServerMonitor {
 					} else {
 						mAdbServerMonitor.adbDemonDisconnected();
 					}
-				} else if(!isConnected && adb != null && adb.getConnectionAttemptCount() > 5) {
-					if(mAdbServerMonitor.mAllowRestart) {
+				} else if (!isConnected && adb != null && adb.getConnectionAttemptCount() > 5) {
+					if (mAdbServerMonitor.mAllowRestart) {
 						runningAdbPath = mAdbServerMonitor.mAdbPath;
 						adbVersion = AdbVersionManager.getAdbVersion(runningAdbPath);
 						mAdbServerMonitor.adbDemonConnected(runningAdbPath, adbVersion);
 
 						isConnected = mAdbServerMonitor.startAdb();
 
-						if(!isConnected){
+						if (!isConnected){
 							Log.e("Failure: startAdb");
 							mAdbServerMonitor.adbDemonDisconnected();
 						}
 					} else {
 						AndroidDebugBridge.disconnectBridge(10, TimeUnit.SECONDS);
 					}
-				} else if(!isConnected && adb == null) {
+				} else if (!isConnected && adb == null) {
 					String[] adbPath = getRunningAdbPath();
-					if(adbPath != null) {
-						if(adbPath.length == 1) {
+					if (adbPath != null) {
+						if (adbPath.length == 1) {
 							runningAdbPath = adbPath[0];
 							AndroidDebugBridge.createBridge(10, TimeUnit.SECONDS);
-						} else if(adbPath.length > 1) {
+						} else if (adbPath.length > 1) {
 							Log.d("current running adb is multiple.");
-							for(String s: adbPath) {
+							for (String s: adbPath) {
 								Log.d("adb:" + s);
 							}
 						}

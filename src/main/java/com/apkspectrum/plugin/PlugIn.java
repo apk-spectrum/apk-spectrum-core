@@ -8,107 +8,106 @@ import java.util.Map;
 import javax.swing.Action;
 import javax.swing.Icon;
 
-public interface PlugIn
-{
-	public static final String ENABLED = "enabled";
+public interface PlugIn {
+    public static final String ENABLED = "enabled";
 
-	/**
-	 * Check to latest version and update for APK Scanner.
-	 */
-	public static final int PLUGIN_TPYE_UNKNOWN = 0;
+    /**
+     * Check to latest version and update for APK Scanner.
+     */
+    public static final int PLUGIN_TPYE_UNKNOWN = 0;
 
-	/**
-	 * Check to latest version and update for APK Scanner.
-	 */
-	public static final int PLUGIN_TPYE_UPDATE_CHECKER = 0x01;
+    /**
+     * Check to latest version and update for APK Scanner.
+     */
+    public static final int PLUGIN_TPYE_UPDATE_CHECKER = 0x01;
 
-	/**
-	 * Search package information from app store or external service.
-	 */
-	public static final int PLUGIN_TPYE_PACKAGE_SEARCHER = 0x02;
+    /**
+     * Search package information from app store or external service.
+     */
+    public static final int PLUGIN_TPYE_PACKAGE_SEARCHER = 0x02;
 
-	/**
-	 * Launch extra tools. so possible add to toolbar.
-	 */
-	public static final int PLUGIN_TPYE_EXTERNAL_TOOL = 0x04;
+    /**
+     * Launch extra tools. so possible add to toolbar.
+     */
+    public static final int PLUGIN_TPYE_EXTERNAL_TOOL = 0x04;
 
-	/**
-	 * Add extra component to tabs.
-	 */
-	public static final int PLUGIN_TPYE_EXTRA_COMPONENT = 0x08;
+    /**
+     * Add extra component to tabs.
+     */
+    public static final int PLUGIN_TPYE_EXTRA_COMPONENT = 0x08;
 
-	/**
-	 * Launch extra tools. so possible add to toolbar.
-	 */
-	public static final int PLUGIN_TPYE_ALL = 0x0F;
+    /**
+     * Launch extra tools. so possible add to toolbar.
+     */
+    public static final int PLUGIN_TPYE_ALL = 0x0F;
 
-	/**
-	 * Get the plug-in name
-	 *
-	 * @return the name of plug-in
-	 */
-	public String getName();
+    /**
+     * Get the plug-in name
+     *
+     * @return the name of plug-in
+     */
+    public String getName();
 
-	/**
-	 * Get the icon for plug-in
-	 *
-	 * @return the icon
-	 */
-	public Icon getIcon();
-	public Icon getIcon(int w, int h);
-	public Icon getIcon(Dimension size);
+    /**
+     * Get the icon for plug-in
+     *
+     * @return the icon
+     */
+    public Icon getIcon();
 
-	/**
-	 * Get the icon URL for plug-in
-	 *
-	 * @return the icon URL
-	 */
-	public URL getIconURL();
+    public Icon getIcon(int w, int h);
 
-	/**
-	 * Get the plug-in type.
-	 *
-	 * @return type of plug-in
-	 */
-	public int getType();
+    public Icon getIcon(Dimension size);
 
-	public String getLabel();
+    /**
+     * Get the icon URL for plug-in
+     *
+     * @return the icon URL
+     */
+    public URL getIconURL();
 
-	public String getDescription();
+    /**
+     * Get the plug-in type.
+     *
+     * @return type of plug-in
+     */
+    public int getType();
 
-	public boolean isEnabled();
+    public String getLabel();
 
-	public boolean isEnabled(boolean inheritance);
+    public String getDescription();
 
-	public void setEnabled(boolean enable);
+    public boolean isEnabled();
 
-	public String getPackageName();
+    public boolean isEnabled(boolean inheritance);
 
-	public PlugInPackage getPlugInPackage();
+    public void setEnabled(boolean enable);
 
-	public PlugInGroup getParantGroup();
+    public String getPackageName();
 
-	public String getGroupName();
+    public PlugInPackage getPlugInPackage();
 
-	public String getActionCommand();
+    public PlugInGroup getParantGroup();
 
-	public Action makeAction();
+    public String getGroupName();
 
-	public void launch();
+    public String getActionCommand();
 
-	public Map<String, Object> getChangedProperties();
+    public Action makeAction();
 
-	public void restoreProperties(Map<String, Object> tmp);
+    public void launch();
 
-	public PlugInConfig getPlugInConfig();
+    public Map<String, Object> getChangedProperties();
+
+    public void restoreProperties(Map<String, Object> tmp);
+
+    public PlugInConfig getPlugInConfig();
 
     public void addPropertyChangeListener(PropertyChangeListener listener);
 
     public void removePropertyChangeListener(PropertyChangeListener listener);
 
-    public void addPropertyChangeListener(String prop,
-    		PropertyChangeListener listener);
+    public void addPropertyChangeListener(String prop, PropertyChangeListener listener);
 
-    public void removePropertyChangeListener(String prop,
-    		PropertyChangeListener listener);
+    public void removePropertyChangeListener(String prop, PropertyChangeListener listener);
 }

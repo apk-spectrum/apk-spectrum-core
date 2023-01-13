@@ -7,7 +7,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public
-@interface UIThemeName {
-	String value();
+public @interface UIThemeName {
+    String value();
 }
