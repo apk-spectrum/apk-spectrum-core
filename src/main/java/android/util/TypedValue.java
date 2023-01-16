@@ -15,9 +15,14 @@
  */
 
 package android.util;
+// import android.annotation.AnyRes;
+// import android.annotation.FloatRange;
+// import android.annotation.IntDef;
+// import android.annotation.IntRange;
+// import android.content.pm.ActivityInfo.Config;
 
-// unused
-//import android.annotation.AnyRes;
+// import java.lang.annotation.Retention;
+// import java.lang.annotation.RetentionPolicy;
 
 /**
  * Container for a dynamically typed data value.  Primarily used with
@@ -95,6 +100,19 @@ public class TypedValue {
      *  defined below. */
     public static final int COMPLEX_UNIT_MASK = 0xf;
 
+    /** @hide **/
+    /*
+    @IntDef(prefix = "COMPLEX_UNIT_", value = {
+            COMPLEX_UNIT_PX,
+            COMPLEX_UNIT_DIP,
+            COMPLEX_UNIT_SP,
+            COMPLEX_UNIT_PT,
+            COMPLEX_UNIT_IN,
+            COMPLEX_UNIT_MM,
+    })
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface ComplexDimensionUnit {}
+    */
     /** {@link #TYPE_DIMENSION} complex unit: Value is raw pixels. */
     public static final int COMPLEX_UNIT_PX = 0;
     /** {@link #TYPE_DIMENSION} complex unit: Value is Device Independent
@@ -181,17 +199,45 @@ public class TypedValue {
     public int assetCookie;
 
     /** If Value came from a resource, this holds the corresponding resource id. */
-    //@AnyRes // unused
     public int resourceId;
 
-    /** If Value came from a resource, these are the configurations for which
-     *  its contents can change. */
+    /**
+     * If the value came from a resource, these are the configurations for
+     * which its contents can change.
+     *
+     * <p>For example, if a resource has a value defined for the -land resource qualifier,
+     * this field will have the {@link android.content.pm.ActivityInfo#CONFIG_ORIENTATION} bit set.
+     * </p>
+     *
+     * @see android.content.pm.ActivityInfo#CONFIG_MCC
+     * @see android.content.pm.ActivityInfo#CONFIG_MNC
+     * @see android.content.pm.ActivityInfo#CONFIG_LOCALE
+     * @see android.content.pm.ActivityInfo#CONFIG_TOUCHSCREEN
+     * @see android.content.pm.ActivityInfo#CONFIG_KEYBOARD
+     * @see android.content.pm.ActivityInfo#CONFIG_KEYBOARD_HIDDEN
+     * @see android.content.pm.ActivityInfo#CONFIG_NAVIGATION
+     * @see android.content.pm.ActivityInfo#CONFIG_ORIENTATION
+     * @see android.content.pm.ActivityInfo#CONFIG_SCREEN_LAYOUT
+     * @see android.content.pm.ActivityInfo#CONFIG_UI_MODE
+     * @see android.content.pm.ActivityInfo#CONFIG_SCREEN_SIZE
+     * @see android.content.pm.ActivityInfo#CONFIG_SMALLEST_SCREEN_SIZE
+     * @see android.content.pm.ActivityInfo#CONFIG_DENSITY
+     * @see android.content.pm.ActivityInfo#CONFIG_LAYOUT_DIRECTION
+     * @see android.content.pm.ActivityInfo#CONFIG_COLOR_MODE
+     *
+     */
     public int changingConfigurations = -1;
 
     /**
      * If the Value came from a resource, this holds the corresponding pixel density.
      * */
     public int density;
+
+    /**
+     * If the Value came from a style resource or a layout resource (set in an XML layout), this
+     * holds the corresponding style or layout resource id against which the attribute was resolved.
+     */
+    public int sourceResourceId;
 
     /* ------------------------------------------------------------ */
 
@@ -207,6 +253,18 @@ public class TypedValue {
         1.0f*MANTISSA_MULT, 1.0f/(1<<7)*MANTISSA_MULT,
         1.0f/(1<<15)*MANTISSA_MULT, 1.0f/(1<<23)*MANTISSA_MULT
     };
+
+    /**
+     * Determine if a value is a color.
+     *
+     * This works by comparing {@link #type} to {@link #TYPE_FIRST_COLOR_INT}
+     * and {@link #TYPE_LAST_COLOR_INT}.
+     *
+     * @return true if this value is a color
+     */
+    public boolean isColorType() {
+        return (type >= TYPE_FIRST_COLOR_INT && type <= TYPE_LAST_COLOR_INT);
+    }
 
     /**
      * Retrieve the base value from a complex data integer.  This uses the
@@ -302,7 +360,7 @@ public class TypedValue {
                 (data>>COMPLEX_UNIT_SHIFT)&COMPLEX_UNIT_MASK,
                 value,
                 metrics);
-        final int res = (int)(f+0.5f);
+        final int res = (int) ((f >= 0) ? (f + 0.5f) : (f - 0.5f));
         if (res != 0) return res;
         if (value == 0) return 0;
         if (value > 0) return 1;
@@ -348,7 +406,7 @@ public class TypedValue {
      * metrics depending on its unit.
      */
     /* unused
-    public static float applyDimension(int unit, float value,
+    public static float applyDimension(@ComplexDimensionUnit int unit, float value,
                                        DisplayMetrics metrics)
     {
         switch (unit) {
@@ -385,6 +443,130 @@ public class TypedValue {
         return complexToDimension(data, metrics);
     }
     */
+
+    /**
+     * Construct a complex data integer.  This validates the radix and the magnitude of the
+     * mantissa, and sets the {@link TypedValue#COMPLEX_MANTISSA_MASK} and
+     * {@link TypedValue#COMPLEX_RADIX_MASK} components as provided. The units are not set.
+     **
+     * @param mantissa an integer representing the mantissa.
+     * @param radix a radix option, e.g. {@link TypedValue#COMPLEX_RADIX_23p0}.
+     * @return A complex data integer representing the value.
+     * @hide
+     */
+    private static int createComplex(/* @IntRange(from = -0x800000, to = 0x7FFFFF) */ int mantissa,
+            int radix) {
+        if (mantissa < -0x800000 || mantissa >= 0x800000) {
+            throw new IllegalArgumentException("Magnitude of mantissa is too large: " + mantissa);
+        }
+        if (radix < TypedValue.COMPLEX_RADIX_23p0 || radix > TypedValue.COMPLEX_RADIX_0p23) {
+            throw new IllegalArgumentException("Invalid radix: " + radix);
+        }
+        return ((mantissa & TypedValue.COMPLEX_MANTISSA_MASK) << TypedValue.COMPLEX_MANTISSA_SHIFT)
+                | (radix << TypedValue.COMPLEX_RADIX_SHIFT);
+    }
+
+    /**
+     * Convert a base value to a complex data integer.  This sets the {@link
+     * TypedValue#COMPLEX_MANTISSA_MASK} and {@link TypedValue#COMPLEX_RADIX_MASK} fields of the
+     * data to create a floating point representation of the given value. The units are not set.
+     *
+     * <p>This is the inverse of {@link TypedValue#complexToFloat(int)}.
+     *
+     * @param value An integer value.
+     * @return A complex data integer representing the value.
+     * @hide
+     */
+    public static int intToComplex(int value) {
+        if (value < -0x800000 || value >= 0x800000) {
+            throw new IllegalArgumentException("Magnitude of the value is too large: " + value);
+        }
+        return createComplex(value, TypedValue.COMPLEX_RADIX_23p0);
+    }
+
+    /**
+     * Convert a base value to a complex data integer.  This sets the {@link
+     * TypedValue#COMPLEX_MANTISSA_MASK} and {@link TypedValue#COMPLEX_RADIX_MASK} fields of the
+     * data to create a floating point representation of the given value. The units are not set.
+     *
+     * <p>This is the inverse of {@link TypedValue#complexToFloat(int)}.
+     *
+     * @param value A floating point value.
+     * @return A complex data integer representing the value.
+     * @hide
+     */
+    public static int floatToComplex(/* @FloatRange(from = -0x800000, to = 0x7FFFFF) */ float value) {
+        // validate that the magnitude fits in this representation
+        if (value < (float) -0x800000 - .5f || value >= (float) 0x800000 - .5f) {
+            throw new IllegalArgumentException("Magnitude of the value is too large: " + value);
+        }
+        try {
+            // If there's no fraction, use integer representation, as that's clearer
+            if (value == (float) (int) value) {
+                return createComplex((int) value, TypedValue.COMPLEX_RADIX_23p0);
+            }
+            float absValue = Math.abs(value);
+            // If the magnitude is 0, we don't need any magnitude digits
+            if (absValue < 1f) {
+                return createComplex(Math.round(value * (1 << 23)), TypedValue.COMPLEX_RADIX_0p23);
+            }
+            // If the magnitude is less than 2^8, use 8 magnitude digits
+            if (absValue < (float) (1 << 8)) {
+                return createComplex(Math.round(value * (1 << 15)), TypedValue.COMPLEX_RADIX_8p15);
+            }
+            // If the magnitude is less than 2^16, use 16 magnitude digits
+            if (absValue < (float) (1 << 16)) {
+                return createComplex(Math.round(value * (1 << 7)), TypedValue.COMPLEX_RADIX_16p7);
+            }
+            // The magnitude requires all 23 digits
+            return createComplex(Math.round(value), TypedValue.COMPLEX_RADIX_23p0);
+        } catch (IllegalArgumentException ex) {
+            // Wrap exception so as to include the value argument in the message.
+            throw new IllegalArgumentException("Unable to convert value to complex: " + value, ex);
+        }
+    }
+
+    /**
+     * <p>Creates a complex data integer that stores a dimension value and units.
+     *
+     * <p>The resulting value can be passed to e.g.
+     * {@link TypedValue#complexToDimensionPixelOffset(int, DisplayMetrics)} to calculate the pixel
+     * value for the dimension.
+     *
+     * @param value the value of the dimension
+     * @param units the units of the dimension, e.g. {@link TypedValue#COMPLEX_UNIT_DIP}
+     * @return A complex data integer representing the value and units of the dimension.
+     * @hide
+     */
+    public static int createComplexDimension(
+            /* @IntRange(from = -0x800000, to = 0x7FFFFF) */ int value,
+            /* @ComplexDimensionUnit */ int units) {
+        if (units < TypedValue.COMPLEX_UNIT_PX || units > TypedValue.COMPLEX_UNIT_MM) {
+            throw new IllegalArgumentException("Must be a valid COMPLEX_UNIT_*: " + units);
+        }
+        return intToComplex(value) | units;
+    }
+
+    /**
+     * <p>Creates a complex data integer that stores a dimension value and units.
+     *
+     * <p>The resulting value can be passed to e.g.
+     * {@link TypedValue#complexToDimensionPixelOffset(int, DisplayMetrics)} to calculate the pixel
+     * value for the dimension.
+     *
+     * @param value the value of the dimension
+     * @param units the units of the dimension, e.g. {@link TypedValue#COMPLEX_UNIT_DIP}
+     * @return A complex data integer representing the value and units of the dimension.
+     * @hide
+     */
+    public static int createComplexDimension(
+            /* @FloatRange(from = -0x800000, to = 0x7FFFFF) */ float value,
+            /* @ComplexDimensionUnit */ int units) {
+        if (units < TypedValue.COMPLEX_UNIT_PX || units > TypedValue.COMPLEX_UNIT_MM) {
+            throw new IllegalArgumentException("Must be a valid COMPLEX_UNIT_*: " + units);
+        }
+        return floatToComplex(value) | units;
+    }
 
     /**
      * Converts a complex data value holding a fraction to its final floating
@@ -525,4 +707,3 @@ public class TypedValue {
         return sb.toString();
     }
 };
-
