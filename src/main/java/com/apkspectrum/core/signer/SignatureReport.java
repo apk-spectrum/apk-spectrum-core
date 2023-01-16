@@ -30,9 +30,9 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource._RStr;
 import com.apkspectrum.util.Base64;
-import com.apkspectrum.util.Log;
 
 public class SignatureReport {
 

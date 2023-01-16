@@ -10,9 +10,9 @@ import javax.swing.JSplitPane;
 
 import com.apkspectrum.core.scanner.ApkScanner;
 import com.apkspectrum.data.apkinfo.ApkInfo;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource.ResAction;
 import com.apkspectrum.resource._RConst;
-import com.apkspectrum.util.Log;
 
 public class ApkActionEventHandler extends ActionEventHandler {
     public ApkActionEventHandler() {

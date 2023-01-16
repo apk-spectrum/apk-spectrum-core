@@ -21,8 +21,8 @@ import com.android.ddmlib.ShellCommandUnresponsiveException;
 import com.android.ddmlib.SyncException;
 import com.android.ddmlib.TimeoutException;
 import com.apkspectrum.core.scanner.ApkScanner;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.tool.adb.AdbDeviceHelper.CommandRejectedException;
-import com.apkspectrum.util.Log;
 
 
 public class PackageManager {

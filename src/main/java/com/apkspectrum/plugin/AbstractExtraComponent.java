@@ -1,8 +1,8 @@
 package com.apkspectrum.plugin;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.plugin.manifest.Component;
 import com.apkspectrum.swing.ITabbedRequest;
-import com.apkspectrum.util.Log;
 
 public abstract class AbstractExtraComponent<T> extends AbstractPlugIn
 		implements ExtraComponent<T> {

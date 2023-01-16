@@ -16,6 +16,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource._RStr;
 
 

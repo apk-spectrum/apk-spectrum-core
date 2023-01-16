@@ -16,8 +16,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.plugin.manifest.Component;
-import com.apkspectrum.util.Log;
 
 public class UpdateCheckerLinker extends AbstractUpdateChecker {
 

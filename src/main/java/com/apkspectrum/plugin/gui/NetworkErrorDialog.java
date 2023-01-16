@@ -5,12 +5,12 @@ import java.awt.Component;
 import javax.swing.JOptionPane;
 
 import com.apkspectrum.plugin.UpdateChecker;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.plugin.NetworkException;
 import com.apkspectrum.plugin.PlugInConfig;
 import com.apkspectrum.plugin.PlugInManager;
 import com.apkspectrum.resource._RStr;
 import com.apkspectrum.swing.MessageBoxPane;
-import com.apkspectrum.util.Log;
 
 public class NetworkErrorDialog {
     public static final int RESULT_NONE = 0;

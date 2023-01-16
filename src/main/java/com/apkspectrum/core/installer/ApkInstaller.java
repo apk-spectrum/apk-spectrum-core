@@ -14,13 +14,13 @@ import com.android.ddmlib.ShellCommandUnresponsiveException;
 import com.android.ddmlib.SyncException;
 import com.android.ddmlib.TimeoutException;
 import com.apkspectrum.data.apkinfo.CompactApkInfo;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource._RProp;
 import com.apkspectrum.tool.adb.AdbDeviceHelper;
 import com.apkspectrum.tool.adb.AdbDeviceHelper.CommandRejectedException;
 import com.apkspectrum.tool.adb.PackageManager;
 import com.apkspectrum.tool.adb.SimpleOutputReceiver;
 import com.apkspectrum.util.FileUtil;
-import com.apkspectrum.util.Log;
 import com.apkspectrum.util.ZipFileUtil;
 
 public class ApkInstaller {

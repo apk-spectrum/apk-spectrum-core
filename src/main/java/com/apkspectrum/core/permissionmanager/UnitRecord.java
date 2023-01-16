@@ -6,7 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.w3c.dom.NamedNodeMap;
 
-import com.apkspectrum.util.Log;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.util.XmlPath;
 
 public class UnitRecord<T> {

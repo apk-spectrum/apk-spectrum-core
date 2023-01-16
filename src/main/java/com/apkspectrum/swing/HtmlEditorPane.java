@@ -28,8 +28,8 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource._RConst;
-import com.apkspectrum.util.Log;
 
 public class HtmlEditorPane extends JEditorPane implements HyperlinkListener {
     private static final long serialVersionUID = 7856109068620039501L;

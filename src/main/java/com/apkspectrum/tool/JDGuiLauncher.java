@@ -2,8 +2,8 @@ package com.apkspectrum.tool;
 
 import java.io.File;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource._RFile;
-import com.apkspectrum.util.Log;
 import com.apkspectrum.util.SystemUtil;
 
 public class JDGuiLauncher {

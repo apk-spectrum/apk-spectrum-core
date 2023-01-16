@@ -25,6 +25,7 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 
 import com.apkspectrum.data.apkinfo.ApkInfo;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.plugin.gui.NetworkErrorDialog;
 import com.apkspectrum.plugin.gui.UpdateNotificationWindow;
 import com.apkspectrum.plugin.manifest.InvalidManifestException;
@@ -33,7 +34,6 @@ import com.apkspectrum.resource._RConst;
 import com.apkspectrum.resource._RFile;
 import com.apkspectrum.swing.ApkActionEventHandler;
 import com.apkspectrum.util.GeneralVersionChecker;
-import com.apkspectrum.util.Log;
 
 public final class PlugInManager {
     private static List<PlugInPackage> pluginPackages = new ArrayList<>();

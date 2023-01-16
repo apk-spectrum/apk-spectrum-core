@@ -13,9 +13,9 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource.ResProp;
 import com.apkspectrum.resource._RProp;
-import com.apkspectrum.util.Log;
 
 public class WindowSizeMemorizer implements ComponentListener, WindowListener {
     static public final int MEMORIZE_TYPE_WINDOWN_CLOSED = 0x01;

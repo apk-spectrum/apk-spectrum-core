@@ -31,8 +31,8 @@ import com.apkspectrum.data.apkinfo.UsesLibraryInfo;
 import com.apkspectrum.data.apkinfo.UsesPermissionInfo;
 import com.apkspectrum.data.apkinfo.UsesPermissionSdk23Info;
 import com.apkspectrum.data.apkinfo.WidgetInfo;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.tool.aapt.AaptNativeWrapper;
-import com.apkspectrum.util.Log;
 import com.apkspectrum.util.SystemUtil;
 import com.apkspectrum.util.URITool;
 

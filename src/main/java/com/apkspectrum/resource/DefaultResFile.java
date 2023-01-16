@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.apkspectrum.util.Log;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.util.SystemUtil;
 
 public class DefaultResFile implements ResFile<File> {

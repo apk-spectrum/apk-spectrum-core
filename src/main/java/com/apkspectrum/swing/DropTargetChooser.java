@@ -15,7 +15,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.UIManager;
 
-import com.apkspectrum.util.Log;
+import com.apkspectrum.logback.Log;
 
 public class DropTargetChooser extends JComponent {
     private static final long serialVersionUID = 4972112842742444927L;

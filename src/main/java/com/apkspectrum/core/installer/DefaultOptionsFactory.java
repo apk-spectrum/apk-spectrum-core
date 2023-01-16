@@ -10,11 +10,11 @@ import com.android.ddmlib.TimeoutException;
 import com.apkspectrum.core.signer.SignatureReport;
 import com.apkspectrum.data.apkinfo.ApkInfo;
 import com.apkspectrum.data.apkinfo.CompactApkInfo;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.tool.adb.AdbDeviceHelper;
 import com.apkspectrum.tool.adb.PackageInfo;
 import com.apkspectrum.tool.adb.PackageManager;
 import com.apkspectrum.tool.adb.SimpleOutputReceiver;
-import com.apkspectrum.util.Log;
 
 public class DefaultOptionsFactory {
     private CompactApkInfo apkInfo;

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.util.FileUtil.FSStyle;
 
 public class ZipFileUtil {

@@ -24,12 +24,12 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.plugin.NetworkException;
 import com.apkspectrum.plugin.PlugInManager;
 import com.apkspectrum.plugin.PlugInPackage;
 import com.apkspectrum.plugin.UpdateChecker;
 import com.apkspectrum.resource._RStr;
-import com.apkspectrum.util.Log;
 
 public class UpdateNotificationPanel extends JPanel
         implements ListSelectionListener, ActionListener {

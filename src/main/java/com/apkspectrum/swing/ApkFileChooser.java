@@ -7,9 +7,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource._RProp;
 import com.apkspectrum.resource._RStr;
-import com.apkspectrum.util.Log;
 
 public class ApkFileChooser {
 

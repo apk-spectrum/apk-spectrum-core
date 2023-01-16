@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import com.apkspectrum.logback.Log;
+
 public class ClassFinder {
     //https://dzone.com/articles/get-all-classes-within-package
 

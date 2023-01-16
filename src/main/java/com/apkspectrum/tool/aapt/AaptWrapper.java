@@ -3,9 +3,9 @@ package com.apkspectrum.tool.aapt;
 import java.io.File;
 import java.util.ArrayList;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource._RFile;
 import com.apkspectrum.util.ConsolCmd;
-import com.apkspectrum.util.Log;
 
 public class AaptWrapper {
     static private final Object initSync = new Object();

@@ -25,11 +25,11 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.plugin.PlugInConfig;
 import com.apkspectrum.plugin.PlugInPackage;
 import com.apkspectrum.resource._RStr;
 import com.apkspectrum.swing.MessageBoxPane;
-import com.apkspectrum.util.Log;
 
 public class ConfigurationsSettingPanel extends JPanel implements ActionListener {
     private static final long serialVersionUID = -7112752391206173232L;

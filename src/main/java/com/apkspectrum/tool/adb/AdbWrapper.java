@@ -4,12 +4,12 @@ import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import com.android.ddmlib.AdbVersion;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource._RFile;
 import com.apkspectrum.resource._RProp;
 import com.apkspectrum.util.ConsolCmd;
 import com.apkspectrum.util.ConsolCmd.ConsoleOutputObserver;
 import com.apkspectrum.util.FileUtil;
-import com.apkspectrum.util.Log;
 import com.google.common.util.concurrent.Uninterruptibles;
 
 public class AdbWrapper {

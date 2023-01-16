@@ -2,8 +2,8 @@ package com.apkspectrum.core.installer;
 
 import java.util.ArrayList;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource._RProp;
-import com.apkspectrum.util.Log;
 
 public class OptionsBundle {
     public static final int FLAG_OPT_INSTALL = 0x010000;

@@ -29,6 +29,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.apkspectrum.logback.Log;
+
 public class XmlPath {
     private static final XPathFactory xPathFactory;
     private static final DocumentBuilderFactory documentBuilderFactory;

@@ -11,13 +11,13 @@ import java.util.zip.ZipFile;
 import com.apkspectrum.core.signer.SignatureReport;
 import com.apkspectrum.core.signer.SignatureReportByApksig;
 import com.apkspectrum.data.apkinfo.ApkInfo;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource._RConst;
 import com.apkspectrum.resource._RProp;
 import com.apkspectrum.tool.aapt.AaptNativeWrapper;
 import com.apkspectrum.tool.adb.AdbWrapper;
 import com.apkspectrum.util.ConsolCmd.ConsoleOutputObserver;
 import com.apkspectrum.util.FileUtil;
-import com.apkspectrum.util.Log;
 import com.apkspectrum.util.SystemUtil;
 import com.apkspectrum.util.ZipFileUtil;
 

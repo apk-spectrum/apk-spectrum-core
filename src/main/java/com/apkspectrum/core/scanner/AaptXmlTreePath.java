@@ -9,8 +9,8 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource._RFile;
-import com.apkspectrum.util.Log;
 import com.apkspectrum.util.XmlPath;
 
 import android.util.TypedValue;

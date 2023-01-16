@@ -39,6 +39,7 @@ import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.plugin.PlugIn;
 import com.apkspectrum.plugin.PlugInGroup;
 import com.apkspectrum.plugin.PlugInManager;
@@ -46,7 +47,6 @@ import com.apkspectrum.plugin.PlugInPackage;
 import com.apkspectrum.resource._RImg;
 import com.apkspectrum.resource._RStr;
 import com.apkspectrum.swing.ImageScaler;
-import com.apkspectrum.util.Log;
 
 public class PlugInSettingPanel extends JPanel implements TreeSelectionListener {
     private static final long serialVersionUID = 1234825421488294264L;

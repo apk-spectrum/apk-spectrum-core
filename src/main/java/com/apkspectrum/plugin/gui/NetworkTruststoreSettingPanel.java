@@ -49,6 +49,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import com.apkspectrum.core.signer.SignatureReport;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.plugin.NetworkSetting;
 import com.apkspectrum.plugin.PlugInConfig;
 import com.apkspectrum.plugin.PlugInPackage;
@@ -56,7 +57,6 @@ import com.apkspectrum.resource._RFile;
 import com.apkspectrum.resource._RStr;
 import com.apkspectrum.swing.ApkFileChooser;
 import com.apkspectrum.swing.MessageBoxPane;
-import com.apkspectrum.util.Log;
 
 public class NetworkTruststoreSettingPanel extends JPanel
         implements ActionListener, ListSelectionListener {

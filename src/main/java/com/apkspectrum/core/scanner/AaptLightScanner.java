@@ -3,9 +3,9 @@ package com.apkspectrum.core.scanner;
 import java.io.File;
 
 import com.apkspectrum.data.apkinfo.ApkInfo;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.tool.aapt.AaptNativeWrapper;
 import com.apkspectrum.util.FileUtil;
-import com.apkspectrum.util.Log;
 import com.apkspectrum.util.ZipFileUtil;
 
 public class AaptLightScanner extends AaptScanner {

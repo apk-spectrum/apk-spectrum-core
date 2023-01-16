@@ -2,7 +2,7 @@ package com.apkspectrum.core.permissionmanager;
 
 import com.apkspectrum.data.apkinfo.PermissionInfo;
 import com.apkspectrum.data.apkinfo.UsesPermissionInfo;
-import com.apkspectrum.util.Log;
+import com.apkspectrum.logback.Log;
 
 public class RevokedPermissionInfo extends PermissionInfo {
     public enum RevokedReason {

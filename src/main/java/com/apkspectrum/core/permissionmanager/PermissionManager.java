@@ -15,9 +15,9 @@ import com.apkspectrum.data.apkinfo.PermissionInfo;
 import com.apkspectrum.data.apkinfo.ResourceInfo;
 import com.apkspectrum.data.apkinfo.UsesPermissionInfo;
 import com.apkspectrum.data.apkinfo.UsesPermissionSdk23Info;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource._RFile;
 import com.apkspectrum.resource._RImg;
-import com.apkspectrum.util.Log;
 import com.apkspectrum.util.XmlPath;
 
 public class PermissionManager {

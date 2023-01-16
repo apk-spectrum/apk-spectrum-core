@@ -33,8 +33,8 @@ import javax.net.ssl.X509TrustManager;
 
 import org.slf4j.helpers.MessageFormatter;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource._RFile;
-import com.apkspectrum.util.Log;
 import com.apkspectrum.util.SystemUtil;
 import com.github.markusbernhardt.proxy.ProxySearch;
 import com.github.markusbernhardt.proxy.selector.misc.BufferedProxySelector.CacheScope;

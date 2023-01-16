@@ -3,8 +3,8 @@ package com.apkspectrum.tool.aapt;
 import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource._RFile;
-import com.apkspectrum.util.Log;
 import com.apkspectrum.util.SystemUtil;
 
 public class AaptNativeWrapper {

@@ -18,6 +18,7 @@ import java.util.Map.Entry;
 
 import javax.swing.Action;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.plugin.manifest.Component;
 import com.apkspectrum.plugin.manifest.Configuration;
 import com.apkspectrum.plugin.manifest.InvalidManifestException;
@@ -27,7 +28,6 @@ import com.apkspectrum.plugin.manifest.Resources;
 import com.apkspectrum.plugin.manifest.StringData;
 import com.apkspectrum.resource._RStr;
 import com.apkspectrum.util.FileUtil;
-import com.apkspectrum.util.Log;
 import com.apkspectrum.util.XmlPath;
 import com.google.common.collect.ObjectArrays;
 

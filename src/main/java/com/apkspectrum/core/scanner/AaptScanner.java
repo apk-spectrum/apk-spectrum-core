@@ -8,10 +8,10 @@ import org.json.simple.parser.ParseException;
 
 import com.apkspectrum.data.apkinfo.ApkInfo;
 import com.apkspectrum.data.apkinfo.ResourceInfo;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.tool.aapt.AaptNativeWrapper;
 import com.apkspectrum.util.FileUtil;
 import com.apkspectrum.util.Launcher;
-import com.apkspectrum.util.Log;
 import com.apkspectrum.util.URITool;
 import com.apkspectrum.util.ZipFileUtil;
 

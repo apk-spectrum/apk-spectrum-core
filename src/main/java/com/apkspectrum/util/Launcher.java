@@ -15,6 +15,8 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import com.apkspectrum.logback.Log;
+
 public final class Launcher {
     private List<String> defaultCmd;
     private String[] jvmOpts;

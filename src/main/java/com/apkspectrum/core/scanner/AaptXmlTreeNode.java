@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.apkspectrum.util.Log;
+import com.apkspectrum.logback.Log;
 
 public class AaptXmlTreeNode {
     private String name;

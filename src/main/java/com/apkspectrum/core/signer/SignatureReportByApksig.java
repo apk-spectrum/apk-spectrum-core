@@ -8,7 +8,7 @@ import java.security.cert.X509Certificate;
 import com.android.apksig.ApkVerifier;
 import com.android.apksig.ApkVerifier.Result;
 import com.android.apksig.apk.ApkFormatException;
-import com.apkspectrum.util.Log;
+import com.apkspectrum.logback.Log;
 
 public class SignatureReportByApksig extends SignatureReport {
 	public SignatureReportByApksig(File file) {

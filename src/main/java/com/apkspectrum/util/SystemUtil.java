@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.apkspectrum.jna.ProcessPathKernel32;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource._RProp;
 import com.sun.jna.Native;
 import com.sun.jna.platform.win32.Advapi32Util;

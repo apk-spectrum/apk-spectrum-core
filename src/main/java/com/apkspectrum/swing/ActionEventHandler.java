@@ -25,9 +25,9 @@ import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource.ResAction;
 import com.apkspectrum.util.ClassFinder;
-import com.apkspectrum.util.Log;
 
 public class ActionEventHandler implements ActionListener, PropertyChangeListener {
     public static final String CONDITIONS_KEY = "conditions_key";

@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.apkspectrum.logback.Log;
+
 public class ConsolCmd {
     private boolean multiCmdExit;
 

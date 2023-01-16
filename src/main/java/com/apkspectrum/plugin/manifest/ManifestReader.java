@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import org.w3c.dom.Node;
 
 import com.apkspectrum.annotations.NonNull;
-import com.apkspectrum.util.Log;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.util.XmlPath;
 
 public class ManifestReader {
