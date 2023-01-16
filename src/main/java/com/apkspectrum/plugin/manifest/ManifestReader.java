@@ -6,14 +6,13 @@ import java.util.ArrayList;
 
 import org.w3c.dom.Node;
 
-import com.apkspectrum.annotations.NonNull;
 import com.apkspectrum.logback.Log;
 import com.apkspectrum.util.XmlPath;
 
 public class ManifestReader {
     private ManifestReader() {}
 
-    static public Manifest readManifest(@NonNull File path) throws InvalidManifestException {
+    static public Manifest readManifest(File path) throws InvalidManifestException {
         if (path == null || !path.canRead()) {
             Log.w("path is null or can not read");
             return null;
@@ -21,7 +20,7 @@ public class ManifestReader {
         return makeManifest(new XmlPath(path));
     }
 
-    static public Manifest readManifest(@NonNull InputStream input)
+    static public Manifest readManifest(InputStream input)
             throws InvalidManifestException {
         if (input == null) {
             Log.w("input is null");
@@ -30,7 +29,7 @@ public class ManifestReader {
         return makeManifest(new XmlPath(input));
     }
 
-    static private Manifest makeManifest(@NonNull XmlPath manifest)
+    static private Manifest makeManifest(XmlPath manifest)
             throws InvalidManifestException {
         if (manifest == null) {
             throw new InvalidManifestException("XmlPath is null", new NullPointerException());
@@ -67,7 +66,7 @@ public class ManifestReader {
                 resources, configuration);
     }
 
-    static private PlugIn makePlugin(@NonNull XmlPath manifest) {
+    static private PlugIn makePlugin(XmlPath manifest) {
         XmlPath node = manifest.getNode("/manifest/plugin");
         boolean enabled = !"false".equals(node.getAttribute("enabled"));
         String label = node.getAttribute("label");
@@ -82,7 +81,7 @@ public class ManifestReader {
                 useConfigurationSetting);
     }
 
-    static private Component[] makeComponents(@NonNull XmlPath manifest) {
+    static private Component[] makeComponents(XmlPath manifest) {
         ArrayList<Component> components = new ArrayList<>();
         XmlPath list = manifest.getNodeList("/manifest/plugin/*");
         for (int i = 0; i < list.getCount(); i++) {
@@ -167,7 +166,7 @@ public class ManifestReader {
     }
 
     @SuppressWarnings("unused")
-    static private Linker[] makeLinker(@NonNull XmlPath component) {
+    static private Linker[] makeLinker(XmlPath component) {
         // Log.d("makeLinker() " + component.toString());
         ArrayList<Linker> linkers = new ArrayList<>();
         XmlPath node = component.getChildNodes();
