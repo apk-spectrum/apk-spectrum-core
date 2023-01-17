@@ -15,138 +15,142 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-public final class Launcher
-{
-	private List<String> defaultCmd;
-	private String[] jvmOpts;
+import com.apkspectrum.logback.Log;
 
-	public Launcher() {
-		this((Class<?>) null, null);
-	}
+public final class Launcher {
+    private List<String> defaultCmd;
+    private String[] jvmOpts;
 
-	public Launcher(String className)
-			throws ClassNotFoundException {
-		this(className, null);
-	}
+    public Launcher() {
+        this((Class<?>) null, null);
+    }
 
-	public Launcher(Class<?> clazz) {
-		this(clazz, null);
-	}
+    public Launcher(String className) throws ClassNotFoundException {
+        this(className, null);
+    }
 
-	public Launcher(String className, String classPaths)
-			throws ClassNotFoundException {
-		this(Class.forName(className), classPaths);
-	}
+    public Launcher(Class<?> clazz) {
+        this(clazz, null);
+    }
 
-	public Launcher(Class<?> clazz, String classPaths) {
-		initLauncher(clazz, classPaths);
-	}
+    public Launcher(String className, String classPaths) throws ClassNotFoundException {
+        this(Class.forName(className), classPaths);
+    }
 
-	private void initLauncher(Class<?> clazz, String classPaths) {
-		String className = null;
-		if(clazz == null) {
-			Attributes attrs = getMainManifestAttributes();
-			//URL url = (URL) attrs.get("URL");
-			className = attrs.getValue("Main-Class");
-			try {
-				clazz = Class.forName(className);
-			} catch (ClassNotFoundException e) {
-				Log.e(e.getMessage());
-				return;
-			}
-			if(classPaths == null) {
-				classPaths = attrs.getValue("Class-Path");
-			}
-		}
-		defaultCmd = getDefaultCmd(clazz, classPaths);
-	}
+    public Launcher(Class<?> clazz, String classPaths) {
+        initLauncher(clazz, classPaths);
+    }
 
-	public void setJvmOptions(String... jvmOpts) {
-		this.jvmOpts = jvmOpts;
-	}
+    private void initLauncher(Class<?> clazz, String classPaths) {
+        String className = null;
+        if (clazz == null) {
+            Attributes attrs = getMainManifestAttributes();
+            // URL url = (URL) attrs.get("URL");
+            className = attrs.getValue("Main-Class");
+            try {
+                clazz = Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                Log.e(e.getMessage());
+                return;
+            }
+            if (classPaths == null) {
+                classPaths = attrs.getValue("Class-Path");
+            }
+        }
+        defaultCmd = getDefaultCmd(clazz, classPaths);
+    }
 
-	public void run(String... params) {
-		run(params, jvmOpts);
-	}
+    public void setJvmOptions(String... jvmOpts) {
+        this.jvmOpts = jvmOpts;
+    }
 
-	public void run(String[] params, String[] jvmOpts) {
-		SystemUtil.exec(getCommand(params, jvmOpts));
-	}
+    public void run(String... params) {
+        run(params, jvmOpts);
+    }
 
-	public Attributes getMainManifestAttributes() {
-	    Enumeration<URL> resEnum;
-	    try {
-	    	resEnum = Launcher.class.getClassLoader().getResources(JarFile.MANIFEST_NAME);
-	        while (resEnum.hasMoreElements()) {
+    public void run(String[] params, String[] jvmOpts) {
+        SystemUtil.exec(getCommand(params, jvmOpts));
+    }
+
+    public Attributes getMainManifestAttributes() {
+        Enumeration<URL> resEnum;
+        try {
+            resEnum = Launcher.class.getClassLoader().getResources(JarFile.MANIFEST_NAME);
+            while (resEnum.hasMoreElements()) {
                 URL url = (URL) resEnum.nextElement();
-	            try (InputStream is = url.openStream()){
-	                if (is == null) continue;
+                try (InputStream is = url.openStream()) {
+                    if (is == null) continue;
                     Manifest manifest = new Manifest(is);
                     Attributes mainAttribs = manifest.getMainAttributes();
-                    if(mainAttribs.getValue("Main-Class") != null) {
-                    	mainAttribs.putValue("URL", url.toExternalForm());
+                    if (mainAttribs.getValue("Main-Class") != null) {
+                        mainAttribs.putValue("URL", url.toExternalForm());
                         return mainAttribs;
-	                }
-	            } catch (IOException e) { }
-	        }
-	    } catch (IOException e) { }
-	    return null;
-	}
+                    }
+                } catch (IOException e) {
+                }
+            }
+        } catch (IOException e) {
+        }
+        return null;
+    }
 
-	public List<String> getCommand(String[] param) {
-		return getCommand(param, jvmOpts);
-	}
+    public List<String> getCommand(String[] param) {
+        return getCommand(param, jvmOpts);
+    }
 
-	public List<String> getCommand(String[] param, String[] jvmOpts) {
-		List<String> command = null;
-		if(defaultCmd != null) {
-			command = new ArrayList<String>(defaultCmd);
-			if(jvmOpts != null) {
-				command.addAll(1, Arrays.asList(jvmOpts));
-			}
-			if(param != null) {
-				command.addAll(Arrays.asList(param));
-			}
-			Log.v("command " + command.toString());
-		} else {
-			Log.w("command is null");
-		}
-		return command;
-	}
+    public List<String> getCommand(String[] param, String[] jvmOpts) {
+        List<String> command = null;
+        if (defaultCmd != null) {
+            command = new ArrayList<String>(defaultCmd);
+            if (jvmOpts != null) {
+                command.addAll(1, Arrays.asList(jvmOpts));
+            }
+            if (param != null) {
+                command.addAll(Arrays.asList(param));
+            }
+            Log.v("command " + command.toString());
+        } else {
+            Log.w("command is null");
+        }
+        return command;
+    }
 
-	public static List<String> getDefaultCmd(Class<?> launchClass, String classPaths) {
-		List<String> defaultCmd = new ArrayList<>();
+    public static List<String> getDefaultCmd(Class<?> launchClass, String classPaths) {
+        List<String> defaultCmd = new ArrayList<>();
 
-		String appPath = null;
-		try {
-			appPath = new File(launchClass.getProtectionDomain().getCodeSource().getLocation().toURI()).getAbsolutePath();
-		} catch (URISyntaxException e) {
-			Log.w(e.getMessage());
-			appPath = launchClass.getProtectionDomain().getCodeSource().getLocation().getPath();
-			if(SystemUtil.isWindows() && appPath.startsWith("/")) {
-				appPath = appPath.substring(1);
-			}
-		}
+        String appPath = null;
+        try {
+            appPath = new File(
+                    launchClass.getProtectionDomain().getCodeSource().getLocation().toURI())
+                            .getAbsolutePath();
+        } catch (URISyntaxException e) {
+            Log.w(e.getMessage());
+            appPath = launchClass.getProtectionDomain().getCodeSource().getLocation().getPath();
+            if (SystemUtil.isWindows() && appPath.startsWith("/")) {
+                appPath = appPath.substring(1);
+            }
+        }
 
-		StringBuilder classPathBuilder = new StringBuilder(appPath);
-		if(classPaths != null && !classPaths.isEmpty()) {
-			classPathBuilder.append(File.pathSeparator);
-			classPathBuilder.append(classPaths.replaceAll(" ", File.pathSeparator));
-		}
+        StringBuilder classPathBuilder = new StringBuilder(appPath);
+        if (classPaths != null && !classPaths.isEmpty()) {
+            classPathBuilder.append(File.pathSeparator);
+            classPathBuilder.append(classPaths.replaceAll(" ", File.pathSeparator));
+        }
 
-		try {
-			classPaths = URLDecoder.decode(classPathBuilder.toString(), "UTF-8");
-		} catch (UnsupportedEncodingException e1) { }
+        try {
+            classPaths = URLDecoder.decode(classPathBuilder.toString(), "UTF-8");
+        } catch (UnsupportedEncodingException e1) {
+        }
 
-		defaultCmd.add("java");
-		if(SystemUtil.isMac()) {
-			defaultCmd.add("-Xdock:name=APK Scanner");
-		}
-		defaultCmd.add("-Dfile.encoding=utf-8");
-		defaultCmd.add("-cp");
-		defaultCmd.add(classPaths);
-		defaultCmd.add(launchClass.getName());
+        defaultCmd.add("java");
+        if (SystemUtil.isMac()) {
+            defaultCmd.add("-Xdock:name=APK Scanner");
+        }
+        defaultCmd.add("-Dfile.encoding=utf-8");
+        defaultCmd.add("-cp");
+        defaultCmd.add(classPaths);
+        defaultCmd.add(launchClass.getName());
 
-		return defaultCmd;
-	}
+        return defaultCmd;
+    }
 }

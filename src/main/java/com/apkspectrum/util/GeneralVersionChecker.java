@@ -5,11 +5,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GeneralVersionChecker {
-    public static final GeneralVersionChecker UNKNOWN = new GeneralVersionChecker(-1, -1, -1);
+    public static final GeneralVersionChecker UNKNOWN_VERSION =
+            new GeneralVersionChecker(-1, -1, -1);
 
     /** Matches e.g. ".... 1.0.32" */
-    private static final Pattern GENERAL_VERSION_PATTERN = Pattern.compile(
-            "^[^\\d]*(\\d+)(\\.(\\d+)(\\.(\\d+))?)?.*");
+    private static final Pattern GENERAL_VERSION_PATTERN =
+            Pattern.compile("^[^\\d]*(\\d+)(\\.(\\d+)(\\.(\\d+))?)?.*");
 
     public final int major;
     public final int minor;
@@ -39,7 +40,7 @@ public class GeneralVersionChecker {
     }
 
     public static GeneralVersionChecker parseFrom(String input) {
-    	if(input == null) return new GeneralVersionChecker(0, 0, 0);
+        if (input == null) return new GeneralVersionChecker(0, 0, 0);
         Matcher matcher = GENERAL_VERSION_PATTERN.matcher(input);
         if (matcher.matches()) {
             int major = Integer.parseInt(matcher.group(1));
@@ -47,7 +48,7 @@ public class GeneralVersionChecker {
             int micro = matcher.group(5) != null ? Integer.parseInt(matcher.group(5)) : 0;
             return new GeneralVersionChecker(major, minor, micro);
         } else {
-            return UNKNOWN;
+            return UNKNOWN_VERSION;
         }
     }
 

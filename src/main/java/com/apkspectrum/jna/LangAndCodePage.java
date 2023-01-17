@@ -30,7 +30,7 @@ public final class LangAndCodePage extends Structure
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
+    @Override
     protected List getFieldOrder()
     {
         List fieldOrder = new ArrayList();

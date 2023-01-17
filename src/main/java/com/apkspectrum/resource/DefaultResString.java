@@ -14,224 +14,217 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.apkspectrum.util.Log;
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.util.XmlPath;
 import com.apkspectrum.util.ZipFileUtil;
 
-public class DefaultResString implements ResString<String>
-{
-	public static final String DEFAULT_XML_NAME = "strings";
+public class DefaultResString implements ResString<String> {
+    public static final String DEFAULT_XML_NAME = "strings";
 
-	static {
-		_RProp.LANGUAGE.addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				setLanguage((String) evt.getNewValue());
-			}
-		});
-	}
+    static {
+        _RProp.LANGUAGE.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                setLanguage((String) evt.getNewValue());
+            }
+        });
+    }
 
-	private static List<LanguageChangeListener> listeners = new ArrayList<>();
-	private static String lang = null;
-	
-	private static Map<String, XmlPath[]> xmlPaths = new HashMap<>();
+    private static List<LanguageChangeListener> listeners = new ArrayList<>();
+    private static String lang = null;
 
-	private String defaultXmlName;
-	private String value;
+    private static Map<String, XmlPath[]> xmlPaths = new HashMap<>();
 
-	public DefaultResString(String value) {
-		this(DEFAULT_XML_NAME, value);
-	}
+    private String defaultXmlName;
+    private String value;
 
-	public DefaultResString(String defaultXmlName, String value) {
-		this.defaultXmlName = defaultXmlName;
-		this.value = value;
-	}
+    public DefaultResString(String value) {
+        this(DEFAULT_XML_NAME, value);
+    }
 
-	@Override
-	public String getValue() {
-		return value;
-	}
+    public DefaultResString(String defaultXmlName, String value) {
+        this.defaultXmlName = defaultXmlName;
+        this.value = value;
+    }
 
-	@Override
-	public String get() {
-		return getString();
-	}
+    @Override
+    public String getValue() {
+        return value;
+    }
 
-	@Override
-	public String toString() {
-		return getString();
-	}
+    @Override
+    public String get() {
+        return getString();
+    }
 
-	@Override
-	public String getString() {
-		String id = getValue();
-		String value = null;
+    @Override
+    public String toString() {
+        return getString();
+    }
 
-		if(!id.startsWith("@")) return id;
-		id = id.substring(1);
+    @Override
+    public String getString() {
+        String id = getValue();
+        String value = null;
 
-		XmlPath[] stringXmlPath = xmlPaths.get(defaultXmlName);
+        if (!id.startsWith("@")) return id;
+        id = id.substring(1);
 
-		if(stringXmlPath == null) {
-			stringXmlPath = makeStringXmlPath(defaultXmlName);
-			xmlPaths.put(defaultXmlName, stringXmlPath);
-		}
+        XmlPath[] stringXmlPath = xmlPaths.get(defaultXmlName);
 
-		for(XmlPath xPath: stringXmlPath) {
-			XmlPath node = xPath.getNode(
-					"/resources/string[@name='" + id + "']");
-			if(node != null) {
-				value = node.getTextContent();
-				if(value != null) break;
-			}
-		}
+        if (stringXmlPath == null) {
+            stringXmlPath = makeStringXmlPath(defaultXmlName);
+            xmlPaths.put(defaultXmlName, stringXmlPath);
+        }
 
-		return value != null ? value.replaceAll("\\\\n", "\n")
-				.replaceAll("\\\\t", "\t") : null;
-	}
+        for (XmlPath xPath : stringXmlPath) {
+            XmlPath node = xPath.getNode("/resources/string[@name='" + id + "']");
+            if (node != null) {
+                value = node.getTextContent();
+                if (value != null) break;
+            }
+        }
 
-	public static void setLanguage(String l) {
-		if(lang == l) return;
-		String old = lang;
-		lang = l;
-		xmlPaths.clear();
+        return value != null ? value.replaceAll("\\\\n", "\n").replaceAll("\\\\t", "\t") : null;
+    }
 
-		fireLanguageChange(old, lang);
-	}
+    public static void setLanguage(String l) {
+        if (lang == l) return;
+        String old = lang;
+        lang = l;
+        xmlPaths.clear();
 
-	public static String getLanguage() {
-		return lang;
-	}
+        fireLanguageChange(old, lang);
+    }
 
-	public static void addLanguageChangeListener(
-			LanguageChangeListener listener) {
-		if(listener == null) return;
-		if(!listeners.contains(listener)) {
-			listeners.add(listener);
-		}
-	}
+    public static String getLanguage() {
+        return lang;
+    }
 
-	public static void removeLanguageChangeListener(
-			LanguageChangeListener listener) {
-		if(listener == null) return;
-		if(listeners.contains(listener)) {
-			listeners.remove(listener);
-		}
-	}
+    public static void addLanguageChangeListener(LanguageChangeListener listener) {
+        if (listener == null) return;
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
+    }
 
-	public static LanguageChangeListener[] getLanguageChangeListener() {
-		return listeners.toArray(new LanguageChangeListener[listeners.size()]);
-	}
+    public static void removeLanguageChangeListener(LanguageChangeListener listener) {
+        if (listener == null) return;
+        if (listeners.contains(listener)) {
+            listeners.remove(listener);
+        }
+    }
 
-	private static void fireLanguageChange(String oldLanguage,
-			String newLanguage) {
-		for(LanguageChangeListener l: listeners) {
-			l.languageChange(oldLanguage, newLanguage);
-		}
-	}
+    public static LanguageChangeListener[] getLanguageChangeListener() {
+        return listeners.toArray(new LanguageChangeListener[listeners.size()]);
+    }
 
-	private static XmlPath[] makeStringXmlPath(String xmlName) {
-		ArrayList<XmlPath> xmlList = new ArrayList<XmlPath>();
+    private static void fireLanguageChange(String oldLanguage, String newLanguage) {
+        for (LanguageChangeListener l : listeners) {
+            l.languageChange(oldLanguage, newLanguage);
+        }
+    }
 
-		if(lang != null && !lang.isEmpty()) {
-			String fileName = xmlName + "-" + lang.toLowerCase() + ".xml";
+    private static XmlPath[] makeStringXmlPath(String xmlName) {
+        ArrayList<XmlPath> xmlList = new ArrayList<XmlPath>();
 
-			File extFile = new DefaultResFile(
-					ResFile.Type.DATA, fileName).get();
-			if(extFile.exists()) {
-				xmlList.add(new XmlPath(extFile));
-			}
+        if (lang != null && !lang.isEmpty()) {
+            String fileName = xmlName + "-" + lang.toLowerCase() + ".xml";
 
-			ResFile<?> resXml = new DefaultResFile(
-					ResFile.Type.RES_VALUE, fileName);
-			try(InputStream xml = resXml.getResourceAsStream()) {
-				if(xml != null) {
-					xmlList.add(new XmlPath(xml));
-				}
-			} catch(IOException e) { }
-		}
+            File extFile = new DefaultResFile(ResFile.Type.DATA, fileName).get();
+            if (extFile.exists()) {
+                xmlList.add(new XmlPath(extFile));
+            }
 
-		String fileName = xmlName + ".xml";
-		File extFile = new DefaultResFile(ResFile.Type.DATA, fileName).get();
-		if(extFile.exists()) {
-			xmlList.add(new XmlPath(extFile));
-		}
+            ResFile<?> resXml = new DefaultResFile(ResFile.Type.RES_VALUE, fileName);
+            try (InputStream xml = resXml.getResourceAsStream()) {
+                if (xml != null) {
+                    xmlList.add(new XmlPath(xml));
+                }
+            } catch (IOException e) {
+            }
+        }
 
-		ResFile<?> resXml = new DefaultResFile(ResFile.Type.RES_VALUE, fileName);
-		try(InputStream xml = resXml.getResourceAsStream()) {
-			if(xml != null) {
-				xmlList.add(new XmlPath(xml));
-			}
-		} catch(IOException e) { }
+        String fileName = xmlName + ".xml";
+        File extFile = new DefaultResFile(ResFile.Type.DATA, fileName).get();
+        if (extFile.exists()) {
+            xmlList.add(new XmlPath(extFile));
+        }
 
-		return xmlList.toArray(new XmlPath[0]);
-	}
+        ResFile<?> resXml = new DefaultResFile(ResFile.Type.RES_VALUE, fileName);
+        try (InputStream xml = resXml.getResourceAsStream()) {
+            if (xml != null) {
+                xmlList.add(new XmlPath(xml));
+            }
+        } catch (IOException e) {
+        }
 
-	public static String[] getSupportedLanguages() {
-		return getSupportedLanguages(DEFAULT_XML_NAME);
-	}
+        return xmlList.toArray(new XmlPath[0]);
+    }
 
-	public static String[] getSupportedLanguages(String xmlName) {
-		ArrayList<String> languages = new ArrayList<String>();
+    public static String[] getSupportedLanguages() {
+        return getSupportedLanguages(DEFAULT_XML_NAME);
+    }
 
-		File valueDir = new DefaultResFile(ResFile.Type.DATA, "").get();
-		if(valueDir != null && valueDir.isDirectory()) {
-			String prefix = xmlName + "-";
-			for(String name: valueDir.list()) {
-				if(name.startsWith(prefix) && name.endsWith(".xml")) {
-					name = name.substring(prefix.length(), name.length() - 4);
-					if(!languages.contains(name)) {
-						languages.add(name);
-					}
-				}
-			}
-		}
+    public static String[] getSupportedLanguages(String xmlName) {
+        ArrayList<String> languages = new ArrayList<String>();
 
-		URL resource = new DefaultResFile(ResFile.Type.RES_VALUE, "").getURL();
-		String resFilePath = resource.getFile();
-		try {
-			resFilePath = URLDecoder.decode(resFilePath, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+        File valueDir = new DefaultResFile(ResFile.Type.DATA, "").get();
+        if (valueDir != null && valueDir.isDirectory()) {
+            String prefix = xmlName + "-";
+            for (String name : valueDir.list()) {
+                if (name.startsWith(prefix) && name.endsWith(".xml")) {
+                    name = name.substring(prefix.length(), name.length() - 4);
+                    if (!languages.contains(name)) {
+                        languages.add(name);
+                    }
+                }
+            }
+        }
 
-		if("jar".equals(resource.getProtocol())) {
-			String[] jarPath = resFilePath.split("!");
-			if(jarPath != null && jarPath.length == 2) {
-				String[] list = ZipFileUtil.findFiles(jarPath[0].substring(5),
-						".xml", "^"+jarPath[1].substring(1) + "/.*");
-				String prefix = "values/" + xmlName + "-";
-				for(String name : list) {
-					if(name.startsWith(prefix)
-							&& name.endsWith(".xml")) {
-						name = name.substring(prefix.length(), name.length()-4);
-						if(!languages.contains(name)) {
-							languages.add(name);
-						}
-					}
-				}
-			}
-		} else if("file".equals(resource.getProtocol())) {
-			valueDir = new File(resFilePath);
-			if(valueDir != null && valueDir.isDirectory()) {
-				String prefix = xmlName + "-";
-				for(String name: valueDir.list()) {
-					if(name.startsWith(prefix) && name.endsWith(".xml")) {
-						name = name.substring(prefix.length(), name.length()-4);
-						if(!languages.contains(name)) {
-							languages.add(name);
-						}
-					}
-				}
-			}
-		} else {
-			Log.e("Unknown protocol " + resource);
-		}
+        URL resource = new DefaultResFile(ResFile.Type.RES_VALUE, "").getURL();
+        String resFilePath = resource.getFile();
+        try {
+            resFilePath = URLDecoder.decode(resFilePath, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
-		Collections.sort(languages);
-		languages.add(0, "");
+        if ("jar".equals(resource.getProtocol())) {
+            String[] jarPath = resFilePath.split("!");
+            if (jarPath != null && jarPath.length == 2) {
+                String[] list = ZipFileUtil.findFiles(jarPath[0].substring(5), ".xml",
+                        "^" + jarPath[1].substring(1) + "/.*");
+                String prefix = "values/" + xmlName + "-";
+                for (String name : list) {
+                    if (name.startsWith(prefix) && name.endsWith(".xml")) {
+                        name = name.substring(prefix.length(), name.length() - 4);
+                        if (!languages.contains(name)) {
+                            languages.add(name);
+                        }
+                    }
+                }
+            }
+        } else if ("file".equals(resource.getProtocol())) {
+            valueDir = new File(resFilePath);
+            if (valueDir != null && valueDir.isDirectory()) {
+                String prefix = xmlName + "-";
+                for (String name : valueDir.list()) {
+                    if (name.startsWith(prefix) && name.endsWith(".xml")) {
+                        name = name.substring(prefix.length(), name.length() - 4);
+                        if (!languages.contains(name)) {
+                            languages.add(name);
+                        }
+                    }
+                }
+            }
+        } else {
+            Log.e("Unknown protocol " + resource);
+        }
 
-		return languages.toArray(new String[languages.size()]);
-	}
+        Collections.sort(languages);
+        languages.add(0, "");
+
+        return languages.toArray(new String[languages.size()]);
+    }
 }

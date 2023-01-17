@@ -53,10 +53,10 @@ import java.io.Reader;
  */
 public class FileDrop
 {
-	public static final int STATUS_DRAG_NO_ACTION = 0;
-	public static final int STATUS_DRAG_ENTERED = 1;
-	public static final int STATUS_DRAG_EXISTED = 2;
-	public static final int STATUS_DRAG_DROPED = 3;
+    public static final int STATUS_DRAG_NO_ACTION = 0;
+    public static final int STATUS_DRAG_ENTERED = 1;
+    public static final int STATUS_DRAG_EXISTED = 2;
+    public static final int STATUS_DRAG_DROPED = 3;
 
     private transient javax.swing.border.Border normalBorder;
     private transient java.awt.dnd.DropTargetListener dropListener;
@@ -275,49 +275,49 @@ public class FileDrop
         if( supportsDnD() )
         {
             final MouseListener mouseListener = new MouseAdapter() {
-    			@Override
-    			public void mouseEntered(MouseEvent arg0) {
-					c.removeMouseListener(this);
-					EventQueue.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							if(dragStatus != STATUS_DRAG_ENTERED) return;
-							dragStatus = STATUS_DRAG_NO_ACTION;
-							FileDrop.remove(out, c, recursive);
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									makeDropTarget(out, c, recursive);
-								}
-							});
-						}
-					});
-    			}
-    		};
+                @Override
+                public void mouseEntered(MouseEvent arg0) {
+                    c.removeMouseListener(this);
+                    EventQueue.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(dragStatus != STATUS_DRAG_ENTERED) return;
+                            dragStatus = STATUS_DRAG_NO_ACTION;
+                            FileDrop.remove(out, c, recursive);
+                            EventQueue.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    makeDropTarget(out, c, recursive);
+                                }
+                            });
+                        }
+                    });
+                }
+            };
 
-        	// Make a drop listener
+            // Make a drop listener
             dropListener = new java.awt.dnd.DropTargetListener()
             {   @SuppressWarnings("rawtypes")
-			public void dragEnter( java.awt.dnd.DropTargetDragEvent evt )
+            public void dragEnter( java.awt.dnd.DropTargetDragEvent evt )
                 {       log( out, "FileDrop: dragEnter event." );
-            		dragStatus = STATUS_DRAG_NO_ACTION;
-                	boolean isFileTypeOK = false;
-                	try {
-                    	java.awt.datatransfer.Transferable tr = evt.getTransferable();
-						java.util.List fileList = (java.util.List)
-						        tr.getTransferData(java.awt.datatransfer.DataFlavor.javaFileListFlavor);
-						if(fileList.size() == 1 && fileList.get(0).toString().endsWith(".apk")) {
-							if(new File(fileList.get(0).toString()).isFile())
-									isFileTypeOK = true;
-						}
-						fileList.get(0);
-					} catch (UnsupportedFlavorException | IOException e) {
-						e.printStackTrace();
-					}
+                    dragStatus = STATUS_DRAG_NO_ACTION;
+                    boolean isFileTypeOK = false;
+                    try {
+                        java.awt.datatransfer.Transferable tr = evt.getTransferable();
+                        java.util.List fileList = (java.util.List)
+                                tr.getTransferData(java.awt.datatransfer.DataFlavor.javaFileListFlavor);
+                        if(fileList.size() == 1 && fileList.get(0).toString().endsWith(".apk")) {
+                            if(new File(fileList.get(0).toString()).isFile())
+                                    isFileTypeOK = true;
+                        }
+                        fileList.get(0);
+                    } catch (UnsupportedFlavorException | IOException e) {
+                        e.printStackTrace();
+                    }
                     // Is this an acceptable drag event?
                     if( isDragOk( out, evt ) && isFileTypeOK )
                     {
-                    	dragStatus = STATUS_DRAG_ENTERED;
+                        dragStatus = STATUS_DRAG_ENTERED;
                         // If it's a Swing component, set its border
                         if( c instanceof javax.swing.JComponent )
                         {   javax.swing.JComponent jc = (javax.swing.JComponent) c;
@@ -329,7 +329,7 @@ public class FileDrop
                                 listener.dragEnter();
                             java.awt.Component dropComp = evt.getDropTargetContext().getComponent();
                             if(dropComp instanceof FileDrop.Listener)
-                            	((FileDrop.Listener)dropComp).dragEnter();
+                                ((FileDrop.Listener)dropComp).dragEnter();
                             c.addMouseListener(mouseListener);
                         }   // end if: JComponent   
 
@@ -351,7 +351,7 @@ public class FileDrop
                 }   // end dragOver
 
                 @SuppressWarnings({ "rawtypes", "unchecked" })
-				public void drop( java.awt.dnd.DropTargetDropEvent evt )
+                public void drop( java.awt.dnd.DropTargetDropEvent evt )
                 {   log( out, "FileDrop: drop event." );
                     try
                     {   // Get whatever was dropped
@@ -360,7 +360,7 @@ public class FileDrop
                         // Is it a file list?
                         if (tr.isDataFlavorSupported (java.awt.datatransfer.DataFlavor.javaFileListFlavor))
                         {
-                        	dragStatus = STATUS_DRAG_DROPED;
+                            dragStatus = STATUS_DRAG_DROPED;
                             // Say we'll take it.
                             //evt.acceptDrop ( java.awt.dnd.DnDConstants.ACTION_COPY_OR_MOVE );
                             evt.acceptDrop ( java.awt.dnd.DnDConstants.ACTION_COPY );
@@ -370,7 +370,7 @@ public class FileDrop
                             java.util.List fileList = (java.util.List) 
                                 tr.getTransferData(java.awt.datatransfer.DataFlavor.javaFileListFlavor);
                             @SuppressWarnings("unused")
-							java.util.Iterator iterator = fileList.iterator();
+                            java.util.Iterator iterator = fileList.iterator();
 
                             // Convert list to array
                             java.io.File[] filesTemp = new java.io.File[ fileList.size() ];
@@ -382,7 +382,7 @@ public class FileDrop
                                 listener.filesDropped( files );
                             java.awt.Component dropComp = evt.getDropTargetContext().getComponent();
                             if(dropComp instanceof FileDrop.Listener)
-                            	((FileDrop.Listener)dropComp).filesDropped( files );
+                                ((FileDrop.Listener)dropComp).filesDropped( files );
                             c.removeMouseListener(mouseListener);
                             // Mark that drop is completed.
                             evt.getDropTargetContext().dropComplete(true);
@@ -396,7 +396,7 @@ public class FileDrop
                             boolean handled = false;
                             for (int zz = 0; zz < flavors.length; zz++) {
                                 if (flavors[zz].isRepresentationClassReader()) {
-                                	dragStatus = STATUS_DRAG_DROPED;
+                                    dragStatus = STATUS_DRAG_DROPED;
                                     // Say we'll take it.
                                     //evt.acceptDrop ( java.awt.dnd.DnDConstants.ACTION_COPY_OR_MOVE );
                                     evt.acceptDrop(java.awt.dnd.DnDConstants.ACTION_COPY);
@@ -410,7 +410,7 @@ public class FileDrop
                                         listener.filesDropped(createFileArray(br, out));
                                     java.awt.Component dropComp = evt.getDropTargetContext().getComponent();
                                     if(dropComp instanceof FileDrop.Listener)
-                                    	((FileDrop.Listener)dropComp).filesDropped( createFileArray(br, out) );
+                                        ((FileDrop.Listener)dropComp).filesDropped( createFileArray(br, out) );
                                     c.removeMouseListener(mouseListener);
                                     // Mark that drop is completed.
                                     evt.getDropTargetContext().dropComplete(true);
@@ -420,7 +420,7 @@ public class FileDrop
                                 }
                             }
                             if(!handled){
-                            	dragStatus = STATUS_DRAG_NO_ACTION;
+                                dragStatus = STATUS_DRAG_NO_ACTION;
                                 log( out, "FileDrop: not a file list or reader - abort." );
                                 evt.rejectDrop();
                             }
@@ -448,7 +448,7 @@ public class FileDrop
                                 listener.dragExit();
                             java.awt.Component dropComp = evt.getDropTargetContext().getComponent();
                             if(dropComp instanceof FileDrop.Listener)
-                            	((FileDrop.Listener)dropComp).dragExit();
+                                ((FileDrop.Listener)dropComp).dragExit();
                             c.removeMouseListener(mouseListener);
                         }   // end if: JComponent
                     }   // end finally
@@ -456,7 +456,7 @@ public class FileDrop
 
                 public void dragExit( java.awt.dnd.DropTargetEvent evt ) 
                 {   log( out, "FileDrop: dragExit event." );
-                	dragStatus = STATUS_DRAG_EXISTED;
+                    dragStatus = STATUS_DRAG_EXISTED;
                     // If it's a Swing component, reset its border
                     if( c instanceof javax.swing.JComponent )
                     {   javax.swing.JComponent jc = (javax.swing.JComponent) c;
@@ -466,7 +466,7 @@ public class FileDrop
                             listener.dragExit();
                         java.awt.Component dropComp = evt.getDropTargetContext().getComponent();
                         if(dropComp instanceof FileDrop.Listener)
-                        	((FileDrop.Listener)dropComp).dragExit();
+                            ((FileDrop.Listener)dropComp).dragExit();
                         c.removeMouseListener(mouseListener);
                     }   // end if: JComponent
                 }   // end dragExit
@@ -502,7 +502,7 @@ public class FileDrop
             boolean support = false;
             try
             {   @SuppressWarnings({ "unused", "rawtypes" })
-			Class arbitraryDndClass = Class.forName( "java.awt.dnd.DnDConstants" );
+            Class arbitraryDndClass = Class.forName( "java.awt.dnd.DnDConstants" );
                 support = true;
             }   // end try
             catch( Exception e )
@@ -517,7 +517,7 @@ public class FileDrop
      // BEGIN 2007-09-12 Nathan Blomquist -- Linux (KDE/Gnome) support added.
      private static String ZERO_CHAR_STRING = "" + (char)0;
      @SuppressWarnings({ "rawtypes", "unchecked" })
-	private static File[] createFileArray(BufferedReader bReader, PrintStream out)
+    private static File[] createFileArray(BufferedReader bReader, PrintStream out)
      {
         try { 
             java.util.List list = new java.util.ArrayList();
@@ -571,7 +571,7 @@ public class FileDrop
             }   // end hierarchyChanged
         }); // end hierarchy listener
         if( c.getParent() != null )
-        	c.setDropTarget(dt); //new java.awt.dnd.DropTarget(c, dropListener);
+            c.setDropTarget(dt); //new java.awt.dnd.DropTarget(c, dropListener);
         
         if( recursive && (c instanceof java.awt.Container ) )
         {   
@@ -725,10 +725,10 @@ public class FileDrop
      * @author  rob@iharder.net
      * @version 1.2
      */
-	public static class Event extends java.util.EventObject {
+    public static class Event extends java.util.EventObject {
         private static final long serialVersionUID = 3901819171303238236L;
 
-		private java.io.File[] files;
+        private java.io.File[] files;
 
         /**
          * Constructs an {@link Event} with the array
@@ -882,7 +882,7 @@ public class FileDrop
          * @since 1.1
          */
         @SuppressWarnings("rawtypes")
-		public TransferableObject( Class dataClass, Fetcher fetcher )
+        public TransferableObject( Class dataClass, Fetcher fetcher )
         {   this.fetcher = fetcher;
             this.customFlavor = new java.awt.datatransfer.DataFlavor( dataClass, MIME_TYPE );
         }   // end constructor

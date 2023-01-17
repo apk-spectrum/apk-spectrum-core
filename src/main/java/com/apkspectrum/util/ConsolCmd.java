@@ -7,102 +7,98 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConsolCmd
-{
-	private boolean multiCmdExit;
+import com.apkspectrum.logback.Log;
 
-	public interface ConsoleOutputObserver
-	{
-		public boolean ConsolOutput(String output);
-	}
+public class ConsolCmd {
+    private boolean multiCmdExit;
 
-	private ConsolCmd()
-	{
-		multiCmdExit = false;
-	}
+    public interface ConsoleOutputObserver {
+        public boolean ConsolOutput(String output);
+    }
 
-	static public String[] exec(String[] cmd) {
-		return (new ConsolCmd()).exec_i(cmd, false, null);
-	}
+    private ConsolCmd() {
+        multiCmdExit = false;
+    }
 
-	static public String[] exec(String[] cmd, boolean showLog) {
-		return (new ConsolCmd()).exec_i(cmd, showLog, null);
-	}
+    static public String[] exec(String[] cmd) {
+        return (new ConsolCmd()).exec_i(cmd, false, null);
+    }
 
-	static public String[] exec(String[] cmd, boolean showLog, ConsoleOutputObserver observer) {
-		return (new ConsolCmd()).exec_i(cmd, showLog, observer);
-	}
+    static public String[] exec(String[] cmd, boolean showLog) {
+        return (new ConsolCmd()).exec_i(cmd, showLog, null);
+    }
 
-	private String[] exec_i(String[] cmd, boolean showLog, ConsoleOutputObserver observer)
-	{
-		String s = "";
-		List<String> buffer = new ArrayList<String>();
+    static public String[] exec(String[] cmd, boolean showLog, ConsoleOutputObserver observer) {
+        return (new ConsolCmd()).exec_i(cmd, showLog, observer);
+    }
 
-		if(showLog) {
-			Log.i(echoCmd(cmd));
-		}
-    	if(observer != null) {
-    		observer.ConsolOutput(echoCmd(cmd));
-    	}
+    private String[] exec_i(String[] cmd, boolean showLog, ConsoleOutputObserver observer) {
+        String s = "";
+        List<String> buffer = new ArrayList<String>();
 
-    	Process process = null;
-		try {
-			process = new ProcessBuilder(cmd).redirectErrorStream(true).start();
-			try(InputStream inputStream = process.getInputStream();
-				InputStreamReader inputStreamReader = new InputStreamReader(inputStream/*, encoding*/);
-				BufferedReader stdOut = new BufferedReader(inputStreamReader)) {
-			    while ((s = stdOut.readLine()) != null) {
-			    	if(showLog) Log.i(s);
-			    	if(observer != null) {
-			    		multiCmdExit = !observer.ConsolOutput(s) || multiCmdExit;
-			    	}
-			    	buffer.add(s);
-			    }
-			}
-		} catch (IOException e) {
-		      Log.e("error: " + e.getMessage());
-		      return null;
-	    } finally {
-	    	if(process != null) {
-	    		process.destroy();
-	    	}
-	    }
+        Log.v(echoCmd(cmd));
 
-		String[] ret = buffer.toArray(new String[buffer.size()]);
-		return ret;
-	}
+        if (observer != null) {
+            observer.ConsolOutput(echoCmd(cmd));
+        }
 
-	static public String[][] exec(String[][] cmd)
-	{
-		return (new ConsolCmd()).exec_i(cmd, false, null);
-	}
+        Process process = null;
+        try {
+            process = new ProcessBuilder(cmd).redirectErrorStream(true).start();
+            try (InputStream inputStream = process.getInputStream();
+                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream/* , encoding */);
+                    BufferedReader stdOut = new BufferedReader(inputStreamReader)) {
+                while ((s = stdOut.readLine()) != null) {
+                    if (showLog) Log.i(s);
+                    if (observer != null) {
+                        multiCmdExit = !observer.ConsolOutput(s) || multiCmdExit;
+                    }
+                    buffer.add(s);
+                }
+            }
+        } catch (IOException e) {
+            Log.e("error: " + e.getMessage());
+            return null;
+        } finally {
+            if (process != null) {
+                process.destroy();
+            }
+        }
 
-	static public String[][] exec(String[][] cmd, boolean showLog)
-	{
-		return (new ConsolCmd()).exec_i(cmd, showLog, null);
-	}
+        String[] ret = buffer.toArray(new String[buffer.size()]);
+        return ret;
+    }
 
-	static public String[][] exec(String[][] cmd, boolean showLog, final ConsoleOutputObserver observer)
-	{
-		return (new ConsolCmd()).exec_i(cmd, showLog, observer);
-	}
+    static public String[][] exec(String[][] cmd) {
+        return (new ConsolCmd()).exec_i(cmd, false, null);
+    }
 
-	private String[][] exec_i(String[][] cmd, boolean showLog, final ConsoleOutputObserver observer) {
-		List<String[]> buffer = new ArrayList<String[]>();
+    static public String[][] exec(String[][] cmd, boolean showLog) {
+        return (new ConsolCmd()).exec_i(cmd, showLog, null);
+    }
 
-		for(int i = 0; i < cmd.length; i++) {
-			buffer.add(exec_i(cmd[i], showLog, observer));
-			if(multiCmdExit) break;
-		}
+    static public String[][] exec(String[][] cmd, boolean showLog,
+            final ConsoleOutputObserver observer) {
+        return (new ConsolCmd()).exec_i(cmd, showLog, observer);
+    }
 
-		return buffer.toArray(new String[0][0]);
-	}
+    private String[][] exec_i(String[][] cmd, boolean showLog,
+            final ConsoleOutputObserver observer) {
+        List<String[]> buffer = new ArrayList<String[]>();
 
-	private String echoCmd(String[] cmd) {
-		String echo = "";
-		for(int i = 0; i < cmd.length; i++){
-			echo += (i==0?"":" ") + cmd[i];
-		}
-		return echo;
-	}
+        for (int i = 0; i < cmd.length; i++) {
+            buffer.add(exec_i(cmd[i], showLog, observer));
+            if (multiCmdExit) break;
+        }
+
+        return buffer.toArray(new String[0][0]);
+    }
+
+    private String echoCmd(String[] cmd) {
+        String echo = "";
+        for (int i = 0; i < cmd.length; i++) {
+            echo += (i == 0 ? "" : " ") + cmd[i];
+        }
+        return echo;
+    }
 }

@@ -5,10 +5,10 @@ import java.awt.event.MouseEvent;
 import javax.swing.JCheckBoxMenuItem;
 
 public class NoCloseCheckBoxMenuItem extends JCheckBoxMenuItem {
-	private static final long serialVersionUID = 4982874784585596549L;
+    private static final long serialVersionUID = 4982874784585596549L;
 
-	public NoCloseCheckBoxMenuItem() {
-    	super();
+    public NoCloseCheckBoxMenuItem() {
+        super();
     }
 
     @Override

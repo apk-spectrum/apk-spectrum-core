@@ -16,166 +16,161 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.apkspectrum.logback.Log;
 import com.apkspectrum.plugin.manifest.Component;
-import com.apkspectrum.util.Log;
 
-public class UpdateCheckerLinker extends AbstractUpdateChecker
-{
-	public UpdateCheckerLinker(PlugInPackage pluginPackage, Component component)
-	{
-		super(pluginPackage, component);
-	}
+public class UpdateCheckerLinker extends AbstractUpdateChecker {
 
-	public boolean getNewVersion() throws NetworkException {
-		if(!NetworkSetting.isEnabledNetworkInterface()) {
-			Log.w("No such network interface");
-			throw makeNetworkException(
-					new NetworkNotFoundException("No such network interface"));
-		}
+    public UpdateCheckerLinker(PlugInPackage pluginPackage, Component component) {
+        super(pluginPackage, component);
+    }
 
-		System.setProperty("http.protocols", "TLSv1,TLSv1.1,TLSv1.2");
+    public boolean getNewVersion() throws NetworkException {
+        if (!NetworkSetting.isEnabledNetworkInterface()) {
+            Log.w("No such network interface");
+            throw makeNetworkException(new NetworkNotFoundException("No such network interface"));
+        }
 
-		NetworkSetting networkSetting = new NetworkSetting(pluginPackage);
-		HttpURLConnection request = null;
-		boolean ignoreSSLCert = false;
-		boolean isSetTruststore = false;
-		try {
-			URL targetURL = new URL(component.url);
-			networkSetting.setProxyServer(targetURL.toURI());
-			isSetTruststore = networkSetting.setSSLTrustStore();
-			ignoreSSLCert = NetworkSetting.isIgnoreSSLCert();
-			request = (HttpURLConnection) targetURL.openConnection();
-			request.setRequestMethod("GET");
-		} catch (MalformedURLException | URISyntaxException e) {
-			throw makeNetworkException(e);
-		} catch (IOException e) {
-			throw makeNetworkException(e);
-		} finally {
-			if(isSetTruststore) networkSetting.restoreSSLTrustStore();
-		}
+        System.setProperty("http.protocols", "TLSv1,TLSv1.1,TLSv1.2");
 
-		request.setUseCaches(false);
-		request.setDefaultUseCaches(false);
-		request.setDoOutput(false);
-		request.setDoInput(true);
-		request.setInstanceFollowRedirects(false);
-		request.setConnectTimeout(5000);
-		request.setReadTimeout(5000);
+        NetworkSetting networkSetting = new NetworkSetting(pluginPackage);
+        HttpURLConnection request = null;
+        boolean ignoreSSLCert = false;
+        boolean isSetTruststore = false;
+        try {
+            URL targetURL = new URL(component.url);
+            networkSetting.setProxyServer(targetURL.toURI());
+            isSetTruststore = networkSetting.setSSLTrustStore();
+            ignoreSSLCert = NetworkSetting.isIgnoreSSLCert();
+            request = (HttpURLConnection) targetURL.openConnection();
+            request.setRequestMethod("GET");
+        } catch (MalformedURLException | URISyntaxException e) {
+            throw makeNetworkException(e);
+        } catch (IOException e) {
+            throw makeNetworkException(e);
+        } finally {
+            if (isSetTruststore) networkSetting.restoreSSLTrustStore();
+        }
 
-		// customizing information
-		request.setRequestProperty("User-Agent","");
-		request.setRequestProperty("Referer","");
-		request.setRequestProperty("Cookie","");
-		request.setRequestProperty("Origin","");
-		request.setRequestProperty("Cache-Control",
-										"no-cache, no-store, must-revalidate");
-		request.setRequestProperty("Pragma", "no-cache");
-		request.setRequestProperty("Expires", "0");
+        request.setUseCaches(false);
+        request.setDefaultUseCaches(false);
+        request.setDoOutput(false);
+        request.setDoInput(true);
+        request.setInstanceFollowRedirects(false);
+        request.setConnectTimeout(5000);
+        request.setReadTimeout(5000);
 
-		//request.setRequestProperty("Content-Type",
-		//		"application/x-www-form-urlencoded");
-		//request.setRequestProperty("Content-length",
-		//		String.valueOf(param.length()));
+        // customizing information
+        request.setRequestProperty("User-Agent", "");
+        request.setRequestProperty("Referer", "");
+        request.setRequestProperty("Cookie", "");
+        request.setRequestProperty("Origin", "");
+        request.setRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate");
+        request.setRequestProperty("Pragma", "no-cache");
+        request.setRequestProperty("Expires", "0");
 
-		//request.setRequestMethod("POST");
-		//OutputStream opstrm = request.getOutputStream();
-		//opstrm.write("".getBytes());
-		//opstrm.flush();
-		//opstrm.close();
+        // request.setRequestProperty("Content-Type",
+        // "application/x-www-form-urlencoded");
+        // request.setRequestProperty("Content-length",
+        // String.valueOf(param.length()));
 
-		String jsonData = null;
-		try ( InputStream is = request.getInputStream();
-			  InputStreamReader isr = new InputStreamReader(is,"UTF-8");
-			  BufferedReader br = new BufferedReader(isr) ) {
+        // request.setRequestMethod("POST");
+        // OutputStream opstrm = request.getOutputStream();
+        // opstrm.write("".getBytes());
+        // opstrm.flush();
+        // opstrm.close();
 
-			String buffer = null;
-			StringBuffer sb = new StringBuffer();
-			boolean flag = false;
-			while ((buffer = br.readLine()) != null) {
-				sb.append(flag ? "\n": "").append(buffer);
-				flag = true;
-			}
-			jsonData = sb.toString();
-			Log.v(jsonData);
-		} catch (IOException e) {
-			throw makeNetworkException(e);
-		} finally {
-			request.disconnect();
-		}
+        String jsonData = null;
+        try (InputStream is = request.getInputStream();
+                InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+                BufferedReader br = new BufferedReader(isr)) {
 
-		JSONParser parser = new JSONParser();
-		JSONObject data = null;
-		try {
-			data = (JSONObject)parser.parse(jsonData);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+            String buffer = null;
+            StringBuffer sb = new StringBuffer();
+            boolean flag = false;
+            while ((buffer = br.readLine()) != null) {
+                sb.append(flag ? "\n" : "").append(buffer);
+                flag = true;
+            }
+            jsonData = sb.toString();
+            Log.v(jsonData);
+        } catch (IOException e) {
+            throw makeNetworkException(e);
+        } finally {
+            request.disconnect();
+        }
 
-		if(data != null && data.containsKey("version")) {
-			if(ignoreSSLCert && data.containsKey("url")) {
-				Log.w("remove url : " + data.get("url"));
-				data.remove("url");
-			}
-			setLatestVersionInfo(data);
-			setLastUpdateDate(new Date().getTime());
-		} else {
-			return false;
-		}
+        JSONParser parser = new JSONParser();
+        JSONObject data = null;
+        try {
+            data = (JSONObject) parser.parse(jsonData);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
-		return true;
-	}
+        if (data != null && data.containsKey("version")) {
+            if (ignoreSSLCert && data.containsKey("url")) {
+                Log.w("remove url : " + data.get("url"));
+                data.remove("url");
+            }
+            setLatestVersionInfo(data);
+            setLastUpdateDate(new Date().getTime());
+        } else {
+            return false;
+        }
 
-	@Override
-	public boolean checkNewVersion() throws NetworkException {
-		setState(STATUS_UPDATE_CHEKCING);
-		if(!getNewVersion()) {
-			Log.i("No such new version");
-			setState(STATUS_NO_UPDATED);
-			return false;
-		}
-		boolean existedNewVersion = hasNewVersion();
-		if(existedNewVersion) {
-			setState(STATUS_HAS_NEW_UPDATED);
-		} else {
-			setState(STATUS_NO_UPDATED);
-		}
-		return existedNewVersion;
-	}
+        return true;
+    }
 
-	@Override
-	public void launch() {
-		setState(STATUS_UPDATING);
-		try {
-			if(latestVersionInfo == null && getLastNetworkException() == null
-					&& !checkNewVersion()) {
-				Log.i("Current version is latest or cann't get latest version");
-				setState(STATUS_NO_UPDATED);
-				return;
-			}
-		} catch (NetworkException e) {
-			setState(STATUS_ERROR_OCCURED);
-			e.printStackTrace();
-			return;
-		}
+    @Override
+    public boolean checkNewVersion() throws NetworkException {
+        setState(STATUS_UPDATE_CHEKCING);
+        if (!getNewVersion()) {
+            Log.i("No such new version");
+            setState(STATUS_NO_UPDATED);
+            return false;
+        }
+        boolean existedNewVersion = hasNewVersion();
+        if (existedNewVersion) {
+            setState(STATUS_HAS_NEW_UPDATED);
+        } else {
+            setState(STATUS_NO_UPDATED);
+        }
+        return existedNewVersion;
+    }
 
-		String url = null;
-		if(latestVersionInfo != null) {
-			url = (String)latestVersionInfo.get("url");
-		}
-		if(url == null) {
-			url = component.updateUrl != null
-					? component.updateUrl : component.url;
-		}
+    @Override
+    public void launch() {
+        setState(STATUS_UPDATING);
+        try {
+            if (latestVersionInfo == null && getLastNetworkException() == null
+                    && !checkNewVersion()) {
+                Log.i("Current version is latest or cann't get latest version");
+                setState(STATUS_NO_UPDATED);
+                return;
+            }
+        } catch (NetworkException e) {
+            setState(STATUS_ERROR_OCCURED);
+            e.printStackTrace();
+            return;
+        }
 
-		Desktop desktop = Desktop.isDesktopSupported()
-				? Desktop.getDesktop() : null;
-		if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-	        try {
-	            desktop.browse(new URI(url));
-	        } catch (Exception e1) {
-	            e1.printStackTrace();
-	        }
-	    }
-		setState(STATUS_UPDATE_COMPLETED);
-	}
+        String url = null;
+        if (latestVersionInfo != null) {
+            url = (String) latestVersionInfo.get("url");
+        }
+        if (url == null) {
+            url = component.updateUrl != null ? component.updateUrl : component.url;
+        }
+
+        Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+        if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+            try {
+                desktop.browse(new URI(url));
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }
+        setState(STATUS_UPDATE_COMPLETED);
+    }
 }
