@@ -9,6 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -120,7 +121,7 @@ public class PermissionRecorder {
                     Log.v(resUrl);
                     rawResXml[j] = getSource(resUrl);
                     if (rawResXml[j] != null && decoder != null) {
-                        if (isAOSP) rawResXml[j] = new String(decoder.decode(rawResXml[j]));
+                        if (isAOSP) rawResXml[j] = new String(decoder.decode(rawResXml[j]), StandardCharsets.UTF_8);
                         resPath[j] = new XmlPath(rawResXml[j]);
                     } else {
                         Log.w("rawResXml[" + j + "] is null, " + resUrl);
