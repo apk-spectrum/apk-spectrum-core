@@ -1,0 +1,96 @@
+<resources>
+	<string name="title_edit_config">配置环境变量</string>
+	<string name="title_no_such_network">网络错误 - 未连接此网络</string>
+	<string name="title_network_timeout">网络错误 - 连接超时</string>
+	<string name="title_ssl_exception">网络错误 - SSL异常</string>
+	<string name="title_update_list">更新列表</string>
+
+	<string name="btn_close">关闭</string>
+	<string name="btn_add">添加</string>
+	<string name="btn_del">删除</string>
+	<string name="btn_edit">编辑</string>
+	<string name="btn_retry">重试</string>
+	<string name="btn_apply">应用</string>
+	<string name="btn_remove">删除</string>
+	<string name="btn_import">导入</string>
+	<string name="btn_manage_cert">管理证书</string>
+	<string name="btn_check_update">检查更新</string>
+	<string name="btn_go_to_website">打开网站</string>
+	<string name="btn_update">更新</string>
+	<string name="btn_download">下载</string>
+	<string name="btn_no_updated">无更新</string>
+	<string name="btn_choose_update">选择更新</string>
+
+	<string name="file_size_Bytes">Bytes</string>
+	<string name="file_size_KB">KB</string>
+	<string name="file_size_MB">MB</string>
+	<string name="file_size_GB">GB</string>
+	<string name="file_size_TB">TB</string>
+
+	<string name="label_error">错误</string>
+	<string name="label_warning">警告</string>
+	<string name="label_info">信息</string>
+	<string name="label_question">问题</string>
+	<string name="label_apk_file_description">Android 软件包(.apk | .apex)</string>
+	<string name="label_save_as">另存为...</string>
+	<string name="label_plugins_settings">插件设置</string>
+	<string name="label_plugins_description">描述</string>
+	<string name="label_plugin_pcakge_config">插件包配置</string>
+	<string name="label_key_name">名称</string>
+	<string name="label_key_value">值</string>
+	<string name="label_proxy_setting">代理服务器设置</string>
+	<string name="label_truststore_setting">SSL信任存储设置</string>
+	<string name="label_pac_script_url">PAC脚本的URL :</string>
+	<string name="label_alias">别名：</string>
+	<string name="label_description">描述：</string>
+	<string name="label_do_not_look_again">不再显示</string>
+	<string name="label_update_list">更新列表</string>
+
+	<string name="msg_cannot_write_file">无法覆盖该文件</string>
+	<string name="msg_warn_unsupported_jvm">需要Java 8或更高的64位版本</string>
+	<string name="msg_warn_ssl_ignore">警告，不建议使用此选项！如果您忽略SSL证书，您可能会受到MITM攻击。</string>
+	<string name="msg_no_such_network">没有找到此网络接口。\n\n请检查您的网络连接！\n</string>
+	<string name="msg_failure_proxy_error">失败插件：%s\n\n网络连接超时！\n\n检查您的代理设置或防火墙设置！</string>
+	<string name="msg_failure_ssl_error">错误插件：%s\n\nSSL握手异常.\n\n请将SSL证书添加到你的信任商店并再次尝试！</string>
+	<string name="msg_no_update_informations">无更新信息</string>
+
+	<string name="question_save_overwrite">确定你要覆盖此文件？</string>
+
+	<string name="tree_node_plugins_top">APK 扫描器插件</string>
+	<string name="tree_node_plugins_top_desc">APK 扫描器插件</string>
+	<string name="tree_node_no_plugins">无插件</string>
+	<string name="tree_node_no_plugins_desc">无插件</string>
+	<string name="tree_node_network_setting">网络设置</string>
+	<string name="tree_node_configurations">配置设置</string>
+	<string name="tree_node_global_setting">常用插件配置</string>
+	<string name="tree_node_global_setting_desc">所有共享插件和使用的全局变量设置</string>
+
+	<string name="pattern_print_x509_cert">所有者： {0}\n颁发者： {1}\n序列号：{2}\n许可日期： {3} 结束日期： {4}\n证书指纹：\n\t MD5:  {5}\n\t SHA1: {6}\n\t SHA256: {7}\n签名算法名称： {8}\n主体公钥算法：{9}\n版本：{10}</string>
+	<string name="with_weak">%s (弱)</string>
+	<string name="key_bit">%d-bit %s key</string>
+	<string name="key_bit_weak">%d-bit %s key (弱)</string>
+	<string name="not_a_singed_jar_file">不是签名的jar文件</string>
+	<string name="timestamp">时间戳：</string>
+
+	<string name="proxy_menu_no_proxy">无代理</string>
+	<string name="proxy_menu_global">使用插件代理设置</string>
+	<string name="proxy_menu_system">使用系统代理设置（如果存在）</string>
+	<string name="proxy_menu_pac_script">使用PAC脚本</string>
+	<string name="proxy_menu_manual">手动设置代理</string>
+
+	<string name="truststore_golbal">插件通用信任存储</string>
+	<string name="truststore_apkscanner">APK 扫描器信任存储</string>
+	<string name="truststore_jvm">JVM 信任存储</string>
+	<string name="truststore_manual">手动配置</string>
+	<string name="truststore_ignore">忽略SSL证书（不推荐）</string>
+
+	<string name="column_issued_to">颁发给</string>
+	<string name="column_issued_by">颁发日期</string>
+	<string name="column_expires_on">过期日期</string>
+	<string name="column_alias">别名</string>
+	<string name="column_name">名称</string>
+	<string name="column_package">软件包</string>
+	<string name="column_this_version">当前版本</string>
+	<string name="column_new_version">新版本</string>
+	<string name="column_last_checked_date">上次检查次更新</string>
+</resources>
