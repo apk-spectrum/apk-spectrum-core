@@ -41,7 +41,7 @@ public enum _RFile implements ResFile<java.io.File> {
     BIN_JADX_WIN                (Type.BIN, "jadx\\bin\\jadx-gui.bat", "win"),
     BIN_JADX_GUI                (Type.BIN, new _RFile[]{ BIN_JADX_WIN, BIN_JADX_LNX, BIN_JADX_MAC }),
 
-	BIN_BYTECODE_VIEWER			(Type.BIN, "Bytecode-Viewer-2.11.2.jar"),
+	BIN_BYTECODE_VIEWER			(Type.BIN, "Bytecode-Viewer-2.12.jar"),
 
     BIN_SIGNAPK                 (Type.BIN, "signapk.jar"),
 
