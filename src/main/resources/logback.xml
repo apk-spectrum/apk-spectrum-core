@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="false">
+    <!-- Pattern -->
+    <!-- %.-1level : http://logback.qos.ch/manual/layouts.html : Output just one letter for the level -->
+    <property name="LOG_PATTERN" value="%d{MM-dd HH:mm:ss.SSS} %3tid{0} %.-1level %logger{0}\(%line\) : %msg%n"/>
+
+    <!-- Custom tid converter -->
+    <!-- http://logback.qos.ch/manual/layouts.html : Creating a custom conversion specifier -->
+    <conversionRule conversionWord="tid" converterClass="com.apkspectrum.logback.pattern.ThreadIdConverter" />
+
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+    <!-- Console Appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${LOG_PATTERN}</pattern>
+        </layout>
+    </appender>
+
+    <!-- List Appender -->
+    <appender name="LIST" class="ch.qos.logback.core.read.ListAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${LOG_PATTERN}</pattern>
+        </layout>
+    </appender>
+
+    <!-- root logging level -->
+    <root level="error">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="LIST"/>
+    </root>
+</configuration>

@@ -1,6 +1,5 @@
 package com.apkspectrum.data.apkinfo;
 
-public class CategoryInfo
-{
-	public String name = null;
+public class CategoryInfo {
+    public String name = null;
 }
