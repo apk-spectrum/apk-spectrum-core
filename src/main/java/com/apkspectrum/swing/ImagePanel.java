@@ -1,5 +1,6 @@
 package com.apkspectrum.swing;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -30,7 +31,8 @@ public class ImagePanel extends JPanel {
             setMaximumSize(size);
             setPreferredSize(size);
         }
-        getParent().repaint();
+        Container parent = getParent();
+        if (parent != null) parent.repaint();
     }
 
     public void paintComponent(Graphics g) {
