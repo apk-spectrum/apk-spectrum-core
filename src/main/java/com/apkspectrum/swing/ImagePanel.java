@@ -30,6 +30,7 @@ public class ImagePanel extends JPanel {
             setMaximumSize(size);
             setPreferredSize(size);
         }
+        getParent().repaint();
     }
 
     public void paintComponent(Graphics g) {
