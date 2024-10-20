@@ -39,4 +39,5 @@ https://android.googlesource.com/platform/frameworks/base/+/master/core/java/and
     <sdk-info apiLevel="32" platformVersion="Android 12L" versionCode="S_V2" codeName="Android 12L" icon="/icons/logo/s.png"/>
     <sdk-info apiLevel="33" platformVersion="Android 13" versionCode="T" codeName="TIRAMISU" icon="/icons/logo/t.png"/>
     <sdk-info apiLevel="34" platformVersion="Android 14" versionCode="U" codeName="UPSIDE_DOWN_CAKE" icon="/icons/logo/u.png"/>
+    <sdk-info apiLevel="35" platformVersion="Android 15" versionCode="V" codeName="Vanilla Ice Cream" icon="/icons/logo/v.png"/>
 </resources>
