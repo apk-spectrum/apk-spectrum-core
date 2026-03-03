@@ -107,7 +107,12 @@ public class AaptNativeWrapper {
     private native static String[] run(String[] params);
 
     public static void main(String[] args) {
-        run(new String[]{ "version" });
+        String[] version = run(new String[]{ "version" });
+        if (version == null || version.length == 0) {
+            Log.e("Failed to get version.");
+        } else {
+            Log.i("version[{}] : {}", version.length, version[0]);
+        }
     }
 
     static {

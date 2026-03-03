@@ -144,6 +144,14 @@ cc_test_host {
 // ==========================================================
 // Build the host shared library: libaapt
 // ==========================================================
+genrule {
+    name: "build-numer-header",
+    cmd: "BUILD_NUMBER=`cat ../../../build_number.txt` && " +
+         "echo '#pragma once' > $(out) && " +
+         "echo '#define BUILD_NUMBER \"'$${BUILD_NUMBER}'\"' >> $(out)",
+    out: ["build_number.h"],
+}
+
 cc_defaults {
     name: "spectrum_defaults",
     cflags: [
@@ -152,6 +160,7 @@ cc_defaults {
         "-DAPKSCANNER_JNI",
     ],
     header_libs: ["jni_headers"],
+    generated_headers: ["build-numer-header"],
     stl: "libc++_static",
 }
 
@@ -176,7 +185,7 @@ cc_library_host_shared {
     defaults: ["libAaptNative_defaults"],
     cflags: ["-DSPECTRUM_NATIVE_DLL"],
     enabled: false,
-    target: { 
+    target: {
         windows_x86_64: {
             enabled: false,
         },

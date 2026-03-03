@@ -16,7 +16,7 @@ repo sync -c -j8
 
 cd frameworks/base
 git remote add spectrum https://github.com/apk-spectrum/platform_frameworks_base.git
-git fetch --depth 10 spectrum spectrum-tools-35.0.2
+git fetch --depth 12 spectrum spectrum-tools-35.0.2
 git checkout spectrum-tools-35.0.2
 export BUILD_NUMBER=`git rev-parse --abbrev-ref HEAD`-`git rev-parse --short=10 HEAD`-`date +%Y%m%d`
 cd ../..
