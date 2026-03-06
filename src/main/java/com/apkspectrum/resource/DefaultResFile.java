@@ -70,7 +70,13 @@ public class DefaultResFile implements ResFile<File> {
     @Override
     public String getPath() {
         if (type == Type.RES_VALUE || type == Type.RES_ROOT) {
-            return getURL().toExternalForm();
+            String path = getURL().toExternalForm();
+            try {
+                path = URLDecoder.decode(path, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                Log.i("{}", e.getMessage(), e);
+            }
+            return path;
         }
         return getUTF8Path(value);
     }
