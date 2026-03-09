@@ -59,6 +59,10 @@ public class ApkInfoHelper {
         return getLauncherActivityList(apkInfo, includeMain);
     }
 
+    public String[] searchResource(String suffix, String filterRegex) {
+        return searchResource(apkInfo, suffix, filterRegex);
+    }
+
     public static CompactApkInfo getCompactApkInfo(ApkInfo apkInfo) {
         return new CompactApkInfo(apkInfo);
     }
@@ -224,5 +228,29 @@ public class ApkInfoHelper {
         }
 
         return value;
+    }
+
+    public static String[] searchResource(ApkInfo apkInfo, String suffix, String filterRegex) {
+        if (apkInfo == null || apkInfo.resources == null) {
+            return null;
+        }
+
+        List<String> tempList = new ArrayList<>();
+        for(String path: apkInfo.resources) {
+            if (filterRegex != null && !path.matches(filterRegex)) continue;
+
+            if (suffix == null) {
+                tempList.add(path);
+            } else {
+                for (String s : suffix.split(";")) {
+                    if (path.endsWith(s)) {
+                        tempList.add(path);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return tempList.toArray(new String[tempList.size()]);
     }
 }

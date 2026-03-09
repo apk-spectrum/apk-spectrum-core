@@ -11,6 +11,7 @@ import java.util.zip.ZipFile;
 import com.apkspectrum.core.signer.SignatureReport;
 import com.apkspectrum.core.signer.SignatureReportByApksig;
 import com.apkspectrum.data.apkinfo.ApkInfo;
+import com.apkspectrum.data.apkinfo.ApkInfoHelper;
 import com.apkspectrum.logback.Log;
 import com.apkspectrum.resource._RConst;
 import com.apkspectrum.resource._RProp;
@@ -19,7 +20,6 @@ import com.apkspectrum.tool.adb.AdbWrapper;
 import com.apkspectrum.util.ConsolCmd.ConsoleOutputObserver;
 import com.apkspectrum.util.FileUtil;
 import com.apkspectrum.util.SystemUtil;
-import com.apkspectrum.util.ZipFileUtil;
 
 abstract public class ApkScanner {
     public static final String APKSCANNER_TYPE_AAPT = "AAPT";
@@ -82,22 +82,26 @@ abstract public class ApkScanner {
     }
 
     public void setStatusListener(StatusListener statusListener, boolean evokeCompleted) {
+        int scanningStatus = 0, lastErrorCode = 0;
         synchronized (this) {
             this.statusListener = statusListener;
             if (statusListener == null || !evokeCompleted) return;
 
-            if (lastErrorCode != NO_ERR) {
-                statusListener.onError(lastErrorCode);
-            } else if (scanningStatus != 0) {
-                for (int s = 1; (s & STATUS_ALL_COMPLETED) != 0; s <<= 1) {
-                    if (!isCompleted(s)) continue;
-                    Log.v(s + " is compleated sooner than register listener");
-                    statusListener.onStateChanged(s);
-                }
-                if (isCompleted(STATUS_ALL_COMPLETED)) {
-                    statusListener.onSuccess();
-                    statusListener.onCompleted();
-                }
+            scanningStatus = this.scanningStatus;
+            lastErrorCode = this.lastErrorCode;
+        }
+
+        if (lastErrorCode != NO_ERR) {
+            statusListener.onError(lastErrorCode);
+        } else if (scanningStatus != 0) {
+            for (int s = 1; (s & STATUS_ALL_COMPLETED) != 0; s <<= 1) {
+                if (!isCompleted(s)) continue;
+                Log.v(s + " is compleated sooner than register listener");
+                statusListener.onStateChanged(s);
+            }
+            if (isCompleted(STATUS_ALL_COMPLETED)) {
+                statusListener.onSuccess();
+                statusListener.onCompleted();
             }
         }
     }
@@ -214,9 +218,9 @@ abstract public class ApkScanner {
             apkInfo.certificates = certs.toArray(new String[certs.size()]);
         }
 
-        String[] certFilePaths = ZipFileUtil.findFiles(apkInfo.filePath, null, "^META-INF/.*");
+        String[] certFilePaths = ApkInfoHelper.searchResource(apkInfo, null, "^META-INF/.*");
 
-        if (certs.isEmpty() && certFilePaths == null) {
+        if (certs.isEmpty() || certFilePaths == null) {
             Log.e("No such folder : META-INFO/");
             return;
         }
@@ -271,42 +275,48 @@ abstract public class ApkScanner {
     }
 
     protected void scanningStarted() {
+        StatusListener statusListener = null;
         synchronized (this) {
             lastErrorCode = 0;
-
-            if (statusListener != null) {
-                statusListener.onStart(0);
-            }
+            statusListener = this.statusListener;
+        }
+        if (statusListener != null) {
+            statusListener.onStart(0);
         }
     }
 
     protected void errorOccurred(int errorCode) {
+        StatusListener statusListener = null;
         synchronized (this) {
             lastErrorCode = errorCode;
-            if (statusListener != null) {
-                statusListener.onError(errorCode);
-                statusListener.onCompleted();
-            }
+            statusListener = this.statusListener;
+        }
+        if (statusListener != null) {
+            statusListener.onError(errorCode);
+            statusListener.onCompleted();
         }
     }
 
     protected void stateChanged(int status) {
+        int scanningStatus = 0;
+        StatusListener statusListener = null;
         synchronized (this) {
             if (status == STATUS_STANBY) {
-                scanningStatus = 0;
+                scanningStatus = this.scanningStatus = 0;
             } else {
-                scanningStatus |= status;
+                scanningStatus = this.scanningStatus |= status;
             }
+            statusListener = this.statusListener;
+        }
 
-            if (statusListener != null) {
-                statusListener.onStateChanged(status);
+        if (statusListener != null) {
+            statusListener.onStateChanged(status);
 
-                if (scanningStatus == STATUS_ALL_COMPLETED) {
-                    Log.i("I: completed... ");
-                    statusListener.onStateChanged(STATUS_ALL_COMPLETED);
-                    statusListener.onSuccess();
-                    statusListener.onCompleted();
-                }
+            if (scanningStatus == STATUS_ALL_COMPLETED) {
+                Log.i("I: completed... ");
+                statusListener.onStateChanged(STATUS_ALL_COMPLETED);
+                statusListener.onSuccess();
+                statusListener.onCompleted();
             }
         }
     }

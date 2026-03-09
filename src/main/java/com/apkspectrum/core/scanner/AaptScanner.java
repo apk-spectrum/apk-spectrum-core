@@ -7,6 +7,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.apkspectrum.data.apkinfo.ApkInfo;
+import com.apkspectrum.data.apkinfo.ApkInfoHelper;
 import com.apkspectrum.data.apkinfo.ResourceInfo;
 import com.apkspectrum.logback.Log;
 import com.apkspectrum.tool.aapt.AaptNativeWrapper;
@@ -39,22 +40,34 @@ public class AaptScanner extends ApkScanner {
             return;
         }
 
+        Object lock = new Object();
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                Log.i("I: new resourceScanner... {}");
+                synchronized (lock) {
+                    if (resourceScanner != null) {
+                        resourceScanner.clear(true);
+                    }
+                    resourceScanner = new AaptNativeScanner(null);
+
+                    synchronized (resourceScanner) {
+                        Log.i("I: add asset apk");
+                        resourceScanner.openApk(apkFile.getAbsolutePath(), frameworkRes);
+                        if (!resourceScanner.hasAssetManager()) {
+                            resourceScanner = null;
+                            Log.e("Failure : Can't open the AssetManager");
+                            errorOccurred(ERR_CAN_NOT_ACCESS_ASSET);
+                            return;
+                        }
+                    }
+                    lock.notifyAll();
+                }
+            }
+        });
+        thread.setPriority(Thread.MIN_PRIORITY);
+        thread.start();
+
         scanningStarted();
-
-        Log.i("I: new resourceScanner...");
-        if (resourceScanner != null) {
-            resourceScanner.clear(true);
-        }
-        resourceScanner = new AaptNativeScanner(null);
-
-        Log.i("I: add asset apk");
-        resourceScanner.openApk(apkFile.getAbsolutePath(), frameworkRes);
-        if (!resourceScanner.hasAssetManager()) {
-            resourceScanner = null;
-            Log.e("Failure : Can't open the AssetManager");
-            errorOccurred(ERR_CAN_NOT_ACCESS_ASSET);
-            return;
-        }
 
         Log.i("I: getDump AndroidManifest...");
         String[] androidManifest = AaptNativeWrapper.Dump.getXmltree(apkFile.getAbsolutePath(),
@@ -68,6 +81,7 @@ public class AaptScanner extends ApkScanner {
         Log.i("I: createAaptXmlTree...");
         AaptXmlTreePath manifestPath = new AaptXmlTreePath();
         manifestPath.createAaptXmlTree(androidManifest);
+        Log.i("I: createAaptXmlTree...compleated");
 
         if (manifestPath.getNode("/manifest") == null
                 || manifestPath.getNode("/manifest/application") == null) {
@@ -76,23 +90,40 @@ public class AaptScanner extends ApkScanner {
             return;
         }
 
+        Log.i("I: create apkinfo");
         apkInfo = new ApkInfo();
         apkInfo.filePath = apkFile.getAbsolutePath();
         apkInfo.fileSize = apkFile.length();
         apkInfo.tempWorkPath = FileUtil.makeTempPath(
                 apkInfo.filePath.substring(apkInfo.filePath.lastIndexOf(File.separator)));
-        apkInfo.a2xConvert = new AxmlToXml(resourceScanner);
 
         setType();
 
+        Log.i("I: STATUS_STANBY");
         stateChanged(STATUS_STANBY);
 
         Log.v("Temp path : " + apkInfo.tempWorkPath);
 
         manifestReader = new AaptManifestReader(null, apkInfo.manifest);
-        manifestReader.setResourceScanner(resourceScanner);
         manifestReader.setManifestPath(manifestPath);
-        Log.i("xmlTreeSync completed");
+
+        synchronized (lock) {
+            if (resourceScanner == null) {
+                Log.i("wait resourceScanner");
+                Thread.yield();
+                try {
+                    lock.wait(3000);
+                } catch (InterruptedException e) {
+                    errorOccurred(ERR_CAN_NOT_ACCESS_ASSET);
+                    return;
+                }
+            }
+        }
+        synchronized (resourceScanner) {
+            Log.i("resourceScanner initialed");
+            apkInfo.a2xConvert = new AxmlToXml(resourceScanner);
+            manifestReader.setResourceScanner(resourceScanner, apkInfo.a2xConvert);
+        }
 
         Log.i("I: read basic info...");
         manifestReader.readBasicInfo();
@@ -110,46 +141,36 @@ public class AaptScanner extends ApkScanner {
         Log.i("read basic info completed");
         stateChanged(STATUS_BASIC_INFO_COMPLETED);
 
-        new Thread(new Runnable() {
+        thread = new Thread(new Runnable() {
             public void run() {
+                Log.i("I: read Resource list...");
+                apkInfo.resources = ZipFileUtil.findFiles(apkInfo.filePath, null, null);
+                stateChanged(STATUS_RESOURCE_COMPLETED);
+
+                Log.i("I: read libraries list...");
+                apkInfo.libraries = ApkInfoHelper.searchResource(apkInfo, ".so", null);
+                stateChanged(STATUS_LIB_COMPLETED);
+
                 Log.i("read signatures...");
                 solveCert();
                 stateChanged(STATUS_CERT_COMPLETED);
                 Log.i("read signatures completed...");
             }
-        }).start();
+        });
+        thread.setPriority(Thread.NORM_PRIORITY);
+        thread.start();
 
-        new Thread(new Runnable() {
-            public void run() {
-                Log.i("I: read libraries list...");
-                apkInfo.libraries = ZipFileUtil.findFiles(apkInfo.filePath, ".so", null);
-                stateChanged(STATUS_LIB_COMPLETED);
-
-                Log.i("I: read Resource list...");
-                apkInfo.resources = ZipFileUtil.findFiles(apkInfo.filePath, null, null);
-                stateChanged(STATUS_RESOURCE_COMPLETED);
-            }
-        }).start();
-
-        new Thread(new Runnable() {
-            public void run() {
-                Log.i("I: read aapt dump resources...");
-                apkInfo.resourcesWithValue =
-                        AaptNativeWrapper.Dump.getResources(apkInfo.filePath, true);
-                stateChanged(STATUS_RES_DUMP_COMPLETED);
-                Log.i("resources completed");
-            }
-        }).start();
+        startResourceDumpThread();
 
         // Activity/Service/Receiver/provider intent-filter
         Log.i("I: read components...");
         manifestReader.readComponents();
         stateChanged(STATUS_ACTIVITY_COMPLETED);
 
-        // widget
         Log.i("I: read widgets...");
-        apkInfo.widgets = manifestReader.getWidgetList(apkInfo.filePath);
-        stateChanged(STATUS_WIDGET_COMPLETED);
+        readWidgets();
+
+        Log.i("I: openApk()...end");
     }
 
     protected void readApexInfo() {
@@ -177,6 +198,25 @@ public class AaptScanner extends ApkScanner {
                 e.printStackTrace();
             }
         }
+    }
+
+    protected void startResourceDumpThread() {
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                Log.i("I: read aapt dump resources...");
+                apkInfo.resourcesWithValue =
+                        AaptNativeWrapper.Dump.getResources(apkInfo.filePath, true);
+                stateChanged(STATUS_RES_DUMP_COMPLETED);
+                Log.i("resources completed");
+            }
+        });
+        thread.setPriority(Thread.NORM_PRIORITY);
+        thread.start();
+    }
+
+    protected void readWidgets() {
+        apkInfo.widgets = manifestReader.getWidgetList(apkInfo.filePath);
+        stateChanged(STATUS_WIDGET_COMPLETED);
     }
 
     protected ResourceInfo[] changeURLpath(ResourceInfo[] icons,
