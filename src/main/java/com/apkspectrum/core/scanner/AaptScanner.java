@@ -127,7 +127,7 @@ public class AaptScanner extends ApkScanner {
 
         Log.i("I: read basic info...");
         manifestReader.readBasicInfo();
-        Log.i("readBasicInfo() completed");
+        Log.i("readBasicInfo() completed {}", apkInfo.manifest.packageName);
 
         Log.i("read permissions start");
         manifestReader.readPermissions();

@@ -303,7 +303,7 @@ abstract public class ApkScanner {
         synchronized (this) {
             if (status == STATUS_STANBY) {
                 scanningStatus = this.scanningStatus = 0;
-            } else {
+            } else if (status != STATUS_ALL_COMPLETED) {
                 scanningStatus = this.scanningStatus |= status;
             }
             statusListener = this.statusListener;
@@ -322,7 +322,9 @@ abstract public class ApkScanner {
     }
 
     public int getStatus() {
-        return scanningStatus;
+        synchronized (this) {
+            return scanningStatus;
+        }
     }
 
     public boolean isScanning() {
