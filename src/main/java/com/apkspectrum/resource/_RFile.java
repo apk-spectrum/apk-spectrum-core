@@ -49,7 +49,7 @@ public enum _RFile implements ResFile<java.io.File> {
     DATA_PERMISSIONS_HISTORY    (Type.DATA, "PermissionsHistory.xml"),
 
     RAW_ROOT_PATH               (Type.RES_ROOT, ""),
-    RAW_ANDROID_MANIFEST        (Type.RES_ROOT, "AndroidManifest.xml"),
+    RAW_ANDROID_RESOURCES       (Type.RES_ROOT, "resources.arsc"),
 
     RAW_VALUES_PATH             (Type.RES_VALUE, ""),
     RAW_PUBLIC_XML              (Type.RES_VALUE, "public.xml"),

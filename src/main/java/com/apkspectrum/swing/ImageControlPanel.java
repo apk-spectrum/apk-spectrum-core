@@ -255,7 +255,7 @@ public class ImageControlPanel extends JPanel implements ActionListener {
 
                 // at.scale(scale, scale);
 
-                String text = String.format("  %d X %d     %s     %s% ", bi.getWidth(),
+                String text = String.format("  %d X %d     %s     %d%%", bi.getWidth(),
                         bi.getHeight(), Filesize, Math.round(scale * 100));
 
                 // g2D.drawImage(bi, at, this);

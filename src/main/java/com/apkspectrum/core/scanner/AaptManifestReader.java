@@ -69,8 +69,12 @@ public class AaptManifestReader {
     }
 
     public void setResourceScanner(AaptNativeScanner scanner) {
+        setResourceScanner(scanner, new AxmlToXml(scanner));
+    }
+
+    public void setResourceScanner(AaptNativeScanner scanner, AxmlToXml a2xml) {
         this.resourceScanner = scanner;
-        a2xml = new AxmlToXml(resourceScanner);
+        this.a2xml = a2xml;
     }
 
     public void readBasicInfo() {

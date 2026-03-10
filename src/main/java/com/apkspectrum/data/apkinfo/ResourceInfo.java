@@ -37,4 +37,9 @@ public class ResourceInfo implements Cloneable {
             throw new Error(e.toString());
         }
     }
+
+    @Override
+    public String toString() {
+        return "ResourceInfo[name=\"" + name + "\", configuration=\"" + configuration + "]";
+    }
 }
