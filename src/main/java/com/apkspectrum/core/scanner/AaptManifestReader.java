@@ -1018,7 +1018,7 @@ public class AaptManifestReader {
 
     public ResourceInfo[] getResourceValues(String id) {
         ResourceInfo[] resVal = null;
-        while (id != null && id.startsWith("@")) {
+        while (id != null && id.startsWith("@") && !id.matches("@0x0+\\s*")) {
             if (!id.matches("@0x[\\da-fA-F]+\\s*")) {
                 resVal = null;
                 break;
